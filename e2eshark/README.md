@@ -65,7 +65,7 @@
  cause of any failure. You can specify -r 'your dir name' to the run.py to name your test run directory 
  as per your choice. The default name for the run directory is 'test-run'.
 
- Note that, you will be required to pass --hfhome argument to the run.py to point to a directory where 
+ Note that, you will be required to pass --cachedir argument to the run.py to point to a directory where 
  model weights etc. from Hugging Face will be downloaded. The downloaded data can be large so set it to
  other than your home, preferably with 100 GB or more free space.
 
@@ -310,7 +310,7 @@ Now take following steps:
 
 Once your model.py is ready, you can go to root of the e2eshark test directory and run test as below 
    ```
-   python ./run.py --hfhome 'YOUR_PATH'/HF_HOME -c "your torch mlir build dir" --tests pytorch/operators/maxpool_2d_large --mode direct --runupto torch-mlir --torchtolinalg
+   python ./run.py --cachedir 'path_to_your_cache_dir' -c "your torch mlir build dir" --tests pytorch/operators/maxpool_2d_large --mode direct --runupto torch-mlir --torchtolinalg
    ```
    Note that I did not specify -i for IREE build as I am running only upto torch-mlir. Also, I have added 
    --torchtolinalg to make sure I test upto linalg lowerging as I am not running iree-compile
@@ -320,7 +320,7 @@ Once your model.py is ready, you can go to root of the e2eshark test directory a
    If you want to test upto inference, then provide your iree build in addition as -i option and run as
 
    ```
-   python ./run.py --hfhome 'YOUR_PATH'/HF_HOME -c "your torch mlir build dir" -i 'path_to_your_iree_build_dir' --tests pytorch/operators/maxpool_2d_large --mode direct
+   python ./run.py --cachedir 'path_to_your_cache_dir' -c "your torch mlir build dir" -i 'path_to_your_iree_build_dir' --tests pytorch/operators/maxpool_2d_large --mode direct
    ```
 
    As before, run above with --mode onnx if you want ONNX to get generated from pytorch and tested in addition.
@@ -354,8 +354,7 @@ Once your model.py is ready, you can go to root of the e2eshark test directory a
    Then test it as: 
 
    ```
-   python ./run.py --hfhome 'YOUR_PATH'/HF_HOME -c "your torch mlir build dir" -i 'path_to_your_iree_build_dir' 
-   --tests onnx/operators/cumsum_small --mode direct --runupto inference --torchtolinalg
+   python ./run.py --cachedir 'path_to_your_cache_dir' -c "your torch mlir build dir" -i 'path_to_your_iree_build_dir' --tests onnx/operators/cumsum_small --mode direct --runupto inference --torchtolinalg
    ```
 
    Then follow steps similar to the one described above for pytorch framework to test more and add 

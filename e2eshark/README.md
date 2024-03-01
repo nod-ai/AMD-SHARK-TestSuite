@@ -151,12 +151,15 @@ conda activate e2e
 ### Running tests
 
 Example 1:
+
+Note that the --cachedir command line argument is necessary for any run command. This is where torch, hugging face, and turbine tank data is cached. Please make sure to choose a directory with large free space.
+
 Run the tests in operators, combinations folders of the default framework (i.e. pytorch),
 Use framework to onnx to torch MLIR path (--mode onnx) and run upto inference (default) using llvm-cpu backend (default),
 use four processor cores (default --jobs 4) on your machine, generate report file after finishing test run
 ```
-python ./run.py --hfhome 'YOUR_PATH'/HF_HOME -c 'path_to_your_torch_mlir_build_dir' 
--i 'path_to_your_iree_build_dir' --report
+python ./run.py -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir'
+--report --cachedir 'path_to_your_cache_dir'
 ```
 You can see logs of test run inside test-run/'test sub-directory'. Start with commands.log file. 
 
@@ -195,11 +198,11 @@ The test-run/passed.txt has list of all tests that passed and test-run/failed.tx
 the tests that failed. After you make changes in your source code to fix torch MLIR or IREE, you can 
 re-run just the failing tests by simply passing test-run/failed.txt as an input like below:
 ```
-python ./run.py --hfhome 'YOUR_PATH'/HF_HOME -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir' --testsfile test-run/failed.txt
+python ./run.py --cachedir 'path_to_your_cache_dir' -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir' --testsfile test-run/failed.txt
 ```
 If you want to just generate report and skip run of tests then, you can pass --norun to skip running tests as below:
 ```
-python ./run.py --hfhome 'YOUR_PATH'/HF_HOME -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir' --testsfile test-run/failed.txt --norun --report
+python ./run.py --cachedir 'path_to_your_cache_dir' -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir' --testsfile test-run/failed.txt --norun --report
 ```
 
 Example 2:
@@ -208,16 +211,15 @@ Say if you tested upto torch-mlir and do not want to test further and come back 
 later. As long as you have not destroyed the test-run dir, you can run following two at different times 
 (first should have generted the torch MLIR for second one to resume successfully):
 ```
-python ./run.py --hfhome 'YOUR_PATH'/HF_HOME -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir' --frameworks pytorch onnx --runupto torch-mlir 
+python ./run.py --cachedir 'path_to_your_cache_dir' -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir' --frameworks pytorch onnx --runupto torch-mlir 
 
-python ./run.py --hfhome 'YOUR_PATH'/HF_HOME -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir' 
---runfrom torch-mlir --runupto inference 
+python ./run.py --cachedir 'path_to_your_cache_dir' -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir' --runfrom torch-mlir --runupto inference 
 
 ```
 Example 3:
 Run given test pytorch/models/opt-125M upto inference (default for --runupto) on target AMD AIE backend
 ```
-python ./run.py --hfhome 'YOUR_PATH'/HF_HOME -c 'path_to_your_torch_mlir_build_dir' --frameworks onnx -i 'path_to_your_iree_build_dir' --tests pytorch/models/opt-125M --backend amd-aie
+python ./run.py --cachedir 'path_to_your_cache_dir' -c 'path_to_your_torch_mlir_build_dir' --frameworks onnx -i 'path_to_your_iree_build_dir' --tests pytorch/models/opt-125M --backend amd-aie
 ```
 
 Example 4:
@@ -373,5 +375,5 @@ Once your model.py is ready, you can go to root of the e2eshark test directory a
    The exmaple run below casts the model and input tensor to bf16 for test pytorch/combinations/mlp (which is originally written as fp32 model):
 
    ```
-   python ./run.py --hfhome 'YOUR_PATH'/HF_HOME -c "your torch mlir build dir" -i 'path_to_your_iree_build_dir' --tests pytorch/combinations/mlp --mode onnx --runupto inference --torchtolinalg --todtype bf16
+   python ./run.py --cachedir 'path_to_your_cache_dir' -c "your torch mlir build dir" -i 'path_to_your_iree_build_dir' --tests pytorch/combinations/mlp --mode onnx --runupto inference --torchtolinalg --todtype bf16
    ```

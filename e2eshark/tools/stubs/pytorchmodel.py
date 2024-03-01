@@ -82,7 +82,12 @@ if args.todtype != "default":
 
 if runmode == "onnx" or runmode == "ort":
     onnx_name = outfileprefix + ".onnx"
-    onnx_program = torch.onnx.export(model, E2ESHARK_CHECK["input"], onnx_name)
+    if not isinstance(E2ESHARK_CHECK["input"], list):
+        onnx_program = torch.onnx.export(model, E2ESHARK_CHECK["input"], onnx_name)
+    else:
+        onnx_program = torch.onnx.export(
+            model, tuple(E2ESHARK_CHECK["input"]), onnx_name
+        )
 elif runmode == "direct":
     torch_mlir_name = outfileprefix + ".pytorch.torch.mlir"
     torch_mlir_model = None

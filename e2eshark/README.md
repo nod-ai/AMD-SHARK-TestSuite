@@ -66,15 +66,22 @@
  as per your choice. The default name for the run directory is 'test-run'.
 
  Note that, you will be required to pass --cachedir argument to the run.py to point to a directory where 
- model weights etc. from Hugging Face will be downloaded. The downloaded data can be large so set it to
- other than your home, preferably with 100 GB or more free space.
+ model weights etc. from external model serving repositories such as from Torch Vision, Hugging Face etc.
+ will be downloaded. The downloaded data can be large, so set it to other than your home, 
+ preferably with 100 GB or more free space.
 
 ## Setting up
 
-You will need to have a local build of torch MLIR and IREE. It should work with an installation of IREE too
-as it just neeeds torch-mlir-opt, iree-compile and iree-run-module binaries. the option passed to --torchmlirbuild (-c)
-should point to a directory where bin/torch-mlir-opt can be found and the option passed to --ireebuild (-i) should 
-point to a directory where tools/iree-compile and tools/iree-run-module can be found.
+You will need to have a local build of torch MLIR and pass using --torchmlirbuild (-c) option. 
+By default, a nightly build of IREE is installed when you run 'pip install -r ./requirements.txt'
+and that will be used to run tests. But, if you made changed in IREE or you want to pull 
+the latest fix in IREE, then create a local build and pass that using --ireebuild (-i). 
+
+The arg value passed to --torchmlirbuild (-c) should point to a directory where 
+bin/torch-mlir-opt can be found and the option passed to --ireebuild (-i) should point to 
+a directory where tools/iree-compile and tools/iree-run-module can be found.
+
+In all the exmaples in this README doc the -i option to pass an IREE build location is optional.
 
 To get a local build of torch MLIR, follow:
 https://github.com/llvm/torch-mlir/blob/main/docs/development.md

@@ -4,7 +4,7 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-import os, time, glob, sys, zipfile
+import os, time, glob, sys, zipfile, shutil
 from multiprocessing import Pool
 import argparse
 import numpy as np
@@ -17,15 +17,6 @@ import warnings
 # Need to allow invocation of run.py from anywhere
 sys.path.append(Path(__file__).parent)
 from tools.stubs.commonutils import applyPostProcessPipeline
-
-# Put full path to your Torch MLIR ( https://github.com/llvm/torch-mlir ) build
-# This can be overwritten by command line
-TORCH_MLIR_BUILD = ""
-# Put full path to your IREE build dir
-# if you are not targeting AMD AIE, then IREE build of https://github.com/openxla/iree is fine
-# Else set it to build dir of your build of https://github.com/nod-ai/iree-amd-aie
-# This can be overwritten by comamand line
-IREE_BUILD = ""
 
 
 def getTestsList(frameworkname, test_types):
@@ -333,8 +324,12 @@ def runCodeGeneration(
         print(f"Test {testName} failed [{curphase}]")
         return 1
     logfilename = curphase + ".log"
-    commandname = (
-        "/tools/iree-compile --iree-input-demote-i64-to-i32 --iree-hal-target-backends="
+    commandname = ""
+    if SHARED_IREE_BUILD:
+        commandname = SHARED_IREE_BUILD + "/tools/"
+    # Else pick from path
+    commandname += (
+        "iree-compile --iree-input-demote-i64-to-i32 --iree-hal-target-backends="
         + args.backend
         + " "
     )
@@ -343,8 +338,7 @@ def runCodeGeneration(
     else:
         commandname += " --iree-input-type=torch"
     scriptcommand = (
-        SHARED_IREE_BUILD
-        + commandname
+        commandname
         + " "
         + torchmlirfilename
         + " > "
@@ -454,14 +448,18 @@ def runInference(
         print(f"Created: inference_input.n.bin files")
 
     outputarg = ""
+    commanddir = ""
+    if SHARED_IREE_BUILD:
+        commanddir = SHARED_IREE_BUILD + "/tools/"
+    # else pick from path
     # expecting goldoutputlist to be a List[Tensors]
     # each tensor corresponding to a vmfb output
     for i in range(0, len(goldoutputlist)):
         infoutputfilename = getinfoutfilename(i)
         outputarg += " --output=@" + infoutputfilename + " "
     scriptcommand = (
-        SHARED_IREE_BUILD
-        + "/tools/iree-run-module --module="
+        commanddir
+        + "iree-run-module --module="
         + vmfbfilename
         + inputarg
         + outputarg
@@ -632,14 +630,9 @@ def runTestUsingClassicalFlow(args_tuple):
     else:
         print("Framework ", frameworkname, " not supported")
         return 1
-    
+
     if mode == "turbine":
-        testargs += (
-            " --todtype "
-            + args.todtype
-            + " --outfileprefix "
-            + modelname
-        )
+        testargs += " --todtype " + args.todtype + " --outfileprefix " + modelname
     else:
         testargs += (
             " --todtype "
@@ -649,7 +642,7 @@ def runTestUsingClassicalFlow(args_tuple):
             + " --outfileprefix "
             + modelname
         )
-    
+
     concatenateFiles(modelpy, stubrunmodelpy, runmodelpy)
     curphase = phases[0]
     logfilename = curphase + ".log"
@@ -800,7 +793,9 @@ def initializer(tm_path, iree_path):
     SHARED_IREE_BUILD = iree_path
 
 
-def runFrameworkTests(frameworkname, testsList, args, script_dir, run_dir):
+def runFrameworkTests(
+    frameworkname, testsList, args, script_dir, run_dir, TORCH_MLIR_BUILD, IREE_BUILD
+):
     # print(f"In runFrameworkTests - torch mlir build - {TORCH_MLIR_BUILD}")
     if len(testsList) == 0:
         return
@@ -967,26 +962,22 @@ def generateReport(run_dir, testsList, args):
 
 
 def checkBuild(run_dir, args):
+    IREE_BUILD = ""
+    TORCH_MLIR_BUILD = ""
     if args.torchmlirbuild:
         TORCH_MLIR_BUILD = args.torchmlirbuild
-    TORCH_MLIR_BUILD = os.path.expanduser(TORCH_MLIR_BUILD)
-    TORCH_MLIR_BUILD = os.path.abspath(TORCH_MLIR_BUILD)
-    if not os.path.exists(TORCH_MLIR_BUILD):
-        print(
-            "Torch MLIR build directory",
-            TORCH_MLIR_BUILD,
-            "does not exist.",
-        )
-        sys.exit(1)
+        TORCH_MLIR_BUILD = os.path.expanduser(TORCH_MLIR_BUILD)
+        TORCH_MLIR_BUILD = os.path.abspath(TORCH_MLIR_BUILD)
+        if not os.path.exists(TORCH_MLIR_BUILD):
+            print(
+                "Torch MLIR build directory",
+                TORCH_MLIR_BUILD,
+                "does not exist.",
+            )
+            sys.exit(1)
 
     if args.ireebuild:
         IREE_BUILD = args.ireebuild
-    if args.runupto == "iree-compile" or args.runupto == "inference":
-        if not IREE_BUILD:
-            print(
-                "If --runupto is 'iree-compile' or 'inference' then a valid IREE build is needed. Specify a valid IREE build directory using --ireebuild or set IREE_BUILD in run.py"
-            )
-            sys.exit(1)
         IREE_BUILD = os.path.expanduser(IREE_BUILD)
         IREE_BUILD = os.path.abspath(IREE_BUILD)
         if not os.path.exists(IREE_BUILD):
@@ -1159,9 +1150,13 @@ def main():
         help="Please select a dir with large free space to cache all torch, hf, turbine_tank model data",
         required=True,
     )
-    
+
     args = parser.parse_args()
     cache_dir = args.cachedir
+    if not os.path.exists(cache_dir):
+        print(f"The Cache directory {cache_dir} does not exist")
+        sys.exit(1)
+
     cache_path = os.path.expanduser(cache_dir)
     cache_path = os.path.abspath(cache_dir)
 
@@ -1190,12 +1185,30 @@ def main():
     run_dir = os.path.abspath(args.rundirectory)
     frameworks = args.frameworks
     TORCH_MLIR_BUILD, IREE_BUILD = checkBuild(run_dir, args)
+    # assert
+    if TORCH_MLIR_BUILD == "":
+        print("Torch MLIR build path is required to be set using --torchmlirbuild")
+        sys.exit(1)
+
     print("Starting e2eshark tests. Using", args.jobs, "processes")
     if args.verbose:
         print("Test run with arguments: ", vars(args))
     print("Torch MLIR build:", TORCH_MLIR_BUILD)
     if IREE_BUILD:
         print("IREE build:", IREE_BUILD)
+    else:
+        iree_in_path = shutil.which("iree-compile")
+        if iree_in_path:
+            print(
+                f"IREE BUILD: IREE in PATH {os.path.dirname(iree_in_path)} will be used"
+            )
+        else:
+            if args.runupto == "iree-compile" or args.runupto == "inference":
+                print(
+                    f"Must have IREE in PATH or supply an IREE build using --ireebuild to runupto iree-compile or inference"
+                )
+                sys.exit(1)
+
     print("Test run directory:", run_dir)
     totalTestList = []
     skiptestslist = []
@@ -1232,14 +1245,30 @@ def main():
             testsList = [test for test in testsList if not test in skiptestslist]
             totalTestList += testsList
             if not args.norun:
-                runFrameworkTests(framework, testsList, args, script_dir, run_dir)
+                runFrameworkTests(
+                    framework,
+                    testsList,
+                    args,
+                    script_dir,
+                    run_dir,
+                    TORCH_MLIR_BUILD,
+                    IREE_BUILD,
+                )
     else:
         for framework in frameworks:
             testsList = getTestsList(framework, args.groups)
             testsList = [test for test in testsList if not test in skiptestslist]
             totalTestList += testsList
             if not args.norun:
-                runFrameworkTests(framework, testsList, args, script_dir, run_dir)
+                runFrameworkTests(
+                    framework,
+                    testsList,
+                    args,
+                    script_dir,
+                    run_dir,
+                    TORCH_MLIR_BUILD,
+                    IREE_BUILD,
+                )
 
     # report generation
     if args.report:

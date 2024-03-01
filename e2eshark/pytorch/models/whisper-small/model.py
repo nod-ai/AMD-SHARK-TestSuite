@@ -26,6 +26,7 @@ model = AutoModelForCausalLM.from_pretrained(
     num_labels=2,
     output_attentions=False,
     output_hidden_states=False,
+    attn_implementation="eager",
     torchscript=True,
 )
 model.to("cpu")

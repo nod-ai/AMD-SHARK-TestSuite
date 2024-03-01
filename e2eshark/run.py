@@ -827,29 +827,6 @@ def runFrameworkTests(frameworkname, testsList, args, script_dir, run_dir):
             print("All tasks submitted to process pool completed")
 
 
-def checkAndSetEnvironments(args):
-    HF_HOME = os.environ.get("HF_HOME")
-    if args.hfhome:
-        HF_HOME = args.hfhome
-        HF_HOME = os.path.expanduser(HF_HOME)
-        HF_HOME = os.path.abspath(HF_HOME)
-
-    if HF_HOME:
-        if not os.path.exists(HF_HOME):
-            print(
-                "Hugging Face HF_HOME environment variable or --hfhome argument value",
-                HF_HOME,
-                "does not exist. Set your HF_HOME to a valid dir.",
-            )
-            return 1
-        os.environ["HF_HOME"] = HF_HOME
-    else:
-        print("Your Hugging Face Home is not set. Use --hfhome or set HF_HOME env.")
-        return 1
-    print("HF_HOME:", os.environ.get("HF_HOME"))
-    return 0
-
-
 def convertNumToString(rows):
     strrows = []
     for row in rows:
@@ -987,7 +964,7 @@ def generateReport(run_dir, testsList, args):
             print(items, file=f)
 
 
-def checkBuildAndEnv(run_dir, args):
+def checkBuild(run_dir, args):
     if args.torchmlirbuild:
         TORCH_MLIR_BUILD = args.torchmlirbuild
     TORCH_MLIR_BUILD = os.path.expanduser(TORCH_MLIR_BUILD)
@@ -1019,8 +996,6 @@ def checkBuildAndEnv(run_dir, args):
         except OSError as errormsg:
             print("Could not make run directory", run_dir, " Error message: ", errormsg)
             sys.exit(1)
-    if checkAndSetEnvironments(args):
-        sys.exit(1)
     return (TORCH_MLIR_BUILD, IREE_BUILD)
 
 
@@ -1072,10 +1047,6 @@ def main():
         "-i",
         "--ireebuild",
         help="Path to the IREE build directory",
-    )
-    parser.add_argument(
-        "--hfhome",
-        help="Hugging Face Home (HF_HOME) directory, a dir with large free space",
     )
     parser.add_argument(
         "-j",
@@ -1181,8 +1152,21 @@ def main():
         default=False,
         help="Do not allow any tolerance in comparing results",
     )
-
+    parser.add_argument(
+        "--cachedir",
+        help="Please select a dir with large free space to cache all torch, hf, turbine_tank model data",
+        required=True,
+    )
+    
     args = parser.parse_args()
+    cache_dir = args.cachedir
+    cache_path = os.path.expanduser(cache_dir)
+    cache_path = os.path.abspath(cache_dir)
+    os.environ["TORCH_HOME"] = cache_path
+    os.environ["HF_HOME"] = cache_path
+    os.environ["TURBINE_TANK_CACHE_DIR"] = cache_path
+    print("Cache Directory: " + cache_path)
+
     if args.skiptestsfile and args.testsfile:
         print(f"Only one of --skiptestsfile or --testsfile can be used")
         sys.exit(1)
@@ -1191,7 +1175,7 @@ def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     run_dir = os.path.abspath(args.rundirectory)
     frameworks = args.frameworks
-    TORCH_MLIR_BUILD, IREE_BUILD = checkBuildAndEnv(run_dir, args)
+    TORCH_MLIR_BUILD, IREE_BUILD = checkBuild(run_dir, args)
     print("Starting e2eshark tests. Using", args.jobs, "processes")
     if args.verbose:
         print("Test run with arguments: ", vars(args))

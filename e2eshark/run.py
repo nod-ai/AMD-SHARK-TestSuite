@@ -11,6 +11,8 @@ import numpy as np
 import torch, io
 import struct, pickle, tabulate, statistics
 from pathlib import Path
+import shutil
+import warnings
 
 # Need to allow invocation of run.py from anywhere
 sys.path.append(Path(__file__).parent)
@@ -1162,6 +1164,18 @@ def main():
     cache_dir = args.cachedir
     cache_path = os.path.expanduser(cache_dir)
     cache_path = os.path.abspath(cache_dir)
+
+    if not os.path.exists(cache_path):
+        print(f"Cache directory {cache_path} does not exist.")
+        sys.exit(1)
+    # get the amount of GB available
+    _, _, free = shutil.disk_usage(cache_path)
+    space_available = float(free) / pow(1024, 3)
+    if space_available < 20:
+        warnings.warn("WARNING: Less than 20 GB of space available in selected cache directory. " +
+            "Please choose directory with more space to avoid disk storage issues when running models."
+        )
+    
     os.environ["TORCH_HOME"] = cache_path
     os.environ["HF_HOME"] = cache_path
     os.environ["TURBINE_TANK_CACHE_DIR"] = cache_path

@@ -108,7 +108,7 @@ def import_onnx_files(test_dir_path, imported_dir_path):
         if t is None:
             return False
         input_path = (imported_dir_path / test_input.stem).with_suffix(".npy")
-        np.save(input_path, t, allow_pickle=False)
+        np.save(input_path, t)
         test_data_flagfile_lines.append(f"--input=@{input_path.name}\n")
     for i in range(len(test_outputs)):
         test_output = test_outputs[i]
@@ -116,7 +116,7 @@ def import_onnx_files(test_dir_path, imported_dir_path):
         if t is None:
             return False
         output_path = (imported_dir_path / test_output.stem).with_suffix(".npy")
-        np.save(output_path, t, allow_pickle=False)
+        np.save(output_path, t)
         test_data_flagfile_lines.append(f"--expected_output=@{output_path.name}\n")
 
     with open(test_data_flagfile_path, "wt") as f:

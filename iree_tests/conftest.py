@@ -249,7 +249,7 @@ if not _iree_test_config_files:
     THIS_DIR = Path(__file__).parent
     REPO_ROOT = THIS_DIR.parent
     _iree_test_config_files = [
-        REPO_ROOT / "iree_tests/configs/config_cpu.json",
+        REPO_ROOT / "iree_tests/configs/config_cpu_llvm_sync.json",
         # REPO_ROOT / "iree_tests/configs/config_gpu_vulkan.json",
     ]
 

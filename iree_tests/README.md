@@ -48,7 +48,7 @@ Tests are run using the [pytest](https://docs.pytest.org/en/stable/) framework.
 A [`conftest.py`](conftest.py) file collects test cases from subdirectories,
 wrapping each directory matching the format described above to one test case
 per test configuration. Test configurations are defined in JSON config files
-like [`configs/config_cpu.json`](./configs/config_cpu.json).
+like [`configs/config_cpu_llvm_sync.json`](./configs/config_cpu_llvm_sync.json).
 
 ### Common venv setup with deps
 
@@ -89,7 +89,7 @@ $ pytest iree_tests -n auto
 Run tests using custom config files:
 
 ```bash
-$ export IREE_TEST_CONFIG_FILES=/iree/config_cpu.json;/iree/config_gpu.json
+$ export IREE_TEST_CONFIG_FILES=/iree/config_cpu_llvm_sync.json;/iree/config_gpu_vulkan.json
 $ pytest iree_tests
 ```
 

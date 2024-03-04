@@ -1,0 +1,1 @@
+--expected_output=@output_0.npy

@@ -57,4 +57,4 @@ jobs:
       - name: "Testing with pytest"
         run: |
           source ${VENV_DIR}/bin/activate
-          pytest iree_tests -n auto -rpfE
+          pytest iree_tests -n auto -rpfE --timeout=30

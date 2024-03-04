@@ -124,19 +124,27 @@ class IreeCompileRunItem(pytest.Item):
         self.run_args.append(f"--flagfile={self.spec.data_flagfile_name}")
 
     def runtest(self):
-        # First test compilation...
         if not self.spec.expect_compile_success:
-            pytest.xfail("Expected compilation to fail")
+            self.add_marker(
+                pytest.mark.xfail(
+                    raises=IreeCompileException,
+                    strict=True,
+                    reason="Expected compilation to fail",
+                )
+            )
         self.test_compile()
-        if not self.spec.expect_compile_success:
+
+        if not self.spec.expect_compile_success or self.spec.skip_run:
             return
 
-        if self.spec.skip_run:
-            return
-
-        # ... then test runtime execution
         if not self.spec.expect_run_success:
-            pytest.xfail("Expected run to fail")
+            self.add_marker(
+                pytest.mark.xfail(
+                    raises=IreeRunException,
+                    strict=True,
+                    reason="Expected run to fail",
+                )
+            )
         self.test_run()
 
     def test_compile(self):

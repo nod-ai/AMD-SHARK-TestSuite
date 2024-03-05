@@ -1,5 +1,5 @@
 module {
-  func.func @test_range_int32_type_negative_delta_expanded(%arg0: !torch.vtensor<[],si32>, %arg1: !torch.vtensor<[],si32>, %arg2: !torch.vtensor<[],si32>) -> !torch.vtensor<[2],si32> attributes {torch.onnx_meta.ir_version = 6 : si64, torch.onnx_meta.opset_version = 11 : si64, torch.onnx_meta.producer_name = "backend-test", torch.onnx_meta.producer_version = ""} {
+  func.func @test_range_int32_type_negative_delta_expanded(%arg0: !torch.vtensor<[],si32>, %arg1: !torch.vtensor<[],si32>, %arg2: !torch.vtensor<[],si32>) -> !torch.vtensor<[2],si32> attributes {torch.onnx_meta.ir_version = 6 : si64, torch.onnx_meta.opset_version = 17 : si64, torch.onnx_meta.producer_name = "backend-test", torch.onnx_meta.producer_version = ""} {
     %none = torch.constant.none
     %0 = torch.operator "onnx.Sub"(%arg1, %arg0) : (!torch.vtensor<[],si32>, !torch.vtensor<[],si32>) -> !torch.vtensor<[],si32> 
     %1 = torch.operator "onnx.Cast"(%0) {torch.onnx.to = 1 : si64} : (!torch.vtensor<[],si32>) -> !torch.vtensor<[],f32> 

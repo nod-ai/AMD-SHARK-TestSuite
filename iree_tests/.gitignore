@@ -1,3 +1,7 @@
+# TODO(scotttodd): compile into a build/temp dir instead of the source dir
 *.vmfb
-# TODO(scotttodd): compile into a build dir instead of the source dir
+# TODO(scotttodd): convert into a build/temp dir instead of the source dir
+*.onnx
+
+# Leftovers from an older iteration of compile/run test scripts.
 config_*.txt

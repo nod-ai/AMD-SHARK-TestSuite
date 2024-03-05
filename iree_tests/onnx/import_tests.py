@@ -4,9 +4,11 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
+import argparse
 import onnx
+from multiprocessing import Pool
 from pathlib import Path
-from onnx import numpy_helper
+from onnx import numpy_helper, version_converter
 import shutil
 import subprocess
 import numpy as np
@@ -19,6 +21,9 @@ REPO_ROOT = THIS_DIR.parent.parent
 ONNX_REPO_ROOT = REPO_ROOT / "third_party/onnx"
 ONNX_REPO_GENERATED_TESTS_ROOT = ONNX_REPO_ROOT / "onnx/backend/test/data"
 NODE_TESTS_ROOT = ONNX_REPO_GENERATED_TESTS_ROOT / "node"
+
+# Convert test cases to at least this version using The ONNX Version Converter.
+ONNX_CONVERTER_OUTPUT_MIN_VERSION = 17
 
 # Write imported files to our own 'generated' folder.
 GENERATED_FILES_OUTPUT_ROOT = REPO_ROOT / "iree_tests/onnx/node/generated"
@@ -48,6 +53,16 @@ def convert_io_proto(proto_filename, type_proto):
             return None
 
 
+def import_onnx_files_with_cleanup(test_dir_path):
+    test_name = test_dir_path.name
+    imported_dir_path = Path(GENERATED_FILES_OUTPUT_ROOT) / test_name
+    result = import_onnx_files(test_dir_path, imported_dir_path)
+    if not result:
+        # Note: could comment this out to keep partially imported directories.
+        shutil.rmtree(imported_dir_path)
+    return (test_name, result)
+
+
 def import_onnx_files(test_dir_path, imported_dir_path):
     # This imports one 'test_[name]' subfolder from this:
     #
@@ -71,15 +86,32 @@ def import_onnx_files(test_dir_path, imported_dir_path):
     test_data_flagfile_path = imported_dir_path / "test_data_flags.txt"
     test_data_flagfile_lines = []
 
-    # Import model.onnx to model.mlir.
-    # TODO(scotttodd): copy the .onnx file into the generated folder? Useful for reproducing
-    #                  could also add a symlink or other files with info
-    #                  e.g. importer tool / version / flags used, reproducer command
-    onnx_model_path = test_dir_path / "model.onnx"
+    # Convert model.onnx up to ONNX_CONVERTER_OUTPUT_MIN_VERSION if needed.
+    # TODO(scotttodd): stamp some info e.g. importer tool / version / flags used
+    original_model_path = test_dir_path / "model.onnx"
+    converted_model_path = imported_dir_path / "model.onnx"
+
+    original_model = onnx.load_model(original_model_path)
+    original_version = original_model.opset_import[0].version
+    if original_version < ONNX_CONVERTER_OUTPUT_MIN_VERSION:
+        try:
+            converted_model = version_converter.convert_version(
+                original_model, ONNX_CONVERTER_OUTPUT_MIN_VERSION
+            )
+            onnx.save(converted_model, converted_model_path)
+        except:
+            # Conversion failed. Do our best with the original file.
+            # print(f"WARNING: ONNX conversion failed for {test_dir_path.name}")
+            shutil.copy(original_model_path, converted_model_path)
+    else:
+        # No conversion needed.
+        shutil.copy(original_model_path, converted_model_path)
+
+    # Import converted model.onnx to model.mlir.
     imported_model_path = imported_dir_path / "model.mlir"
     exec_args = [
         "iree-import-onnx",
-        str(onnx_model_path),
+        str(converted_model_path),
         "-o",
         str(imported_model_path),
     ]
@@ -101,7 +133,7 @@ def import_onnx_files(test_dir_path, imported_dir_path):
     test_data_dir = test_data_dirs[0]
     test_inputs = list(test_data_dir.glob("input_*.pb"))
     test_outputs = list(test_data_dir.glob("output_*.pb"))
-    model = onnx.load(onnx_model_path)
+    model = onnx.load(converted_model_path)
     for i in range(len(test_inputs)):
         test_input = test_inputs[i]
         t = convert_io_proto(test_input, model.graph.input[i].type)
@@ -126,6 +158,16 @@ def import_onnx_files(test_dir_path, imported_dir_path):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="ONNX test case importer.")
+    parser.add_argument(
+        "-j",
+        "--jobs",
+        type=int,
+        default=8,
+        help="Number of parallel processes to use when importing test cases",
+    )
+    args = parser.parse_args()
+
     test_dir_paths = find_onnx_tests(NODE_TESTS_ROOT)
 
     # TODO(scotttodd): add flag to not clear output dir?
@@ -134,27 +176,16 @@ if __name__ == "__main__":
     GENERATED_FILES_OUTPUT_ROOT.mkdir(parents=True)
 
     print(f"Importing tests in '{NODE_TESTS_ROOT}'")
-
     print("******************************************************************")
     passed_imports = []
     failed_imports = []
-    # TODO(scotttodd): parallelize this (or move into a test runner like pytest)
-    for i in range(len(test_dir_paths)):
-        test_dir_path = test_dir_paths[i]
-        test_name = test_dir_path.name
-
-        current_number = str(i).rjust(4, "0")
-        progress_str = f"[{current_number}/{len(test_dir_paths)}]"
-        print(f"{progress_str}: Importing {test_name}")
-
-        imported_dir_path = Path(GENERATED_FILES_OUTPUT_ROOT) / test_name
-        result = import_onnx_files(test_dir_path, imported_dir_path)
-        if result:
-            passed_imports.append(test_name)
-        else:
-            failed_imports.append(test_name)
-            # Note: could comment this out to keep partially imported directories.
-            shutil.rmtree(imported_dir_path)
+    with Pool(args.jobs) as pool:
+        results = pool.imap_unordered(import_onnx_files_with_cleanup, test_dir_paths)
+        for result in results:
+            if result[1]:
+                passed_imports.append(result[0])
+            else:
+                failed_imports.append(result[0])
     print("******************************************************************")
 
     passed_imports.sort()

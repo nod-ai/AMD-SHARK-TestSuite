@@ -1,5 +1,5 @@
 module {
-  func.func @test_if(%arg0: !torch.vtensor<[],i1>) -> !torch.vtensor<[5],f32> attributes {torch.onnx_meta.ir_version = 6 : si64, torch.onnx_meta.opset_version = 11 : si64, torch.onnx_meta.producer_name = "backend-test", torch.onnx_meta.producer_version = ""} {
+  func.func @test_if(%arg0: !torch.vtensor<[],i1>) -> !torch.vtensor<[5],f32> attributes {torch.onnx_meta.ir_version = 6 : si64, torch.onnx_meta.opset_version = 17 : si64, torch.onnx_meta.producer_name = "backend-test", torch.onnx_meta.producer_version = ""} {
     %none = torch.constant.none
     %0 = torch.operator "onnx.If"(%arg0) : (!torch.vtensor<[],i1>) -> !torch.vtensor<[5],f32> {
       %1 = torch.operator "onnx.Constant"() {torch.onnx.value = dense_resource<_> : tensor<5xf32>} : () -> !torch.vtensor<[5],f32> 

@@ -163,6 +163,8 @@ def unpackBytearray(barray, num_elem, dtype):
         num_array = struct.unpack("h" * num_elem, barray)
     elif dtype == torch.int8:
         num_array = struct.unpack("b" * num_elem, barray)
+    elif dtype == torch.bool:
+        num_array = struct.unpack("?" * num_elem, barray)
     else:
         print("In unpackBytearray, found an unsupported data type", dtype)
     rettensor = torch.tensor(num_array, dtype=dtype)

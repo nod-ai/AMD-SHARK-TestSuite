@@ -83,19 +83,8 @@ def loadE2eSharkCheckDictionary():
     return e2esharkDict
 
 def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
-    os.environ["AZURE_STORAGE_ACCOUNT_KEY"] = (
-        "***REMOVED***"
-    )
-    os.environ["AZURE_STORAGE_ACCOUNT_NAME"] = "tankturbine"
-    os.environ["AZURE_CONNECTION_STRING"] = (
-        "DefaultEndpointsProtocol=https;AccountName=tankturbine;AccountKey=***REMOVED***;EndpointSuffix=core.windows.net"
-    )
-    os.environ["AZURE_CONTAINER_NAME"] = "tankturbine"
-
-    storage_account_key = os.environ.get("AZURE_STORAGE_ACCOUNT_KEY")
-    storage_account_name = os.environ.get("AZURE_STORAGE_ACCOUNT_NAME")
-    connection_string = os.environ.get("AZURE_CONNECTION_STRING")
-    container_name = os.environ.get("AZURE_CONTAINER_NAME")
+    connection_string = "DefaultEndpointsProtocol=https;AccountName=e2esharkuserartifacts;AccountKey=***REMOVED***;EndpointSuffix=core.windows.net"
+    container_name = "e2esharkuserartifacts"
 
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     blob_client = blob_service_client.get_blob_client(
@@ -112,11 +101,10 @@ def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
             f"model artifacts have already been uploaded for this blob name"
         )
         return
-    # upload to azure storage container tankturbine
+    # upload to azure storage container e2esharkuserartifacts
     with open(file_path, "rb") as data:
         blob_client.upload_blob(data)
     print(f"Uploaded {file_name}.")
-    print(blob_client.url)
     uploadDict[testName] =  blob_client.url
 
 

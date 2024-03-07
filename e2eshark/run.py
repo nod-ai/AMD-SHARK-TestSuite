@@ -13,11 +13,14 @@ import struct, pickle, tabulate, statistics
 from pathlib import Path
 import shutil
 import warnings
+import datetime
+from azure.storage.blob import BlobServiceClient
+import json
 
 # Need to allow invocation of run.py from anywhere
 sys.path.append(Path(__file__).parent)
 from tools.stubs.commonutils import applyPostProcessPipeline
-
+from multiprocessing import Manager
 
 def getTestsList(frameworkname, test_types):
     testsList = []
@@ -79,8 +82,64 @@ def loadE2eSharkCheckDictionary():
             e2esharkDict = pickle.load(pkf)
     return e2esharkDict
 
+def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
+    os.environ["AZURE_STORAGE_ACCOUNT_KEY"] = (
+        "***REMOVED***"
+    )
+    os.environ["AZURE_STORAGE_ACCOUNT_NAME"] = "tankturbine"
+    os.environ["AZURE_CONNECTION_STRING"] = (
+        "DefaultEndpointsProtocol=https;AccountName=tankturbine;AccountKey=***REMOVED***;EndpointSuffix=core.windows.net"
+    )
+    os.environ["AZURE_CONTAINER_NAME"] = "tankturbine"
 
-def logAndReturn(commandslog, timelog, resultdict, retval):
+    storage_account_key = os.environ.get("AZURE_STORAGE_ACCOUNT_KEY")
+    storage_account_name = os.environ.get("AZURE_STORAGE_ACCOUNT_NAME")
+    connection_string = os.environ.get("AZURE_CONNECTION_STRING")
+    container_name = os.environ.get("AZURE_CONTAINER_NAME")
+
+    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+    blob_client = blob_service_client.get_blob_client(
+        container=container_name, blob=file_name
+    )
+    blob = blob_client.from_connection_string(
+        conn_str=connection_string,
+        container_name=container_name,
+        blob_name=blob_client.blob_name,
+    )
+    # we check to see if we already uploaded the blob (don't want to duplicate)
+    if blob.exists():
+        print(
+            f"model artifacts have already been uploaded for this blob name"
+        )
+        return
+    # upload to azure storage container tankturbine
+    with open(file_path, "rb") as data:
+        blob_client.upload_blob(data)
+    print(f"Uploaded {file_name}.")
+    print(blob_client.url)
+    uploadDict[testName] =  blob_client.url
+
+
+def logAndReturn(commandslog, timelog, resultdict, retval, upload, uploadtestsList, cleanup, testDir, testName, uploadDict):
+
+    delete_list = ["mlir", "vmfb"]
+    upload_list = ["mlir"]
+
+    #should already be in test dir
+    os.chdir(testDir)
+
+    # Loop through everything in folder in current working directory
+    if upload or cleanup:
+        for item in os.listdir(os.getcwd()):
+            file_type = item.split(".")[-1]
+            if upload and testName in uploadtestsList and file_type in upload_list:
+                dateAndTime = str(datetime.datetime.now(datetime.timezone.utc))
+                identifier = testName.replace("/", "_") + "/" + dateAndTime + "/" + item
+                uploadToBlobStorage(os.path.abspath(item), identifier, testName, uploadDict)
+            if cleanup:
+                if file_type in delete_list:  # If it isn't in the list for retaining
+                    os.remove(item)  # Remove the item
+
     pickle.dump(resultdict, timelog)
     timelog.close()
     commandslog.close()
@@ -227,6 +286,11 @@ def runTorchMLIRGeneration(
     onnxfilename,
     torchmlirfilename,
     resultdict,
+    upload,
+    uploadtestsList,
+    cleanup,
+    testRunDir,
+    uploadDict,
 ):
     if args.verbose:
         print("Running torch MLIR generation for", testName)
@@ -236,7 +300,18 @@ def runTorchMLIRGeneration(
         print("Test", testName, "failed [" + curphase + "]")
         end = time.time()
         resultdict[curphase] = ["failed", end - start]
-        return logAndReturn(commandslog, timelog, resultdict, 1)
+        return logAndReturn(
+            commandslog,
+            timelog,
+            resultdict,
+            1,
+            upload,
+            uploadtestsList,
+            cleanup,
+            testRunDir,
+            testName,
+            uploadDict,
+        )
     end = time.time()
     resultdict[curphase] = ["passed", end - start]
     if mode == "onnx" or mode == "ort":
@@ -262,7 +337,18 @@ def runTorchMLIRGeneration(
             print("Test", testName, "failed [" + curphase + "]")
             end = time.time()
             resultdict[curphase] = ["failed", end - start]
-            return logAndReturn(commandslog, timelog, resultdict, 1)
+            return logAndReturn(
+                commandslog,
+                timelog,
+                resultdict,
+                1,
+                upload,
+                uploadtestsList,
+                cleanup,
+                testRunDir,
+                testName,
+                uploadDict,
+            )
         end = time.time()
         resultdict[curphase] = ["passed", end - start]
 
@@ -297,7 +383,18 @@ def runTorchMLIRGeneration(
             print("Test", testName, "failed [" + curphase + "]")
             end = time.time()
             resultdict[curphase] = ["failed", end - start]
-            return logAndReturn(commandslog, timelog, resultdict, 1)
+            return logAndReturn(
+                commandslog,
+                timelog,
+                resultdict,
+                1,
+                upload,
+                uploadtestsList,
+                cleanup,
+                testRunDir,
+                testName,
+                uploadDict,
+            )
         end = time.time()
         resultdict[curphase] = ["passed", end - start]
     return 0
@@ -313,6 +410,11 @@ def runCodeGeneration(
     commandslog,
     timelog,
     resultdict,
+    upload,
+    uploadtestsList,
+    cleanup,
+    testRunDir,
+    uploadDict,
 ):
     if args.verbose:
         print("Running code generation for", testName)
@@ -353,7 +455,18 @@ def runCodeGeneration(
         print("Test", testName, "failed [" + curphase + "]")
         end = time.time()
         resultdict[curphase] = ["failed", end - start]
-        return logAndReturn(commandslog, timelog, resultdict, 1)
+        return logAndReturn(
+            commandslog,
+            timelog,
+            resultdict,
+            1,
+            upload,
+            uploadtestsList,
+            cleanup,
+            testRunDir,
+            testName,
+            uploadDict,
+        )
     end = time.time()
     resultdict[curphase] = ["passed", end - start]
     return 0
@@ -404,6 +517,11 @@ def runInference(
     commandslog,
     timelog,
     resultdict,
+    upload,
+    uploadtestsList,
+    cleanup,
+    testRunDir,
+    uploadDict,
 ):
     if args.verbose:
         print("Running inference for", testName)
@@ -476,7 +594,18 @@ def runInference(
         print("Test", testName, "failed [" + curphase + "]")
         end = time.time()
         resultdict[curphase] = ["failed", end - start]
-        return logAndReturn(commandslog, timelog, resultdict, 1)
+        return logAndReturn(
+            commandslog,
+            timelog,
+            resultdict,
+            1,
+            upload,
+            uploadtestsList,
+            cleanup,
+            testRunDir,
+            testName,
+            uploadDict,
+        )
     end = time.time()
 
     # Load the E2ESHARK_CHECK.pkl file saved by model run
@@ -539,7 +668,18 @@ def runInference(
             print("Test", testName, "failed [mismatch]")
             end = time.time()
             resultdict[curphase] = ["mismatch", end - start]
-            return logAndReturn(commandslog, timelog, resultdict, 1)
+            return logAndReturn(
+                commandslog,
+                timelog,
+                resultdict,
+                1,
+                upload,
+                uploadtestsList,
+                cleanup,
+                testRunDir,
+                testName,
+                uploadDict,
+            )
 
     resultdict[curphase] = ["passed", end - start]
 
@@ -589,6 +729,8 @@ def runTestUsingClassicalFlow(args_tuple):
         vmfbfilename,
         modelinputptfilename,
         goldoutputptfilename,
+        uploadtestsList,
+        uploadDict,
     ) = args_tuple
     stubrunmodelpy = toolsDirAbsPath + "/stubs/pytorchmodel.py"
     mode = args.mode
@@ -606,7 +748,7 @@ def runTestUsingClassicalFlow(args_tuple):
     if not os.path.exists(symUtilspy):
         os.symlink(utilspy, symUtilspy)
 
-    # If turbine, special aot export into mlir module, but rest of flow is same
+    # If turbine, uses turbine's aot export into mlir module, but rest of flow is same
     if frameworkname == "pytorch":
         if mode == "turbine":
             stubrunmodelpy = toolsDirAbsPath + "/stubs/turbinemodel.py"
@@ -668,12 +810,28 @@ def runTestUsingClassicalFlow(args_tuple):
             onnxfilename,
             torchmlirfilename,
             resultdict,
+            args.upload,
+            uploadtestsList,
+            args.cleanup,
+            testRunDir,
+            uploadDict,
         ):
             return 1
 
     if args.runupto == "torch-mlir":
         print("Test", testName, "passed")
-        return logAndReturn(commandslog, timelog, resultdict, 0)
+        return logAndReturn(
+            commandslog,
+            timelog,
+            resultdict,
+            0,
+            args.upload,
+            uploadtestsList,
+            args.cleanup,
+            testRunDir,
+            testName,
+            uploadDict,
+        )
 
     if args.runfrom == "model-run" or args.runfrom == "torch-mlir":
         if runCodeGeneration(
@@ -686,11 +844,27 @@ def runTestUsingClassicalFlow(args_tuple):
             commandslog,
             timelog,
             resultdict,
+            args.upload,
+            uploadtestsList,
+            args.cleanup,
+            testRunDir,
+            uploadDict,
         ):
             return 1
     if args.runupto == "iree-compile":
         print("Test", testName, "passed")
-        return logAndReturn(commandslog, timelog, resultdict, 0)
+        return logAndReturn(
+            commandslog,
+            timelog,
+            resultdict,
+            0,
+            args.upload,
+            uploadtestsList,
+            args.cleanup,
+            testRunDir,
+            testName,
+            uploadDict,
+        )
 
     # run inference now
     if (
@@ -709,11 +883,27 @@ def runTestUsingClassicalFlow(args_tuple):
             commandslog,
             timelog,
             resultdict,
+            args.upload,
+            uploadtestsList,
+            args.cleanup,
+            testRunDir,
+            uploadDict,
         ):
             return 1
 
     print("Test", testName, "passed")
-    return logAndReturn(commandslog, timelog, resultdict, 0)
+    return logAndReturn(
+        commandslog,
+        timelog,
+        resultdict,
+        0,
+        args.upload,
+        uploadtestsList,
+        args.cleanup,
+        testRunDir,
+        testName,
+        uploadDict,
+    )
     return 0
 
 
@@ -722,7 +912,7 @@ def runTest(aTuple):
     # Do not construct absolute path here as this will run
     # in a new process and cur dir may change over time giving
     # unpredicatble results
-    (frameworkname, testName, args, script_dir, run_dir) = aTuple
+    (frameworkname, testName, args, script_dir, run_dir, uploadDict) = aTuple
     testRunDir = run_dir + "/" + testName
     modelname = os.path.basename(testName)
     modelinputptfilename = (
@@ -753,6 +943,11 @@ def runTest(aTuple):
     if changeToTestDir(testRunDir):
         return 1
 
+    # set up upload utilities
+    uploadtestsList = []
+    if args.uploadtestsfile:
+        uploadtestsList = getTestsListFromFile(args.uploadtestsfile)
+
     # Open files to log commands run and time taken
     commandslog = open("commands.log", "w")
     timelog = open("time.pkl", "wb")
@@ -776,6 +971,8 @@ def runTest(aTuple):
         vmfbfilename,
         modelinputptfilename,
         goldoutputptfilename,
+        uploadtestsList,
+        uploadDict,
     )
     if args.mode == "vaiml":
         runTestUsingVAIML(args_tuple)
@@ -810,10 +1007,11 @@ def runFrameworkTests(
     [uniqueTestList.append(test) for test in testsList if test not in uniqueTestList]
     if not uniqueTestList:
         return
+    uploadDict = Manager().dict({})
     tupleOfListArg = []
     # Create list of tuple(test, arg, run_dir) to allow launching tests in parallel
     [
-        tupleOfListArg.append((frameworkname, test, args, script_dir, run_dir))
+        tupleOfListArg.append((frameworkname, test, args, script_dir, run_dir, uploadDict))
         for test in uniqueTestList
     ]
     if args.verbose:
@@ -824,6 +1022,8 @@ def runFrameworkTests(
         result.wait()
         if args.verbose:
             print("All tasks submitted to process pool completed")
+    with open('upload_urls.txt', 'w') as convert_file: 
+        convert_file.write(json.dumps(uploadDict._getvalue()))
 
 
 def convertNumToString(rows):
@@ -1118,6 +1318,16 @@ def main():
         help="A file with lists of tests that should be skipped",
     )
     parser.add_argument(
+        "--upload",
+        help="Upload to azure storage based on uploadtestsfile",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--uploadtestsfile",
+        help="A file with lists of tests that should be uploaded",
+    )
+    parser.add_argument(
         "-t",
         "--tests",
         nargs="*",
@@ -1152,6 +1362,12 @@ def main():
         help="Please select a dir with large free space to cache all torch, hf, turbine_tank model data",
         required=True,
     )
+    parser.add_argument(
+        "--cleanup",
+        help="Space efficient testing (removing the large mlir, vmfb files during the model runs)",
+        action="store_true",
+        default=False,
+    )
 
     args = parser.parse_args()
     cache_dir = args.cachedir
@@ -1180,6 +1396,10 @@ def main():
 
     if args.skiptestsfile and args.testsfile:
         print(f"Only one of --skiptestsfile or --testsfile can be used")
+        sys.exit(1)
+    
+    if (not args.uploadtestsfile and args.upload) or (not args.upload and args.uploadtestsfile):
+        print(f"Both upload and uploadtestsfile arguments need to be set if intending to upload to azure")
         sys.exit(1)
 
     # Root dir where run.py is

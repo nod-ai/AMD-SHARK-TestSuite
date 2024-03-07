@@ -16,11 +16,11 @@ import warnings
 import datetime
 from azure.storage.blob import BlobServiceClient
 import json
+from multiprocessing import Manager
 
 # Need to allow invocation of run.py from anywhere
 sys.path.append(Path(__file__).parent)
 from tools.stubs.commonutils import applyPostProcessPipeline
-from multiprocessing import Manager
 
 def getTestsList(frameworkname, test_types):
     testsList = []

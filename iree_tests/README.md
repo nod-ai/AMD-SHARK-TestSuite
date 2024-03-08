@@ -207,6 +207,94 @@ python -m pip install -r ./iree_tests/onnx/requirements.txt
 python ./iree_tests/onnx/import_tests.py
 ```
 
+### PyTorch models
+
+#### Generating model test cases from e2eshark
+
+> [!WARNING]
+> UNDER CONSTRUCTION - this will change!
+
+1. Setup venv for the [e2eshark/](/e2eshark/) directory by following that README
+
+2. Run a test from e2eshark to generate artifact files:
+
+    ```bash
+    e2eshark$ python run.py \
+      --cachedir ${CACHE_DIR} \
+      -c ${TORCH_MLIR_BUILD_DIR} \
+      -i ${IREE_BUILD_DIR} \
+      --tests pytorch/models/resnet50 \
+      --mode turbine
+
+    e2eshark$ ls test-run/pytorch/models/resnet50/
+
+    __pycache__/        inference_input.0.bin           resnet50.default.input.pt
+    commands.log        inference_output.0.bin          resnet50.default.pytorch.torch.mlir
+    commonutils.py@     iree-compile.log                resnet50.default.vmfb
+    E2ESHARK_CHECK.pkl  model-run.log                   runmodel.py
+    inference.log       resnet50.default.goldoutput.pt  time.pkl
+    ```
+
+    We want the program `.mlir` input/output `.pt` files.
+
+3. Run the `.mlir` file through CSE to get it into a canonical form:
+
+    ```bash
+    e2eshark$ iree-opt test-run/pytorch/models/resnet50/resnet50.default.pytorch.torch.mlir \
+      --cse -o test-run/pytorch/models/resnet50/resnet50_cse.mlir
+    ```
+
+> [!NOTE]
+> TODO: Have Turbine / other frontends run CSE for us (`iree-opt` is not
+>   available in pip packages)
+
+4. Extract large constants out to parameters files (real + splats):
+
+    ```bash
+    e2eshark$ iree-compile test-run/pytorch/models/resnet50/resnet50_cse.mlir \
+      --iree-opt-parameter-archive-export-file=test-run/pytorch/models/resnet50/params.irpa \
+      --iree-opt-splat-parameter-archive-export-file=test-run/pytorch/models/resnet50/splats.irpa \
+      --compile-to=global-optimization \
+      -o test-run/pytorch/models/resnet50/resnet50_params.mlir
+    ```
+
+> [!NOTE]
+> TODO: Have Turbine itself output with parameters. The `iree-compile` passes
+>   run as part of "global optimization" and muck with the program
+>   before/after export so handling it correctly in the frontend would be
+>   preferred.
+
+5. Convert from .mlir to .mlirbc (**important**, since that saves space and
+   .mlirbc files are tracked with Git LFS but .mlir files are not)
+
+```bash
+$ iree-ir-tool cp --emit-bytecode \
+  test-run/pytorch/models/resnet50/resnet50_params.mlir \
+  -o test-run/pytorch/models/resnet50/resnet50_params.mlirbc
+```
+
+6. Copy into iree_tests/ as a test case:
+
+    ```bash
+    iree_tests$ mkdir -p pytorch/models/resnet50
+    iree_tests$ cp ../e2eshark/test-run/pytorch/models/resnet50/resnet50_params.mlirbc \
+      pytorch/models/resnet50/
+    iree_tests$ cp ../e2eshark/test-run/pytorch/models/resnet50/splats.irpa \
+      pytorch/models/resnet50/
+    ```
+
+    Also include a `test_data_flags.txt` matching the input signature and using
+    the splat parameters:
+
+    ```txt
+    --input="1x3x224x224xf32"
+    --parameters=splats.irpa
+    ```
+
+> [!NOTE]
+> TODO: validate correctness with both reference backend + real weights and
+>   IREE + splats (`--expected_output=@output_0.npy`)
+
 ## Appendix
 
 ### Working with .mlirbc files
@@ -218,7 +306,7 @@ efficiently, but it is harder to inspect than text (`.mlir`) files.
 To convert files IREE understands between `.mlir` and `.mlirbc`:
 
 ```bash
-iree-ir-tool cp model.mlir -o model.mlirbc
+iree-ir-tool cp model.mlir --emit-bytecode -o model.mlirbc
 iree-ir-tool cp model.mlirbc -o model.mlir
 ```
 

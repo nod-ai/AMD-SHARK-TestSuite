@@ -15,6 +15,7 @@ import shutil
 import warnings
 import datetime
 from azure.storage.blob import BlobServiceClient
+import simplejson
 import json
 from multiprocessing import Manager
 
@@ -105,22 +106,26 @@ def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
     with open(file_path, "rb") as data:
         blob_client.upload_blob(data)
     print(f"Uploaded {file_name}.")
-    uploadDict[testName] =  blob_client.url
+    dict_value = uploadDict.get(testName)
+    if not dict_value:
+        uploadDict[testName] = [blob_client.url]
+    else:
+        dict_value.append(blob_client.url)
+        uploadDict[testName] = dict_value
+    return
 
 
-def logAndReturn(commandslog, timelog, resultdict, retval, upload, uploadtestsList, cleanup, testDir, testName, uploadDict):
+def logAndReturn(commandslog, timelog, resultdict, retval, uploadtestsList, cleanup, testName, uploadDict):
 
     delete_list = ["mlir", "vmfb"]
-    upload_list = ["mlir"]
-
-    #should already be in test dir
-    os.chdir(testDir)
+    upload_list = ["mlir", "pkl"]
 
     # Loop through everything in folder in current working directory
-    if upload or cleanup:
-        for item in os.listdir(os.getcwd()):
+    if uploadtestsList or cleanup:
+        listOfItems = os.listdir(os.getcwd())
+        for item in listOfItems:
             file_type = item.split(".")[-1]
-            if upload and testName in uploadtestsList and file_type in upload_list:
+            if testName in uploadtestsList and file_type in upload_list:
                 dateAndTime = str(datetime.datetime.now(datetime.timezone.utc))
                 identifier = testName.replace("/", "_") + "/" + dateAndTime + "/" + item
                 uploadToBlobStorage(os.path.abspath(item), identifier, testName, uploadDict)
@@ -274,10 +279,8 @@ def runTorchMLIRGeneration(
     onnxfilename,
     torchmlirfilename,
     resultdict,
-    upload,
     uploadtestsList,
     cleanup,
-    testRunDir,
     uploadDict,
 ):
     if args.verbose:
@@ -293,10 +296,8 @@ def runTorchMLIRGeneration(
             timelog,
             resultdict,
             1,
-            upload,
             uploadtestsList,
             cleanup,
-            testRunDir,
             testName,
             uploadDict,
         )
@@ -330,10 +331,8 @@ def runTorchMLIRGeneration(
                 timelog,
                 resultdict,
                 1,
-                upload,
                 uploadtestsList,
                 cleanup,
-                testRunDir,
                 testName,
                 uploadDict,
             )
@@ -376,10 +375,8 @@ def runTorchMLIRGeneration(
                 timelog,
                 resultdict,
                 1,
-                upload,
                 uploadtestsList,
                 cleanup,
-                testRunDir,
                 testName,
                 uploadDict,
             )
@@ -398,10 +395,8 @@ def runCodeGeneration(
     commandslog,
     timelog,
     resultdict,
-    upload,
     uploadtestsList,
     cleanup,
-    testRunDir,
     uploadDict,
 ):
     if args.verbose:
@@ -448,10 +443,8 @@ def runCodeGeneration(
             timelog,
             resultdict,
             1,
-            upload,
             uploadtestsList,
             cleanup,
-            testRunDir,
             testName,
             uploadDict,
         )
@@ -505,10 +498,8 @@ def runInference(
     commandslog,
     timelog,
     resultdict,
-    upload,
     uploadtestsList,
     cleanup,
-    testRunDir,
     uploadDict,
 ):
     if args.verbose:
@@ -587,10 +578,8 @@ def runInference(
             timelog,
             resultdict,
             1,
-            upload,
             uploadtestsList,
             cleanup,
-            testRunDir,
             testName,
             uploadDict,
         )
@@ -661,10 +650,8 @@ def runInference(
                 timelog,
                 resultdict,
                 1,
-                upload,
                 uploadtestsList,
                 cleanup,
-                testRunDir,
                 testName,
                 uploadDict,
             )
@@ -798,10 +785,8 @@ def runTestUsingClassicalFlow(args_tuple):
             onnxfilename,
             torchmlirfilename,
             resultdict,
-            args.upload,
             uploadtestsList,
             args.cleanup,
-            testRunDir,
             uploadDict,
         ):
             return 1
@@ -813,10 +798,8 @@ def runTestUsingClassicalFlow(args_tuple):
             timelog,
             resultdict,
             0,
-            args.upload,
             uploadtestsList,
             args.cleanup,
-            testRunDir,
             testName,
             uploadDict,
         )
@@ -832,10 +815,8 @@ def runTestUsingClassicalFlow(args_tuple):
             commandslog,
             timelog,
             resultdict,
-            args.upload,
             uploadtestsList,
             args.cleanup,
-            testRunDir,
             uploadDict,
         ):
             return 1
@@ -846,10 +827,8 @@ def runTestUsingClassicalFlow(args_tuple):
             timelog,
             resultdict,
             0,
-            args.upload,
             uploadtestsList,
             args.cleanup,
-            testRunDir,
             testName,
             uploadDict,
         )
@@ -871,10 +850,8 @@ def runTestUsingClassicalFlow(args_tuple):
             commandslog,
             timelog,
             resultdict,
-            args.upload,
             uploadtestsList,
             args.cleanup,
-            testRunDir,
             uploadDict,
         ):
             return 1
@@ -885,10 +862,8 @@ def runTestUsingClassicalFlow(args_tuple):
         timelog,
         resultdict,
         0,
-        args.upload,
         uploadtestsList,
         args.cleanup,
-        testRunDir,
         testName,
         uploadDict,
     )
@@ -1010,8 +985,11 @@ def runFrameworkTests(
         result.wait()
         if args.verbose:
             print("All tasks submitted to process pool completed")
-    with open('upload_urls.txt', 'w') as convert_file: 
-        convert_file.write(json.dumps(uploadDict._getvalue()))
+    with open('upload_urls.json', 'w') as convert_file: 
+        # convert_file.write(json.dumps(uploadDict._getvalue()))
+        convert_file.write(
+            simplejson.dumps(simplejson.loads(json.dumps(uploadDict._getvalue())), indent=4, sort_keys=True)
+        )
 
 
 def convertNumToString(rows):
@@ -1306,12 +1284,6 @@ def main():
         help="A file with lists of tests that should be skipped",
     )
     parser.add_argument(
-        "--upload",
-        help="Upload to azure storage based on uploadtestsfile",
-        action="store_true",
-        default=False,
-    )
-    parser.add_argument(
         "--uploadtestsfile",
         help="A file with lists of tests that should be uploaded",
     )
@@ -1384,10 +1356,6 @@ def main():
 
     if args.skiptestsfile and args.testsfile:
         print(f"Only one of --skiptestsfile or --testsfile can be used")
-        sys.exit(1)
-    
-    if (not args.uploadtestsfile and args.upload) or (not args.upload and args.uploadtestsfile):
-        print(f"Both upload and uploadtestsfile arguments need to be set if intending to upload to azure")
         sys.exit(1)
 
     # Root dir where run.py is
@@ -1486,6 +1454,8 @@ def main():
 
     # When all processes are done, print
     print("\nCompleted run of e2e shark tests")
+    print("\nIf using the upload feature, you can find a map of the test name " +
+            "to azure urls for your uploaded artifacts in upload_urls.json")
 
 
 if __name__ == "__main__":

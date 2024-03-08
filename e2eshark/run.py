@@ -122,11 +122,11 @@ def logAndReturn(commandslog, timelog, resultdict, retval, uploadtestsList, clea
 
     # Loop through everything in folder in current working directory
     if uploadtestsList or cleanup:
+        dateAndTime = str(datetime.datetime.now(datetime.timezone.utc))
         listOfItems = os.listdir(os.getcwd())
         for item in listOfItems:
             file_type = item.split(".")[-1]
             if testName in uploadtestsList and file_type in upload_list:
-                dateAndTime = str(datetime.datetime.now(datetime.timezone.utc))
                 identifier = testName.replace("/", "_") + "/" + dateAndTime + "/" + item
                 uploadToBlobStorage(os.path.abspath(item), identifier, testName, uploadDict)
             if cleanup:

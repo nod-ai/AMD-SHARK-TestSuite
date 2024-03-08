@@ -117,7 +117,7 @@ def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
 def logAndReturn(commandslog, timelog, resultdict, retval, uploadtestsList, cleanup, testName, uploadDict, dateAndTime):
 
     delete_list = ["mlir", "vmfb"]
-    upload_list = ["mlir", "pkl"]
+    upload_list = ["mlir"]
 
     # Loop through everything in folder in current working directory
     if uploadtestsList or cleanup:

@@ -20,8 +20,12 @@ class IreeCompileAndRunTestSpec:
     # Directory where test input files are located.
     test_directory: Path
 
-    # Name of input MLIR file in a format accepted by IREE (e.g. torch, tosa, or linalg dialect)
+    # Name of input MLIR file in a format accepted by IREE (e.g. torch, tosa, or linalg dialect).
+    # Including file suffix, e.g. 'model.mlir' or 'model.mlirbc'.
     input_mlir_name: str
+
+    # Stem of input MLIR file, excluding file suffix, e.g. 'model'.
+    input_mlir_stem: str
 
     # Name of flagfile in the same directory as the input MLIR, containing flags like:
     #   --input=@input_0.npy
@@ -50,7 +54,7 @@ class IreeCompileAndRunTestSpec:
 
 
 def pytest_collect_file(parent, file_path):
-    if file_path.name.endswith("model.mlir"):
+    if file_path.name.endswith(".mlir") or file_path.name.endswith(".mlirbc"):
         return MlirFile.from_parent(parent, path=file_path)
 
 
@@ -60,7 +64,7 @@ class MlirFile(pytest.File):
     def collect(self):
         # Expected directory structure:
         #   path/to/test_some_ml_operator/
-        #     - model.mlir
+        #     - *.mlir[bc]
         #     - test_data_flags.txt
         #   path/to/test_some_ml_model/
         #     ...
@@ -91,6 +95,7 @@ class MlirFile(pytest.File):
             spec = IreeCompileAndRunTestSpec(
                 test_directory=test_directory,
                 input_mlir_name=self.path.name,
+                input_mlir_stem=self.path.stem,
                 data_flagfile_name=test_data_flagfile_name,
                 config_name=config_name,
                 iree_compile_flags=config["iree_compile_flags"],
@@ -113,9 +118,9 @@ class IreeCompileRunItem(pytest.Item):
 
         # TODO(scotttodd): swap cwd for a temp path?
         self.test_cwd = self.spec.test_directory
-        vmfb_name = f"model_{self.spec.config_name}.vmfb"
+        vmfb_name = f"{self.spec.input_mlir_stem}_{self.spec.config_name}.vmfb"
 
-        self.compile_args = ["iree-compile", str(self.spec.input_mlir_name)]
+        self.compile_args = ["iree-compile", self.spec.input_mlir_name]
         self.compile_args.extend(self.spec.iree_compile_flags)
         self.compile_args.extend(["-o", str(vmfb_name)])
 

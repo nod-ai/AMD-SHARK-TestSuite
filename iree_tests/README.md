@@ -61,7 +61,9 @@ $ python -m pip install -r iree_tests/requirements.txt
 To use `iree-compile` and `iree-run-module` from Python packages:
 
 ```bash
-$ python -m pip install iree-compiler iree-runtime
+$ python -m pip install --find-links https://iree.dev/pip-release-links.html \
+  iree-compiler iree-runtime --upgrade
+
 ```
 
 To use local versions of `iree-compile` and `iree-run-module`, put them on your
@@ -176,6 +178,11 @@ PASSED iree_tests/onnx/node/generated/test_clip_example/model.mlir::cpu
 
 ## Available test suites
 
+### Simple tests
+
+These are hand-authored tests demonstratating simple features about how the
+tools and test suite work.
+
 ### ONNX test suite
 
 The ONNX test suite is a conversion of the upstream test suite from
@@ -198,4 +205,38 @@ To regenerate the test cases:
 python -m pip install iree-compiler iree-runtime
 python -m pip install -r ./iree_tests/onnx/requirements.txt
 python ./iree_tests/onnx/import_tests.py
+```
+
+## Appendix
+
+### Working with .mlirbc files
+
+The [MLIR Bytecode Format](https://mlir.llvm.org/docs/BytecodeFormat/) (often
+represented as `.mlirbc` files) can be used to store/transmit/load MLIR files
+efficiently, but it is harder to inspect than text (`.mlir`) files.
+
+To convert files IREE understands between `.mlir` and `.mlirbc`:
+
+```bash
+iree-ir-tool cp model.mlir -o model.mlirbc
+iree-ir-tool cp model.mlirbc -o model.mlir
+```
+
+You can also run through `-opt` tools like `torch-mlir-opt` with no options,
+if the tool includes all relevant MLIR dialects:
+
+```bash
+torch-mlir-opt model.mlirbc -o model.mlir
+```
+
+The
+[MLIR VSCode extension](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-mlir)
+can also edit `.mlirbc` files as text.
+
+### Working with large MLIR files
+
+To simply strip weights:
+
+```bash
+iree-ir-tool strip-data model.mlir -o model_stripped.mlir
 ```

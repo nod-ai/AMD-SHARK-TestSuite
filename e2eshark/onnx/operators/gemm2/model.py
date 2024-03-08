@@ -25,23 +25,22 @@ E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
 
 
 # Create an input (ValueInfoProto)
-X = make_tensor_value_info("X", TensorProto.FLOAT, [24, 15])
-Y = make_tensor_value_info("Y", TensorProto.FLOAT, [15, 31])
-B = make_tensor_value_info("B", TensorProto.FLOAT, [24, 31])
+X = make_tensor_value_info("X", TensorProto.FLOAT, [4, 5])
+Y = make_tensor_value_info("Y", TensorProto.FLOAT, [5, 3])
 
 # Create an output
-Z = make_tensor_value_info("Z", TensorProto.FLOAT, [24, 31])
+Z = make_tensor_value_info("Z", TensorProto.FLOAT, [4, 3])
 
 # Create a node (NodeProto)
 gemmnode = make_node(
-    "Gemm", ["X", "Y", "B"], ["Z"], "gemmnode"  # node name  # inputs  # outputs
+    "Gemm", ["X", "Y"], ["Z"], "gemmnode"  # node name  # inputs  # outputs
 )
 
 # Create the graph (GraphProto)
 graph = make_graph(
     [gemmnode],
     "gemmgraph",
-    [X, Y, B],
+    [X, Y],
     [Z],
 )
 
@@ -55,9 +54,8 @@ with open("model.onnx", "wb") as f:
     f.write(onnx_model.SerializeToString())
 
 session = onnxruntime.InferenceSession("model.onnx", None)
-model_input_X = numpy.random.randn(24, 15).astype(numpy.float32)
-model_input_Y = numpy.random.randn(15, 31).astype(numpy.float32)
-model_input_B = numpy.random.randn(24, 31).astype(numpy.float32)
+model_input_X = numpy.random.randn(4, 5).astype(numpy.float32)
+model_input_Y = numpy.random.randn(5, 3).astype(numpy.float32)
 
 # gets X in inputs[0] and Y in inputs[1]
 inputs = session.get_inputs()
@@ -66,14 +64,13 @@ outputs = session.get_outputs()
 
 model_output = session.run(
     [outputs[0].name],
-    {inputs[0].name: model_input_X, inputs[1].name: model_input_Y, inputs[2].name: model_input_B},
+    {inputs[0].name: model_input_X, inputs[1].name: model_input_Y},
 )
 
 # Moving to torch to handle bfloat16 as numpy does not support bfloat16
 E2ESHARK_CHECK["input"] = [
     torch.from_numpy(model_input_X),
     torch.from_numpy(model_input_Y),
-    torch.from_numpy(model_input_B),
 ]
 E2ESHARK_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
 

@@ -105,7 +105,6 @@ def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
     # upload to azure storage container e2esharkuserartifacts
     with open(file_path, "rb") as data:
         blob_client.upload_blob(data)
-    print(f"Uploaded {file_name}.")
     dict_value = uploadDict.get(testName)
     if not dict_value:
         uploadDict[testName] = [blob_client.url]
@@ -115,14 +114,13 @@ def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
     return
 
 
-def logAndReturn(commandslog, timelog, resultdict, retval, uploadtestsList, cleanup, testName, uploadDict):
+def logAndReturn(commandslog, timelog, resultdict, retval, uploadtestsList, cleanup, testName, uploadDict, dateAndTime):
 
     delete_list = ["mlir", "vmfb"]
     upload_list = ["mlir"]
 
     # Loop through everything in folder in current working directory
     if uploadtestsList or cleanup:
-        dateAndTime = str(datetime.datetime.now(datetime.timezone.utc))
         listOfItems = os.listdir(os.getcwd())
         for item in listOfItems:
             file_type = item.split(".")[-1]
@@ -282,6 +280,7 @@ def runTorchMLIRGeneration(
     uploadtestsList,
     cleanup,
     uploadDict,
+    dateAndTime,
 ):
     if args.verbose:
         print("Running torch MLIR generation for", testName)
@@ -300,6 +299,7 @@ def runTorchMLIRGeneration(
             cleanup,
             testName,
             uploadDict,
+            dateAndTime,
         )
     end = time.time()
     resultdict[curphase] = ["passed", end - start]
@@ -335,6 +335,7 @@ def runTorchMLIRGeneration(
                 cleanup,
                 testName,
                 uploadDict,
+                dateAndTime,
             )
         end = time.time()
         resultdict[curphase] = ["passed", end - start]
@@ -379,6 +380,7 @@ def runTorchMLIRGeneration(
                 cleanup,
                 testName,
                 uploadDict,
+                dateAndTime,
             )
         end = time.time()
         resultdict[curphase] = ["passed", end - start]
@@ -398,6 +400,7 @@ def runCodeGeneration(
     uploadtestsList,
     cleanup,
     uploadDict,
+    dateAndTime,
 ):
     if args.verbose:
         print("Running code generation for", testName)
@@ -447,6 +450,7 @@ def runCodeGeneration(
             cleanup,
             testName,
             uploadDict,
+            dateAndTime,
         )
     end = time.time()
     resultdict[curphase] = ["passed", end - start]
@@ -501,6 +505,7 @@ def runInference(
     uploadtestsList,
     cleanup,
     uploadDict,
+    dateAndTime,
 ):
     if args.verbose:
         print("Running inference for", testName)
@@ -582,6 +587,7 @@ def runInference(
             cleanup,
             testName,
             uploadDict,
+            dateAndTime,
         )
     end = time.time()
 
@@ -654,6 +660,7 @@ def runInference(
                 cleanup,
                 testName,
                 uploadDict,
+                dateAndTime,
             )
 
     resultdict[curphase] = ["passed", end - start]
@@ -706,6 +713,7 @@ def runTestUsingClassicalFlow(args_tuple):
         goldoutputptfilename,
         uploadtestsList,
         uploadDict,
+        dateAndTime,
     ) = args_tuple
     stubrunmodelpy = toolsDirAbsPath + "/stubs/pytorchmodel.py"
     mode = args.mode
@@ -788,6 +796,7 @@ def runTestUsingClassicalFlow(args_tuple):
             uploadtestsList,
             args.cleanup,
             uploadDict,
+            dateAndTime,
         ):
             return 1
 
@@ -802,6 +811,7 @@ def runTestUsingClassicalFlow(args_tuple):
             args.cleanup,
             testName,
             uploadDict,
+            dateAndTime
         )
 
     if args.runfrom == "model-run" or args.runfrom == "torch-mlir":
@@ -818,6 +828,7 @@ def runTestUsingClassicalFlow(args_tuple):
             uploadtestsList,
             args.cleanup,
             uploadDict,
+            dateAndTime,
         ):
             return 1
     if args.runupto == "iree-compile":
@@ -831,6 +842,7 @@ def runTestUsingClassicalFlow(args_tuple):
             args.cleanup,
             testName,
             uploadDict,
+            dateAndTime,
         )
 
     # run inference now
@@ -853,6 +865,7 @@ def runTestUsingClassicalFlow(args_tuple):
             uploadtestsList,
             args.cleanup,
             uploadDict,
+            dateAndTime,
         ):
             return 1
 
@@ -866,6 +879,7 @@ def runTestUsingClassicalFlow(args_tuple):
         args.cleanup,
         testName,
         uploadDict,
+        dateAndTime,
     )
     return 0
 
@@ -875,7 +889,7 @@ def runTest(aTuple):
     # Do not construct absolute path here as this will run
     # in a new process and cur dir may change over time giving
     # unpredicatble results
-    (frameworkname, testName, args, script_dir, run_dir, uploadDict) = aTuple
+    (frameworkname, testName, args, script_dir, run_dir, uploadDict, dateAndTime) = aTuple
     testRunDir = run_dir + "/" + testName
     modelname = os.path.basename(testName)
     modelinputptfilename = (
@@ -936,6 +950,7 @@ def runTest(aTuple):
         goldoutputptfilename,
         uploadtestsList,
         uploadDict,
+        dateAndTime,
     )
     if args.mode == "vaiml":
         runTestUsingVAIML(args_tuple)
@@ -971,10 +986,11 @@ def runFrameworkTests(
     if not uniqueTestList:
         return
     uploadDict = Manager().dict({})
+    dateAndTime = str(datetime.datetime.now(datetime.timezone.utc))
     tupleOfListArg = []
     # Create list of tuple(test, arg, run_dir) to allow launching tests in parallel
     [
-        tupleOfListArg.append((frameworkname, test, args, script_dir, run_dir, uploadDict))
+        tupleOfListArg.append((frameworkname, test, args, script_dir, run_dir, uploadDict, dateAndTime))
         for test in uniqueTestList
     ]
     if args.verbose:

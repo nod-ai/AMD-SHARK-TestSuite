@@ -235,7 +235,7 @@ python ./iree_tests/onnx/import_tests.py
     inference.log       resnet50.default.goldoutput.pt  time.pkl
     ```
 
-    We want the program `.mlir` input/output `.pt` files.
+    We want the program `.mlir` and input/output `.pt` files.
 
 3. Run the `.mlir` file through CSE to get it into a canonical form:
 
@@ -259,7 +259,7 @@ python ./iree_tests/onnx/import_tests.py
     ```
 
 > [!NOTE]
-> TODO: Have Turbine itself output with parameters. The `iree-compile` passes
+> TODO: Have Turbine itself output with parameters. The passes in `iree-compile`
 >   run as part of "global optimization" and muck with the program
 >   before/after export so handling it correctly in the frontend would be
 >   preferred.
@@ -278,7 +278,7 @@ $ iree-ir-tool cp --emit-bytecode \
     ```bash
     iree_tests$ mkdir -p pytorch/models/resnet50
     iree_tests$ cp ../e2eshark/test-run/pytorch/models/resnet50/resnet50_params.mlirbc \
-      pytorch/models/resnet50/
+      pytorch/models/resnet50/resnet50.mlirbc
     iree_tests$ cp ../e2eshark/test-run/pytorch/models/resnet50/splats.irpa \
       pytorch/models/resnet50/
     ```

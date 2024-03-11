@@ -40,7 +40,7 @@ jobs:
 
     #   - name: Build torch-mlir
     #     run: |
-    #       git submodule update --init --progress
+    #       git submodule update --init --progres
     #       python -m venv mlir_venv
     #       source mlir_venv/bin/activate
     #       pip install --upgrade pip

@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         version: [3.11]
-        os: [nodai-ubuntu-builder-large]
+        os: [nodai-amdgpu-w7900-x86-64]
     runs-on: ${{matrix.os}}
     env:
       MLIR_VENV_DIR: ${{ github.workspace }}/torch-mlir_venv

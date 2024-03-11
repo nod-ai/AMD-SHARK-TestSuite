@@ -1,0 +1,154 @@
+# Copyright 2024 Advanced Micro Devices
+#
+# Licensed under the Apache License v2.0 with LLVM Exceptions.
+# See https://llvm.org/LICENSE.txt for license information.
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+
+name: E2ESHARK Test Suite
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  # A PR number if a pull request and otherwise the commit hash. This cancels
+  # queued and in-progress runs for the same PR (presubmit) or commit
+  # (postsubmit). The workflow name is prepended to avoid conflicts between
+  # different workflows.
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  torch-mlir:
+    strategy:
+      matrix:
+        version: [3.11]
+        os: [nodai-ubuntu-builder-large]
+    runs-on: ${{matrix.os}}
+    env:
+      MLIR_VENV_DIR: ${{ github.workspace }}/torch-mlir_venv
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          repository: llvm/torch-mlir
+          path: torch-mlir
+      
+      - name: "Setting up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{matrix.version}}
+
+      - name: "Setup Python venv"
+        run: python3 -m venv ${MLIR_VENV_DIR}
+
+      - name: Build torch-mlir
+        run: |
+          source ${MLIR_VENV_DIR}/bin/activate
+          git submodule update --init --progress
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt
+          python3 -m pip install -r torchvision-requirements.txt
+          cmake -GNinja -Bbuild \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DPython3_FIND_VIRTUALENV=ONLY \
+            -DLLVM_ENABLE_PROJECTS=mlir \
+            -DLLVM_EXTERNAL_PROJECTS="torch-mlir" \
+            -DLLVM_EXTERNAL_TORCH_MLIR_SOURCE_DIR="$PWD" \
+            -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+            -DLLVM_TARGETS_TO_BUILD=host \
+            externals/llvm-project/llvm
+          cmake --build build
+          CMAKE_GENERATOR=Ninja python setup.py bdist_wheel --dist-dir ./torch-mlir-wheel -v
+          pip uninstall torch-mlir
+          pip install torch-mlir-wheel/torch_mlir-0.0.1-cp311-cp311-linux_x86_64.whl
+        working-directory: ./torch-mlir
+  
+  iree:
+    strategy:
+      matrix:
+        version: [3.11]
+        os: [nodai-amdgpu-w7900-x86-64]
+    runs-on: ${{matrix.os}}
+    env:
+      IREE_VENV_DIR: ${{ github.workspace }}/iree_venv
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          repository: openxla/iree
+          path: iree
+      
+      - name: "Setting up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{matrix.version}}
+
+      - name: "Setup Python venv"
+        run: python3 -m venv ${IREE_VENV_DIR}
+
+      - name: Build iree
+        run: |
+          source ${IREE_VENV_DIR}/bin/activate
+          git submodule update --init
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r runtime/bindings/python/iree/runtime/build_requirements.txt
+          cmake -G Ninja -B ../iree-build/ -S . \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DIREE_ENABLE_ASSERTIONS=ON \
+            -DIREE_ENABLE_SPLIT_DWARF=ON \
+            -DIREE_ENABLE_THIN_ARCHIVES=ON \
+            -DCMAKE_C_COMPILER=clang \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DIREE_ENABLE_LLD=ON
+          cmake --build ../iree-build/
+        working-directory: ./iree
+  
+  turbine:
+    strategy:
+      matrix:
+        os: [nodai-amdgpu-w7900-x86-64]
+    runs-on: ${{matrix.os}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          repository: nod-ai/SHARK-Turbine
+          path: turbine
+  
+  e2eshark:
+    needs: [torch-mlir, iree, turbine]
+    strategy:
+      matrix:
+        version: [3.11]
+        os: [nodai-amdgpu-w7900-x86-64]
+    runs-on: ${{matrix.os}}
+    env:
+      E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          repository: nod-ai/SHARK-TestSuite
+          path: test-suite
+      
+      - name: "Setting up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{matrix.version}}
+
+      - name: "Setup Python venv"
+        run: python3 -m venv ${E2E_VENV_DIR}
+
+      - name: Build
+        run: |
+          source ${IREE_VENV_DIR}/bin/activate
+          git submodule update --init
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r ../torch-mlir/requirements.txt
+          python3 -m pip install -r ../torch-mlir/torchvision-requirements.txt
+          python3 -m pip install ../torch-mlir/torch-mlir-wheel/torch_mlir-0.0.1-cp311-cp311-linux_x86_64.whl
+          python3 -m pip install -r ./e2eshark/requirements.txt
+          python3 -m pip install -f https://openxla.github.io/iree/pip-release-links.html --upgrade -r ../turbine/core/iree-requirements.txt
+          python3 -m pip install -e ../turbine/core[testing]
+          python3 -m pip install -e ../turbine/models
+        working-directory: ./test-suite

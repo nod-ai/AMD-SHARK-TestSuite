@@ -237,53 +237,18 @@ python ./iree_tests/onnx/import_tests.py
 
     We want the program `.mlir` and input/output `.pt` files.
 
-3. Run the `.mlir` file through CSE to get it into a canonical form:
+3. Run `import_from_e2eshark.py --model=[model_name]` to extract parameters
+   (both splats and real weights), convert to `.mlirbc`, and copy test files
+   into `iree_tests/`:
 
-    ```bash
-    e2eshark$ iree-opt test-run/pytorch/models/resnet50/resnet50.default.pytorch.torch.mlir \
-      --cse -o test-run/pytorch/models/resnet50/resnet50_cse.mlir
-    ```
+   ```bash
+   iree_tests$ python ./pytorch/models/export_from_e2eshark.py resnet50
+   iree_tests$ ls ./pytorch/models/resnet50
 
-> [!NOTE]
-> TODO: Have Turbine / other frontends run CSE for us (`iree-opt` is not
->   available in pip packages)
+   opt-125M.mlirbc  splats.irpa
+   ```
 
-4. Extract large constants out to parameters files (real + splats):
-
-    ```bash
-    e2eshark$ iree-compile test-run/pytorch/models/resnet50/resnet50_cse.mlir \
-      --iree-opt-parameter-archive-export-file=test-run/pytorch/models/resnet50/params.irpa \
-      --iree-opt-splat-parameter-archive-export-file=test-run/pytorch/models/resnet50/splats.irpa \
-      --compile-to=global-optimization \
-      -o test-run/pytorch/models/resnet50/resnet50_params.mlir
-    ```
-
-> [!NOTE]
-> TODO: Have Turbine itself output with parameters. The passes in `iree-compile`
->   run as part of "global optimization" and muck with the program
->   before/after export so handling it correctly in the frontend would be
->   preferred.
-
-5. Convert from .mlir to .mlirbc (**important**, since that saves space and
-   .mlirbc files are tracked with Git LFS but .mlir files are not)
-
-```bash
-$ iree-ir-tool cp --emit-bytecode \
-  test-run/pytorch/models/resnet50/resnet50_params.mlir \
-  -o test-run/pytorch/models/resnet50/resnet50_params.mlirbc
-```
-
-6. Copy into iree_tests/ as a test case:
-
-    ```bash
-    iree_tests$ mkdir -p pytorch/models/resnet50
-    iree_tests$ cp ../e2eshark/test-run/pytorch/models/resnet50/resnet50_params.mlirbc \
-      pytorch/models/resnet50/resnet50.mlirbc
-    iree_tests$ cp ../e2eshark/test-run/pytorch/models/resnet50/splats.irpa \
-      pytorch/models/resnet50/
-    ```
-
-    Also include a `test_data_flags.txt` matching the input signature and using
+4. Add a `test_data_flags.txt` matching the input signature and using
     the splat parameters:
 
     ```txt

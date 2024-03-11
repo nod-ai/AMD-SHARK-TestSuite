@@ -173,6 +173,10 @@ class IreeCompileRunItem(pytest.Item):
         display_name = f"{self.path.parent.name}::{self.name}"
         return self.path, 0, f"IREE compile and run: {display_name}"
 
+    # Defining this for pytest-retry to avoid an AttributeError.
+    def _initrequest(self):
+        pass
+
 
 class IreeCompileException(Exception):
     """Compiler exception that preserves the command line and error output."""

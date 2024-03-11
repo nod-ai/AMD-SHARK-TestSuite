@@ -44,6 +44,7 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r torchvision-requirements.txt
+          pip install "pybind11[global]"
           cmake -GNinja -Bbuild \
             -DCMAKE_BUILD_TYPE=Release \
             -DPython3_FIND_VIRTUALENV=ONLY \

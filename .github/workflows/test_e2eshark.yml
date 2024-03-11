@@ -69,14 +69,19 @@ jobs:
           repository: saienduri/torch-mlir-fork
           path: torch-mlir
 
-      - name: Install python deps (stable)
+      - name: Install python deps (nightly)
         run: |
-          bash build_tools/ci/install_python_deps.sh stable
+          python -m venv mlir_venv
+          source mlir_venv/bin/activate
+          bash build_tools/ci/install_python_deps.sh nightly
         working-directory: ./torch-mlir
 
       - name: Build project
         run: |
           bash build_tools/ci/build_posix.sh
+          pip uninstall torch-mlir
+          pip install torch-mlir-wheel/torch_mlir-0.0.1-cp311-cp311-linux_x86_64.whl
+          deactivate
         working-directory: ./torch-mlir
   
   iree:

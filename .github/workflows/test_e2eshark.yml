@@ -24,43 +24,78 @@ jobs:
         version: [3.11]
         os: [nodai-amdgpu-w7900-x86-64]
     runs-on: ${{matrix.os}}
+    env:
+      CACHE_DIR: ${{ github.workspace }}/.container-cache
+    # steps:
+    #   - name: Checkout repo
+    #     uses: actions/checkout@v2
+    #     with:
+    #       repository: llvm/torch-mlir
+    #       path: torch-mlir
+      
+    #   - name: "Setting up Python"
+    #     uses: actions/setup-python@v5
+    #     with:
+    #       python-version: ${{matrix.version}}
+
+    #   - name: Build torch-mlir
+    #     run: |
+    #       git submodule update --init --progress
+    #       python -m venv mlir_venv
+    #       source mlir_venv/bin/activate
+    #       pip install --upgrade pip
+    #       pip install -r ./externals/llvm-project/mlir/python/requirements.txt
+    #       pip install -r requirements.txt
+    #       pip install -r torchvision-requirements.txt
+    #       pip install "pybind11[global]"
+    #       cmake -GNinja -Bbuild \
+    #         -DCMAKE_BUILD_TYPE=Release \
+    #         -DPython3_FIND_VIRTUALENV=ONLY \
+    #         -DLLVM_ENABLE_PROJECTS=mlir \
+    #         -DLLVM_EXTERNAL_PROJECTS="torch-mlir" \
+    #         -DLLVM_EXTERNAL_TORCH_MLIR_SOURCE_DIR="$PWD" \
+    #         -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+    #         -DLLVM_TARGETS_TO_BUILD=host \
+    #         externals/llvm-project/llvm
+    #       cmake --build build
+    #       CMAKE_GENERATOR=Ninja python setup.py bdist_wheel --dist-dir ./torch-mlir-wheel -v
+    #       pip uninstall torch-mlir
+    #       pip install torch-mlir-wheel/torch_mlir-0.0.1-cp311-cp311-linux_x86_64.whl
+    #       deactivate
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
+      - name: "Checking out repository"
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
         with:
+          submodules: true
           repository: llvm/torch-mlir
           path: torch-mlir
-      
-      - name: "Setting up Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{matrix.version}}
 
-      - name: Build torch-mlir
+      - name: Enable cache
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ env.CACHE_DIR }}
+          key: build-test-cpp-asserts-manylinux-stable-v2-${{ github.sha }}
+          restore-keys: |
+            build-test-cpp-asserts-manylinux-stable-v2-
+
+      - name: Install python deps (stable)
         run: |
-          git submodule update --init --progress
-          python -m venv mlir_venv
-          source mlir_venv/bin/activate
-          pip install --upgrade pip
-          pip install -r ./externals/llvm-project/mlir/python/requirements.txt
-          pip install -r requirements.txt
-          pip install -r torchvision-requirements.txt
-          pip install "pybind11[global]"
-          cmake -GNinja -Bbuild \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DPython3_FIND_VIRTUALENV=ONLY \
-            -DLLVM_ENABLE_PROJECTS=mlir \
-            -DLLVM_EXTERNAL_PROJECTS="torch-mlir" \
-            -DLLVM_EXTERNAL_TORCH_MLIR_SOURCE_DIR="$PWD" \
-            -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
-            -DLLVM_TARGETS_TO_BUILD=host \
-            externals/llvm-project/llvm
-          cmake --build build
-          CMAKE_GENERATOR=Ninja python setup.py bdist_wheel --dist-dir ./torch-mlir-wheel -v
-          pip uninstall torch-mlir
-          pip install torch-mlir-wheel/torch_mlir-0.0.1-cp311-cp311-linux_x86_64.whl
-          deactivate
+          export cache_dir="${{ env.CACHE_DIR }}"
+          bash build_tools/ci/install_python_deps.sh stable
         working-directory: ./torch-mlir
+
+      - name: Build project
+        run: |
+          export cache_dir="${{ env.CACHE_DIR }}"
+          bash build_tools/ci/build_posix.sh
+        working-directory: ./torch-mlir
+
+      - name: Save cache
+        uses: actions/cache/save@v3
+        if: ${{ !cancelled() }}
+        with:
+          path: ${{ env.CACHE_DIR }}
+          key: build-test-cpp-asserts-manylinux-stable-v2-${{ github.sha }}
   
   iree:
     strategy:

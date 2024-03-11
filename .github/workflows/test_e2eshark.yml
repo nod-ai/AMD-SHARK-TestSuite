@@ -24,12 +24,11 @@ jobs:
         version: [3.11]
         os: [nodai-amdgpu-w7900-x86-64]
     runs-on: ${{matrix.os}}
-    env:
-      CACHE_DIR: ${{ github.workspace }}/.container-cache
     # steps:
     #   - name: Checkout repo
     #     uses: actions/checkout@v2
     #     with:
+    #       submodules: true
     #       repository: llvm/torch-mlir
     #       path: torch-mlir
       
@@ -48,15 +47,15 @@ jobs:
     #       pip install -r requirements.txt
     #       pip install -r torchvision-requirements.txt
     #       pip install "pybind11[global]"
-    #       cmake -GNinja -Bbuild \
+    #       cmake -S "$repo_root/externals/llvm-project/llvm" -B "$build_dir" \
+    #         -GNinja \
     #         -DCMAKE_BUILD_TYPE=Release \
     #         -DPython3_FIND_VIRTUALENV=ONLY \
     #         -DLLVM_ENABLE_PROJECTS=mlir \
     #         -DLLVM_EXTERNAL_PROJECTS="torch-mlir" \
     #         -DLLVM_EXTERNAL_TORCH_MLIR_SOURCE_DIR="$PWD" \
     #         -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
-    #         -DLLVM_TARGETS_TO_BUILD=host \
-    #         externals/llvm-project/llvm
+    #         -DLLVM_TARGETS_TO_BUILD=host
     #       cmake --build build
     #       CMAKE_GENERATOR=Ninja python setup.py bdist_wheel --dist-dir ./torch-mlir-wheel -v
     #       pip uninstall torch-mlir
@@ -70,32 +69,15 @@ jobs:
           repository: saienduri/torch-mlir-fork
           path: torch-mlir
 
-      - name: Enable cache
-        uses: actions/cache/restore@v3
-        with:
-          path: ${{ env.CACHE_DIR }}
-          key: build-test-cpp-asserts-manylinux-stable-v2-${{ github.sha }}
-          restore-keys: |
-            build-test-cpp-asserts-manylinux-stable-v2-
-
       - name: Install python deps (stable)
         run: |
-          export cache_dir="${{ env.CACHE_DIR }}"
           bash build_tools/ci/install_python_deps.sh stable
         working-directory: ./torch-mlir
 
       - name: Build project
         run: |
-          export cache_dir="${{ env.CACHE_DIR }}"
           bash build_tools/ci/build_posix.sh
         working-directory: ./torch-mlir
-
-      - name: Save cache
-        uses: actions/cache/save@v3
-        if: ${{ !cancelled() }}
-        with:
-          path: ${{ env.CACHE_DIR }}
-          key: build-test-cpp-asserts-manylinux-stable-v2-${{ github.sha }}
   
   iree:
     strategy:

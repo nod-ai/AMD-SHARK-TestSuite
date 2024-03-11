@@ -36,9 +36,6 @@ jobs:
         with:
           python-version: ${{matrix.version}}
 
-      - name: "Setup Python venv"
-        run: python -m venv ${MLIR_VENV_DIR}
-
       - name: Build torch-mlir
         run: |
           source ${MLIR_VENV_DIR}/bin/activate

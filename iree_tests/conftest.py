@@ -73,7 +73,7 @@ class MlirFile(pytest.File):
     def check_for_remote_files(self, test_case_json):
         """Checks if all remote_files in a JSON test case exist on disk."""
         have_all_files = True
-        for remote_file_group in test_case_json["remote_files"]:
+        for remote_file_group in test_case_json["remote_file_groups"]:
             for remote_file in remote_file_group["files"]:
                 if not (self.path.parent / remote_file).exists():
                     test_case_name = test_case_json["name"]

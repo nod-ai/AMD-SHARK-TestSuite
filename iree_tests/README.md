@@ -248,7 +248,7 @@ python ./iree_tests/onnx/import_tests.py
    opt-125M.mlirbc  splats.irpa
    ```
 
-4. Add a `test_data_flags.txt` matching the input signature and using
+4. Add a `splat_data_flags.txt` matching the input signature and using
     the splat parameters:
 
     ```txt
@@ -256,9 +256,11 @@ python ./iree_tests/onnx/import_tests.py
     --parameters=splats.irpa
     ```
 
-> [!NOTE]
-> TODO: validate correctness with both reference backend + real weights and
->   IREE + splats (`--expected_output=@output_0.npy`)
+5. Upload `inference_input`, `inference_output`, and `real_weights.irpa` files
+   from the `test-run/` folder to Azure (e.g. using Azure Storage Explorer)
+
+6. Add a `real_weights_data_flags.txt` and `test_cases.json` file for real
+   weights, pointing at the uploaded remote files.
 
 ## Appendix
 

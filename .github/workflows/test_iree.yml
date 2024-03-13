@@ -61,3 +61,13 @@ jobs:
         run: |
           source ${VENV_DIR}/bin/activate
           pytest iree_tests -n auto -rpfE --timeout=30 --retries 2 --retry-delay 5 --durations=0
+
+      # TODO(scotttodd): add a local cache for these large files to a persistent runner
+      - name: "Downloading remote files for real weight model tests"
+        run: |
+          source ${VENV_DIR}/bin/activate
+          python3 iree_tests/download_remote_files.py
+      - name: "Testing with pytest"
+        run: |
+          source ${VENV_DIR}/bin/activate
+          pytest iree_tests -n auto -k real_weights -rpfE --timeout=60 --retries 2 --retry-delay 5 --durations=0

@@ -1,6 +1,9 @@
+# Pytest
 pytest
 pytest-retry
 pytest-timeout
 pytest-xdist
 pyjson5
-requests
+
+# Remote file downloading
+azure-storage-blob

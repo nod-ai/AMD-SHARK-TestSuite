@@ -1,3 +1,4 @@
+import torch
 # Copyright 2024 Advanced Micro Devices
 #
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
@@ -12,6 +13,8 @@ E2ESHARK_CHECK_DEF = {
     "input": None,
     # this is output gotten from the model
     "output": None,
+    # output for validation
+    "output_for_validation": None,
     # Controls how to import a graph from PyTorch into MLIR, options are: compile or fximport
     "torchmlirimport": "fximport",
     # By default, the input.to(dtype) is called, set it to False to not do so
@@ -45,6 +48,8 @@ def getOutputTensorList(test_out):
 
 # functionPipeLine = (function, [args other than input], isReturnTuple, indexOfTupleForTupleReturn)
 def applyPostProcessPipeline(item, functionPipeLine):
+    if torch.any(torch.isnan(item)):
+        print("NUMERICS ERROR: The tensor contains NaN values.")
     # Run post processing pipeline
     for func, argextra, isRetTuple, tupleIndex in functionPipeLine:
         if len(argextra) > 0:
@@ -58,7 +63,10 @@ def applyPostProcessPipeline(item, functionPipeLine):
 
 # Apply post processing functions on output
 def postProcess(e2esharkDict):
-    test_output = e2esharkDict["output"]
+    if e2esharkDict.get("output_for_validation") is not None:
+        test_output = e2esharkDict["output_for_validation"]
+    else:
+        test_output = e2esharkDict["output"]
     functionPipeLine = e2esharkDict["postprocess"]
     print(f"{functionPipeLine}")
     postprocess_output = []

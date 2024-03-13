@@ -8,7 +8,7 @@ import sys, argparse
 import torch
 import torch.nn as nn
 import torch_mlir
-from transformers import MobileBertModel, AutoTokenizer
+from transformers import MobileBertForSequenceClassification, AutoTokenizer
 
 # import from e2eshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
@@ -21,7 +21,7 @@ E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
 # model origin: https://huggingface.co/google/mobilebert-uncased
 test_modelname = "google/mobilebert-uncased"
 tokenizer = AutoTokenizer.from_pretrained(test_modelname)
-model = MobileBertModel.from_pretrained(
+model = MobileBertForSequenceClassification.from_pretrained(
     test_modelname,
     num_labels=2,
     output_attentions=False,
@@ -33,9 +33,21 @@ model.to("cpu")
 model.eval()
 E2ESHARK_CHECK["input"] = torch.randint(2, (1, 128))
 E2ESHARK_CHECK["output"] = model(E2ESHARK_CHECK["input"])
+# logit
+E2ESHARK_CHECK["output_for_validation"] = [E2ESHARK_CHECK["output"][0]]
 
 print("Input:", E2ESHARK_CHECK["input"])
 print("Output:", E2ESHARK_CHECK["output"])
 # For geneartive AI models, input is int and should be kept that way for
 # casted models as well
 E2ESHARK_CHECK["inputtodtype"] = False
+
+# Post process output to do:
+# torch.nn.functional.softmax(output, -1)
+# The output logits is the shape of (B, L).
+# (batch size, num labels)
+# This way we create a probability distribution for each possible label
+# when classifying sentence.
+E2ESHARK_CHECK["postprocess"] = [
+    (torch.nn.functional.softmax, [-1], False, 0),
+]

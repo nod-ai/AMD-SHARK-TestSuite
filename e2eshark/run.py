@@ -599,6 +599,7 @@ def runInference(
     for i in range(0, len(goldoutputlist)):
         goldoutput = goldoutputlist[i]
         outputshape = goldoutput.size()
+        print(outputshape)
         torchdtype = goldoutput.dtype
         infoutputfilename = getinfoutfilename(i)
         if args.verbose:
@@ -608,19 +609,23 @@ def runInference(
         infoutput = loadRawBinaryAsTorchSensor(
             infoutputfilename, outputshape, torchdtype
         )
+        print(infoutput.size())
         if args.verbose:
             inerencelog = open(logfilename, "a")
             torch.set_printoptions(profile="full")
             print(f"Gold reference[{i}]:\n{goldoutput}\n", file=inerencelog)
             print(f"Inference Output[{i}]:\n {infoutput}:\n", file=inerencelog)
 
-        goldoutput = goldoutput.flatten()
-        infoutput = infoutput.flatten()
+        goldoutput_flat = goldoutput.flatten()
+        infoutput_flat = infoutput.flatten()
 
-        inferencematched = compareOutputs(args, goldoutput, infoutput, torchdtype)
+        inferencematched = compareOutputs(args, goldoutput_flat, infoutput_flat, torchdtype)
 
-        if not inferencematched:
-            if args.postprocess and e2esharkDict.get("postprocess"):
+        if not inferencematched or e2esharkDict.get("output_for_validation"):
+            if i >= len(goldpostoutputlist):
+                resultdict[curphase] = ["passed", end - start]
+                return
+            if args.postprocess and (e2esharkDict.get("postprocess")):
                 functionPipeLine = e2esharkDict["postprocess"]
                 goldpostoutput = goldpostoutputlist[i]
                 infpostoutput = applyPostProcessPipeline(infoutput, functionPipeLine)
@@ -629,10 +634,15 @@ def runInference(
                     print(f"gold post processed: {goldpostoutput}")
                     print(f"inference post processed: {infpostoutput}")
                 torchdtype = infpostoutput.dtype
+                goldoutput_flat = goldpostoutput.flatten()
+                infoutput_flat = infpostoutput.flatten()
                 inferencematched = compareOutputs(
-                    args, goldpostoutput, infpostoutput, torchdtype
+                    args, goldoutput_flat, infoutput_flat, torchdtype
                 )
 
+        infoutput = infoutput_flat
+        goldoutput = goldoutput_flat
+        
         if not inferencematched:
             failedinflog = open("failedinference.log", "w")
             torch.set_printoptions(profile="full")

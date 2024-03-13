@@ -42,7 +42,6 @@ def download_for_test_case(test_dir: Path, test_case_json: dict):
             max_single_get_size=1024 * 1024 * 32,  # 32 MiB
         ) as container_client:
             download_azure_remote_files(test_dir, container_client, remote_file_group)
-            return
 
 
 if __name__ == "__main__":

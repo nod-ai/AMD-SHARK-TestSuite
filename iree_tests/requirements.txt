@@ -3,3 +3,4 @@ pytest-retry
 pytest-timeout
 pytest-xdist
 pyjson5
+requests

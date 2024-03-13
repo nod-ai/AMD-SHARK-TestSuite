@@ -24,14 +24,12 @@ model = OPTForCausalLM.from_pretrained(
 )
 model.to("cpu")
 model.eval()
-prompt = "this project is very interesting"
+prompt = "What is nature of our existence?"
 encoding = tokenizer(prompt, return_tensors="pt")
 E2ESHARK_CHECK["input"] = encoding["input_ids"].cpu()
-print("INPUT SIZE: " + str(E2ESHARK_CHECK["input"].size()))
 E2ESHARK_CHECK["output"] = model(E2ESHARK_CHECK["input"])
 # logits
 E2ESHARK_CHECK["output_for_validation"] = [E2ESHARK_CHECK["output"][0]]
-print("OUTPUT SIZE: " + str(E2ESHARK_CHECK["output"][0].size()))
 model_response = model.generate(
     E2ESHARK_CHECK["input"],
     do_sample=True,

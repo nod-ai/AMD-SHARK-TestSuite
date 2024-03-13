@@ -599,7 +599,7 @@ def runInference(
     for i in range(0, len(goldoutputlist)):
         goldoutput = goldoutputlist[i]
         outputshape = goldoutput.size()
-        print(outputshape)
+        
         torchdtype = goldoutput.dtype
         infoutputfilename = getinfoutfilename(i)
         if args.verbose:
@@ -609,7 +609,7 @@ def runInference(
         infoutput = loadRawBinaryAsTorchSensor(
             infoutputfilename, outputshape, torchdtype
         )
-        print(infoutput.size())
+
         if args.verbose:
             inerencelog = open(logfilename, "a")
             torch.set_printoptions(profile="full")

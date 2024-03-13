@@ -4,7 +4,7 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-from azure.storage.blob import BlobServiceClient, ContainerClient
+from azure.storage.blob import ContainerClient
 from pathlib import Path
 import pyjson5
 
@@ -24,7 +24,9 @@ def download_azure_remote_files(
         dest = test_dir / remote_file
 
         with open(dest, mode="wb") as local_blob:
-            download_stream = container_client.download_blob(blob_name)
+            download_stream = container_client.download_blob(
+                blob_name, max_concurrency=4
+            )
             local_blob.write(download_stream.readall())
 
 
@@ -33,8 +35,12 @@ def download_for_test_case(test_dir: Path, test_case_json: dict):
         account_url = remote_file_group["azure_account_url"]
         container_name = remote_file_group["azure_container_name"]
 
-        with BlobServiceClient(account_url) as blob_client:
-            container_client = blob_client.get_container_client(container_name)
+        with ContainerClient(
+            account_url,
+            container_name,
+            max_chunk_get_size=1024 * 1024 * 32,  # 32 MiB
+            max_single_get_size=1024 * 1024 * 32,  # 32 MiB
+        ) as container_client:
             download_azure_remote_files(test_dir, container_client, remote_file_group)
             return
 

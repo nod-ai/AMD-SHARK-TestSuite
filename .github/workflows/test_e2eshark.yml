@@ -79,50 +79,48 @@ jobs:
       - name: Build project
         run: |
           bash build_tools/ci/build_posix.sh
-          pip uninstall torch-mlir
-          pip install torch-mlir-wheel/torch_mlir-0.0.1-cp311-cp311-linux_x86_64.whl
           deactivate
         working-directory: ./torch-mlir
   
-  iree:
-    strategy:
-      matrix:
-        version: [3.11]
-        os: [nodai-amdgpu-w7900-x86-64]
-    runs-on: ${{matrix.os}}
-    env:
-      IREE_VENV_DIR: ${{ github.workspace }}/iree_venv
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-        with:
-          repository: openxla/iree
-          path: iree
+  # iree:
+  #   strategy:
+  #     matrix:
+  #       version: [3.11]
+  #       os: [nodai-amdgpu-w7900-x86-64]
+  #   runs-on: ${{matrix.os}}
+  #   env:
+  #     IREE_VENV_DIR: ${{ github.workspace }}/iree_venv
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v2
+  #       with:
+  #         repository: openxla/iree
+  #         path: iree
       
-      - name: "Setting up Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{matrix.version}}
+  #     - name: "Setting up Python"
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: ${{matrix.version}}
 
-      - name: "Setup Python venv"
-        run: python -m venv ${IREE_VENV_DIR}
+  #     - name: "Setup Python venv"
+  #       run: python -m venv ${IREE_VENV_DIR}
 
-      - name: Build iree
-        run: |
-          source ${IREE_VENV_DIR}/bin/activate
-          git submodule foreach git config --get remote.origin.fetch
-          pip install --upgrade pip
-          pip install -r runtime/bindings/python/iree/runtime/build_requirements.txt
-          cmake -G Ninja -B ../iree-build/ -S . \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DIREE_ENABLE_ASSERTIONS=ON \
-            -DIREE_ENABLE_SPLIT_DWARF=ON \
-            -DIREE_ENABLE_THIN_ARCHIVES=ON \
-            -DCMAKE_C_COMPILER=clang \
-            -DCMAKE_CXX_COMPILER=clang++ \
-            -DIREE_ENABLE_LLD=ON
-          cmake --build ../iree-build/
-        working-directory: ./iree
+  #     - name: Build iree
+  #       run: |
+  #         source ${IREE_VENV_DIR}/bin/activate
+  #         git submodule foreach git config --get remote.origin.fetch
+  #         pip install --upgrade pip
+  #         pip install -r runtime/bindings/python/iree/runtime/build_requirements.txt
+  #         cmake -G Ninja -B ../iree-build/ -S . \
+  #           -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  #           -DIREE_ENABLE_ASSERTIONS=ON \
+  #           -DIREE_ENABLE_SPLIT_DWARF=ON \
+  #           -DIREE_ENABLE_THIN_ARCHIVES=ON \
+  #           -DCMAKE_C_COMPILER=clang \
+  #           -DCMAKE_CXX_COMPILER=clang++ \
+  #           -DIREE_ENABLE_LLD=ON
+  #         cmake --build ../iree-build/
+  #       working-directory: ./iree
   
   turbine:
     strategy:
@@ -167,7 +165,7 @@ jobs:
           pip install --upgrade pip
           pip install -r ../torch-mlir/requirements.txt
           pip install -r ../torch-mlir/torchvision-requirements.txt
-          pip install ../torch-mlir/torch-mlir-wheel/torch_mlir-0.0.1-cp311-cp311-linux_x86_64.whl
+          pip install torch-mlir -f https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
           pip install -r ./e2eshark/requirements.txt
           pip install -f https://openxla.github.io/iree/pip-release-links.html --upgrade -r ../turbine/core/iree-requirements.txt
           pip install -e ../turbine/core[testing]

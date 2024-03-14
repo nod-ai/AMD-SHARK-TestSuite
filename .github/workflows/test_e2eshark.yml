@@ -161,7 +161,7 @@ jobs:
           git submodule update --init
           pip install --upgrade pip
           pip install -r /home/esaimana/torch-mlir/requirements.txt
-          pip install -r /home/esaimana/torch-mlir/torch-mlir/torchvision-requirements.txt
+          pip install -r /home/esaimana/torch-mlir/torchvision-requirements.txt
           pip install torch-mlir -f https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
           pip install -r ./e2eshark/requirements.txt
           pip install -e ../turbine/core[testing]

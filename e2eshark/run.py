@@ -996,13 +996,15 @@ def runFrameworkTests(
     ]
     if args.verbose:
         print("Following tests will be run:", uniqueTestList)
+    
+    runTest(tupleOfListArg[0])
 
-    with Pool(poolSize, initializer, (TORCH_MLIR_BUILD, IREE_BUILD)) as p:
-        print("BEGIN")
-        result = p.map_async(runTest, tupleOfListArg)
-        result.wait()
-        if args.verbose:
-            print("All tasks submitted to process pool completed")
+    # with Pool(poolSize, initializer, (TORCH_MLIR_BUILD, IREE_BUILD)) as p:
+    #     print("BEGIN")
+    #     result = p.map_async(runTest, tupleOfListArg)
+    #     result.wait()
+    #     if args.verbose:
+    #         print("All tasks submitted to process pool completed")
     with open('upload_urls.json', 'w') as convert_file: 
         # convert_file.write(json.dumps(uploadDict._getvalue()))
         convert_file.write(

@@ -26,10 +26,10 @@ quantization_config = GPTQConfig(bits=8, disable_exllama=True)
 kwargs["quantization_config"] = quantization_config
 kwargs["device_map"] = "cpu"
 model = AutoModelForCausalLM.from_pretrained(
-    test_modelname, low_cpu_mem_usage=True, attn_implementation="eager", **kwargs, token="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"
+    test_modelname, low_cpu_mem_usage=True, attn_implementation="eager", **kwargs
 )
 # model.output_hidden_states = False
-tokenizer = AutoTokenizer.from_pretrained(test_modelname, token="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")
+tokenizer = AutoTokenizer.from_pretrained(test_modelname)
 prompt = "What is nature of our existence?"
 encoding = tokenizer(prompt, return_tensors="pt")
 E2ESHARK_CHECK["input"] = encoding["input_ids"].cpu()

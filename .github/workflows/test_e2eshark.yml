@@ -71,15 +71,12 @@ jobs:
 
       - name: Install python deps (nightly)
         run: |
-          python -m venv mlir_venv
-          source mlir_venv/bin/activate
           bash build_tools/ci/install_python_deps.sh nightly
         working-directory: ./torch-mlir
 
       - name: Build project
         run: |
           bash build_tools/ci/build_posix.sh
-          deactivate
         working-directory: ./torch-mlir
   
   # iree:

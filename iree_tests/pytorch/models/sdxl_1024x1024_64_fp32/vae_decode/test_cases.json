@@ -1,0 +1,32 @@
+{
+  "test_cases": [
+    {
+      "name": "splats",
+      "runtime_flagfile": "splat_data_flags.txt",
+      "remote_file_groups": []
+    },
+    {
+      "name": "real_weights",
+      "runtime_flagfile": "real_weights_data_flags.txt",
+      "remote_file_groups": [
+        {
+          "azure_account_url": "https://sharkpublic.blob.core.windows.net",
+          "azure_container_name": "sharkpublic",
+          "azure_base_blob_name": "SDXL/SDXL_testing/1024x1024_64_fp32/vae_decode/",
+          "files": [
+            "input0.npy",
+            "golden_out.npy"
+          ]
+        },
+        {
+          "azure_account_url": "https://sharkpublic.blob.core.windows.net",
+          "azure_container_name": "sharkpublic",
+          "azure_base_blob_name": "scotttodd/iree_tests/2024_03_14/vae_decode_fp32/",
+          "files": [
+            "real_weights.irpa"
+          ]
+        }
+      ]
+    }
+  ]
+}

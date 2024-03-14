@@ -295,3 +295,22 @@ To simply strip weights:
 ```bash
 iree-ir-tool strip-data model.mlir -o model_stripped.mlir
 ```
+
+### Working with parameter files
+
+To convert from .safetensors to .irpa (real weights):
+
+```bash
+iree-convert-parameters \
+  --parameters=path/to/file.safetensors \
+  --output=path/to/output.irpa
+```
+
+To strip constants and replace them with splats:
+
+```bash
+iree-convert-parameters \
+  --parameters=path/to/parameters.[safetensors,irpa] \
+  --strip \
+  --output=path/to/output.irpa
+```

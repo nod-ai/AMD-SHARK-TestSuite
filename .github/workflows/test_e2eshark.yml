@@ -67,7 +67,6 @@ jobs:
         with:
           submodules: true
           repository: saienduri/torch-mlir-fork
-          ref: ci-testing
           path: torch-mlir
 
       - name: Install python deps (nightly)

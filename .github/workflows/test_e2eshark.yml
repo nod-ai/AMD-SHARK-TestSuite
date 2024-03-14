@@ -164,6 +164,8 @@ jobs:
           pip install -r ../torch-mlir/torchvision-requirements.txt
           pip install torch-mlir -f https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
           pip install -r ./e2eshark/requirements.txt
+          pip uninstall iree-compiler
+          pip uninstall iree-runtime
           pip install -f https://openxla.github.io/iree/pip-release-links.html --upgrade -r ../turbine/core/iree-requirements.txt
           pip install -e ../turbine/core[testing]
           pip install -e ../turbine/models

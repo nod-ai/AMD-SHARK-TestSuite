@@ -997,6 +997,7 @@ def runFrameworkTests(
     if args.verbose:
         print("Following tests will be run:", uniqueTestList)
     
+    initializer(TORCH_MLIR_BUILD, IREE_BUILD)
     runTest(tupleOfListArg[0])
 
     # with Pool(poolSize, initializer, (TORCH_MLIR_BUILD, IREE_BUILD)) as p:

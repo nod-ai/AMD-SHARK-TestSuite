@@ -998,6 +998,7 @@ def runFrameworkTests(
         print("Following tests will be run:", uniqueTestList)
 
     with Pool(poolSize, initializer, (TORCH_MLIR_BUILD, IREE_BUILD)) as p:
+        print("BEGIN")
         result = p.map_async(runTest, tupleOfListArg)
         result.wait()
         if args.verbose:

@@ -167,6 +167,7 @@ jobs:
           pip install -f https://openxla.github.io/iree/pip-release-links.html --upgrade -r ../turbine/core/iree-requirements.txt
           pip install -e ../turbine/core[testing]
           pip install -e ../turbine/models
-          python ./run.py -c ../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine --tests pytorch/models/beit-base-patch16-224-pt22k-ft22k pytorch/models/bge-base-en-v1.5 pytorch/models/mit-b0 pytorch/models/bert-large-uncased pytorch/models/deit-small-distilled-patch16-224 --cleanup
+          cd e2eshark
+          python ./run.py -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine --tests pytorch/models/beit-base-patch16-224-pt22k-ft22k pytorch/models/bge-base-en-v1.5 pytorch/models/mit-b0 pytorch/models/bert-large-uncased pytorch/models/deit-small-distilled-patch16-224 --cleanup
           deactivate
         working-directory: ./test-suite

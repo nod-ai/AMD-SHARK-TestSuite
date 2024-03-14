@@ -885,7 +885,6 @@ def runTestUsingClassicalFlow(args_tuple):
 
 
 def runTest(aTuple):
-    print("HERE")
     curdir = os.getcwd()
     # Do not construct absolute path here as this will run
     # in a new process and cur dir may change over time giving
@@ -974,7 +973,7 @@ def initializer(tm_path, iree_path):
 def runFrameworkTests(
     frameworkname, testsList, args, script_dir, run_dir, TORCH_MLIR_BUILD, IREE_BUILD
 ):
-    print(f"In runFrameworkTests - torch mlir build - {TORCH_MLIR_BUILD}")
+    # print(f"In runFrameworkTests - torch mlir build - {TORCH_MLIR_BUILD}")
     if len(testsList) == 0:
         return
     poolSize = args.jobs

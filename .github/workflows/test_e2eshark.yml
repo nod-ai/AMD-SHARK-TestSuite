@@ -166,7 +166,8 @@ jobs:
           pip install -r ./e2eshark/requirements.txt
           pip uninstall -y iree-compiler
           pip uninstall -y iree-runtime
-          pip install -f https://openxla.github.io/iree/pip-release-links.html -r ../turbine/core/iree-requirements.txt
+          pip install -f https://openxla.github.io/iree/pip-release-links.html iree-compiler==20240226.813
+          pip install -f https://openxla.github.io/iree/pip-release-links.html iree-runtime==20240226.813
           pip install -e ../turbine/core[testing]
           pip install -e ../turbine/models
           cd e2eshark

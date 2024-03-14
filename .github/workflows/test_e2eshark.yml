@@ -157,7 +157,7 @@ jobs:
 
       - name: Build
         run: |
-          source ${IREE_VENV_DIR}/bin/activate
+          source ${E2E_VENV_DIR}/bin/activate
           git submodule update --init
           pip install --upgrade pip
           pip install -r ../torch-mlir/requirements.txt

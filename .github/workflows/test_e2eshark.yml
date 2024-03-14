@@ -18,66 +18,66 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  torch-mlir:
-    strategy:
-      matrix:
-        version: [3.11]
-        os: [nodai-amdgpu-w7900-x86-64]
-    runs-on: ${{matrix.os}}
-    # steps:
-    #   - name: Checkout repo
-    #     uses: actions/checkout@v2
-    #     with:
-    #       submodules: true
-    #       repository: llvm/torch-mlir
-    #       path: torch-mlir
+  # torch-mlir:
+  #   strategy:
+  #     matrix:
+  #       version: [3.11]
+  #       os: [nodai-amdgpu-w7900-x86-64]
+  #   runs-on: ${{matrix.os}}
+  #   # steps:
+  #   #   - name: Checkout repo
+  #   #     uses: actions/checkout@v2
+  #   #     with:
+  #   #       submodules: true
+  #   #       repository: llvm/torch-mlir
+  #   #       path: torch-mlir
       
-    #   - name: "Setting up Python"
-    #     uses: actions/setup-python@v5
-    #     with:
-    #       python-version: ${{matrix.version}}
+  #   #   - name: "Setting up Python"
+  #   #     uses: actions/setup-python@v5
+  #   #     with:
+  #   #       python-version: ${{matrix.version}}
 
-    #   - name: Build torch-mlir
-    #     run: |
-    #       git submodule update --init --progres
-    #       python -m venv mlir_venv
-    #       source mlir_venv/bin/activate
-    #       pip install --upgrade pip
-    #       pip install -r ./externals/llvm-project/mlir/python/requirements.txt
-    #       pip install -r requirements.txt
-    #       pip install -r torchvision-requirements.txt
-    #       pip install "pybind11[global]"
-    #       cmake -S "$repo_root/externals/llvm-project/llvm" -B "$build_dir" \
-    #         -GNinja \
-    #         -DCMAKE_BUILD_TYPE=Release \
-    #         -DPython3_FIND_VIRTUALENV=ONLY \
-    #         -DLLVM_ENABLE_PROJECTS=mlir \
-    #         -DLLVM_EXTERNAL_PROJECTS="torch-mlir" \
-    #         -DLLVM_EXTERNAL_TORCH_MLIR_SOURCE_DIR="$PWD" \
-    #         -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
-    #         -DLLVM_TARGETS_TO_BUILD=host
-    #       cmake --build build
-    #       CMAKE_GENERATOR=Ninja python setup.py bdist_wheel --dist-dir ./torch-mlir-wheel -v
-    #       pip uninstall torch-mlir
-    #       pip install torch-mlir-wheel/torch_mlir-0.0.1-cp311-cp311-linux_x86_64.whl
-    #       deactivate
-    steps:
-      - name: "Checking out repository"
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
-        with:
-          submodules: true
-          repository: saienduri/torch-mlir-fork
-          path: torch-mlir
+  #   #   - name: Build torch-mlir
+  #   #     run: |
+  #   #       git submodule update --init --progres
+  #   #       python -m venv mlir_venv
+  #   #       source mlir_venv/bin/activate
+  #   #       pip install --upgrade pip
+  #   #       pip install -r ./externals/llvm-project/mlir/python/requirements.txt
+  #   #       pip install -r requirements.txt
+  #   #       pip install -r torchvision-requirements.txt
+  #   #       pip install "pybind11[global]"
+  #   #       cmake -S "$repo_root/externals/llvm-project/llvm" -B "$build_dir" \
+  #   #         -GNinja \
+  #   #         -DCMAKE_BUILD_TYPE=Release \
+  #   #         -DPython3_FIND_VIRTUALENV=ONLY \
+  #   #         -DLLVM_ENABLE_PROJECTS=mlir \
+  #   #         -DLLVM_EXTERNAL_PROJECTS="torch-mlir" \
+  #   #         -DLLVM_EXTERNAL_TORCH_MLIR_SOURCE_DIR="$PWD" \
+  #   #         -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+  #   #         -DLLVM_TARGETS_TO_BUILD=host
+  #   #       cmake --build build
+  #   #       CMAKE_GENERATOR=Ninja python setup.py bdist_wheel --dist-dir ./torch-mlir-wheel -v
+  #   #       pip uninstall torch-mlir
+  #   #       pip install torch-mlir-wheel/torch_mlir-0.0.1-cp311-cp311-linux_x86_64.whl
+  #   #       deactivate
+  #   steps:
+  #     - name: "Checking out repository"
+  #       uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+  #       with:
+  #         submodules: true
+  #         repository: saienduri/torch-mlir-fork
+  #         path: torch-mlir
 
-      - name: Install python deps (nightly)
-        run: |
-          bash build_tools/ci/install_python_deps.sh nightly
-        working-directory: ./torch-mlir
+  #     - name: Install python deps (nightly)
+  #       run: |
+  #         bash build_tools/ci/install_python_deps.sh nightly
+  #       working-directory: ./torch-mlir
 
-      - name: Build project
-        run: |
-          bash build_tools/ci/build_posix.sh
-        working-directory: ./torch-mlir
+  #     - name: Build project
+  #       run: |
+  #         bash build_tools/ci/build_posix.sh
+  #       working-directory: ./torch-mlir
   
   # iree:
   #   strategy:
@@ -160,13 +160,13 @@ jobs:
           source ${E2E_VENV_DIR}/bin/activate
           git submodule update --init
           pip install --upgrade pip
-          pip install -r ../torch-mlir/requirements.txt
-          pip install -r ../torch-mlir/torchvision-requirements.txt
+          pip install -r /home/esaimana/torch-mlir/requirements.txt
+          pip install -r /home/esaimana/torch-mlir/torch-mlir/torchvision-requirements.txt
           pip install torch-mlir -f https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
           pip install -r ./e2eshark/requirements.txt
           pip install -e ../turbine/core[testing]
           pip install -e ../turbine/models
           cd e2eshark
-          python ./run.py -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine --tests pytorch/models/beit-base-patch16-224-pt22k-ft22k pytorch/models/bge-base-en-v1.5 pytorch/models/mit-b0 pytorch/models/bert-large-uncased pytorch/models/deit-small-distilled-patch16-224 --cleanup -v
+          python ./run.py -c /home/esaimana/torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine --tests pytorch/models/beit-base-patch16-224-pt22k-ft22k pytorch/models/bge-base-en-v1.5 pytorch/models/mit-b0 pytorch/models/bert-large-uncased pytorch/models/deit-small-distilled-patch16-224 --cleanup -v
           deactivate
         working-directory: ./test-suite

@@ -23,6 +23,7 @@ from multiprocessing import Manager
 sys.path.append(Path(__file__).parent)
 from tools.stubs.commonutils import applyPostProcessPipeline
 
+
 def getTestsList(frameworkname, test_types):
     testsList = []
     for test_type in test_types:
@@ -83,6 +84,7 @@ def loadE2eSharkCheckDictionary():
             e2esharkDict = pickle.load(pkf)
     return e2esharkDict
 
+
 def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
     connection_string = os.getenv("AZURE_CONNECTION_STRING")
     container_name = "e2esharkuserartifacts"
@@ -98,9 +100,7 @@ def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
     )
     # we check to see if we already uploaded the blob (don't want to duplicate)
     if blob.exists():
-        print(
-            f"model artifacts have already been uploaded for this blob name"
-        )
+        print(f"model artifacts have already been uploaded for this blob name")
         return
     # upload to azure storage container e2esharkuserartifacts
     with open(file_path, "rb") as data:
@@ -114,7 +114,17 @@ def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
     return
 
 
-def logAndReturn(commandslog, timelog, resultdict, retval, uploadtestsList, cleanup, testName, uploadDict, dateAndTime):
+def logAndReturn(
+    commandslog,
+    timelog,
+    resultdict,
+    retval,
+    uploadtestsList,
+    cleanup,
+    testName,
+    uploadDict,
+    dateAndTime,
+):
 
     delete_list = ["mlir", "vmfb"]
     upload_list = ["mlir"]
@@ -126,7 +136,9 @@ def logAndReturn(commandslog, timelog, resultdict, retval, uploadtestsList, clea
             file_type = item.split(".")[-1]
             if testName in uploadtestsList and file_type in upload_list:
                 identifier = testName.replace("/", "_") + "/" + dateAndTime + "/" + item
-                uploadToBlobStorage(os.path.abspath(item), identifier, testName, uploadDict)
+                uploadToBlobStorage(
+                    os.path.abspath(item), identifier, testName, uploadDict
+                )
             if cleanup:
                 if file_type in delete_list:  # If it isn't in the list for retaining
                     os.remove(item)  # Remove the item
@@ -458,10 +470,22 @@ def runCodeGeneration(
 
 
 # ∣input−other∣ ≤ atol + rtol × ∣other∣
-# returns (atol, rtol)
-# Pytorch torch.testing:
-def getTolerances(args):
-    return (args.atol, args.rtol)
+# Pytorch torch.testing defaults:
+#    bf16: atol=1e-05, rtol=1.6e-02
+#    fp16: atol=1e-05, rtol=1e-03
+#    fp32: atol=1e-05, rtol=1.3e-06
+def getTolerances(args, torchdtype):
+    atol, rtol = (1e-05, 1.3e-06)
+    if args.tolerance:
+        atol, rtol = tuple(args.tolerance)
+    elif torchdtype == torch.bfloat16:
+        atol, rtol = (1e-02, 1e-01)
+    elif torchdtype == torch.float16:
+        atol, rtol = (1e-04, 1e-03)
+    else:
+        atol, rtol = (1e-04, 1e-04)
+    return (atol, rtol)
+
 
 def compareOutputs(args, goldoutput, infoutput, dtype):
     # if shapes do not match, we have a problem as comparison routines may crash
@@ -477,7 +501,7 @@ def compareOutputs(args, goldoutput, infoutput, dtype):
             # If each element matches exactly only then torch.equal is true
             inferencematched = torch.equal(infoutput, goldoutput)
         else:
-            atol, rtol = getTolerances(args)
+            atol, rtol = getTolerances(args, dtype)
             inferencematched = torch.allclose(infoutput, goldoutput, rtol, atol)
     return inferencematched
 
@@ -590,7 +614,7 @@ def runInference(
     for i in range(0, len(goldoutputlist)):
         goldoutput = goldoutputlist[i]
         outputshape = goldoutput.size()
-        
+
         torchdtype = goldoutput.dtype
         infoutputfilename = getinfoutfilename(i)
         if args.verbose:
@@ -610,7 +634,9 @@ def runInference(
         goldoutput_flat = goldoutput.flatten()
         infoutput_flat = infoutput.flatten()
 
-        inferencematched = compareOutputs(args, goldoutput_flat, infoutput_flat, torchdtype)
+        inferencematched = compareOutputs(
+            args, goldoutput_flat, infoutput_flat, torchdtype
+        )
 
         if not inferencematched or e2esharkDict.get("output_for_validation"):
             if i >= len(goldpostoutputlist):
@@ -633,7 +659,7 @@ def runInference(
 
         infoutput = infoutput_flat
         goldoutput = goldoutput_flat
-        
+
         if not inferencematched:
             failedinflog = open("failedinference.log", "w")
             torch.set_printoptions(profile="full")
@@ -688,7 +714,7 @@ def runTestUsingVAIML(args_tuple):
         goldoutputptfilename,
     ) = args_tuple
     # TBD
-    print("Running test using VAI-ML is not implemented yet")
+    print("ERROR: Running test using VAI-ML is not implemented yet")
     sys.exit(1)
     return 0
 
@@ -726,7 +752,7 @@ def runTestUsingClassicalFlow(args_tuple):
 
     # create a symlink to the utils file inside the test dir
     if not os.path.exists(utilspy):
-        print(f"[ERR] {utilspy} file missing")
+        print(f"ERROR: {utilspy} file missing")
         sys.exit()
     symUtilspy = os.path.join(testRunDir, "commonutils.py")
     if not os.path.exists(symUtilspy):
@@ -812,7 +838,7 @@ def runTestUsingClassicalFlow(args_tuple):
             args.cleanup,
             testName,
             uploadDict,
-            dateAndTime
+            dateAndTime,
         )
 
     if args.runfrom == "model-run" or args.runfrom == "torch-mlir":
@@ -890,7 +916,9 @@ def runTest(aTuple):
     # Do not construct absolute path here as this will run
     # in a new process and cur dir may change over time giving
     # unpredicatble results
-    (frameworkname, testName, args, script_dir, run_dir, uploadDict, dateAndTime) = aTuple
+    (frameworkname, testName, args, script_dir, run_dir, uploadDict, dateAndTime) = (
+        aTuple
+    )
     testRunDir = run_dir + "/" + testName
     modelname = os.path.basename(testName)
     modelinputptfilename = (
@@ -991,7 +1019,9 @@ def runFrameworkTests(
     tupleOfListArg = []
     # Create list of tuple(test, arg, run_dir) to allow launching tests in parallel
     [
-        tupleOfListArg.append((frameworkname, test, args, script_dir, run_dir, uploadDict, dateAndTime))
+        tupleOfListArg.append(
+            (frameworkname, test, args, script_dir, run_dir, uploadDict, dateAndTime)
+        )
         for test in uniqueTestList
     ]
     if args.verbose:
@@ -1002,10 +1032,14 @@ def runFrameworkTests(
         result.wait()
         if args.verbose:
             print("All tasks submitted to process pool completed")
-    with open('upload_urls.json', 'w') as convert_file: 
+    with open("upload_urls.json", "w") as convert_file:
         # convert_file.write(json.dumps(uploadDict._getvalue()))
         convert_file.write(
-            simplejson.dumps(simplejson.loads(json.dumps(uploadDict._getvalue())), indent=4, sort_keys=True)
+            simplejson.dumps(
+                simplejson.loads(json.dumps(uploadDict._getvalue())),
+                indent=4,
+                sort_keys=True,
+            )
         )
 
 
@@ -1155,7 +1189,7 @@ def checkBuild(run_dir, args):
         TORCH_MLIR_BUILD = os.path.abspath(TORCH_MLIR_BUILD)
         if not os.path.exists(TORCH_MLIR_BUILD):
             print(
-                "Torch MLIR build directory",
+                "ERROR: Torch MLIR build directory",
                 TORCH_MLIR_BUILD,
                 "does not exist.",
             )
@@ -1166,13 +1200,18 @@ def checkBuild(run_dir, args):
         IREE_BUILD = os.path.expanduser(IREE_BUILD)
         IREE_BUILD = os.path.abspath(IREE_BUILD)
         if not os.path.exists(IREE_BUILD):
-            print("IREE build directory", IREE_BUILD, "does not exist.")
+            print("ERROR: IREE build directory", IREE_BUILD, "does not exist.")
             sys.exit(1)
     if not os.path.exists(run_dir):
         try:
             os.mkdir(run_dir)
         except OSError as errormsg:
-            print("Could not make run directory", run_dir, " Error message: ", errormsg)
+            print(
+                "ERROR: Could not make run directory",
+                run_dir,
+                " Error message: ",
+                errormsg,
+            )
             sys.exit(1)
     return (TORCH_MLIR_BUILD, IREE_BUILD)
 
@@ -1315,6 +1354,12 @@ def main():
         help="A file with lists of tests (starting with framework name) to run",
     )
     parser.add_argument(
+        "--tolerance",
+        help="Set abolsulte (atol) and relative (rtol) tolerances for comparing floating point numbers. Example: --tolerance 1e-03 1-04",
+        nargs="+",
+        type=float,
+    )
+    parser.add_argument(
         "--torchmlirimport",
         choices=["compile", "fximport"],
         default="fximport",
@@ -1345,47 +1390,44 @@ def main():
         action="store_true",
         default=False,
     )
-    parser.add_argument(
-        "--rtol",
-        help="Set rtol tolerance parameter",
-        type=float,
-        default=1e-04,
-    )
-    parser.add_argument(
-        "--atol",
-        help="Set atol tolerance parameter",
-        type=float,
-        default=1e-04,
-    )
 
     args = parser.parse_args()
     cache_dir = args.cachedir
     if not os.path.exists(cache_dir):
-        print(f"The Cache directory {cache_dir} does not exist")
+        print(f"ERROR: The Cache directory {cache_dir} does not exist")
         sys.exit(1)
 
     cache_path = os.path.expanduser(cache_dir)
     cache_path = os.path.abspath(cache_dir)
 
     if not os.path.exists(cache_path):
-        print(f"Cache directory {cache_path} does not exist.")
+        print(f"ERROR: The Cache directory {cache_path} does not exist.")
         sys.exit(1)
     # get the amount of GB available
     _, _, free = shutil.disk_usage(cache_path)
     space_available = float(free) / pow(1024, 3)
     if space_available < 20:
-        warnings.warn("WARNING: Less than 20 GB of space available in selected cache directory. " +
-            "Please choose directory with more space to avoid disk storage issues when running models."
+        warnings.warn(
+            "WARNING: Less than 20 GB of space available in selected cache directory. "
+            + "Please choose directory with more space to avoid disk storage issues when running models."
         )
-    
+
     os.environ["TORCH_HOME"] = cache_path
     os.environ["HF_HOME"] = cache_path
     os.environ["TURBINE_TANK_CACHE_DIR"] = cache_path
-    print("Cache Directory: " + cache_path)
 
     if args.skiptestsfile and args.testsfile:
-        print(f"Only one of --skiptestsfile or --testsfile can be used")
+        print(f"ERROR: Only one of --skiptestsfile or --testsfile can be used")
         sys.exit(1)
+
+    # Perform check that only two values atol and rtol are provided for --tolerance
+    if args.tolerance:
+        tol = tuple(args.tolerance)
+        if len(tol) != 2:
+            print(
+                f"ERROR: Incorrent number of arguments {len(tol)} for --tolerance {tol} provided. Provide absolute tolerance followed by relative tolerance floating point values with space in between. Example: --tolerance 1e-03 1e-04"
+            )
+            sys.exit(1)
 
     # Root dir where run.py is
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -1394,10 +1436,18 @@ def main():
     TORCH_MLIR_BUILD, IREE_BUILD = checkBuild(run_dir, args)
     # assert
     if TORCH_MLIR_BUILD == "":
-        print("Torch MLIR build path is required to be set using --torchmlirbuild")
+        print(
+            "ERROR: Torch MLIR build path is required to be set using --torchmlirbuild"
+        )
         sys.exit(1)
 
     print("Starting e2eshark tests. Using", args.jobs, "processes")
+    print("Cache Directory: " + cache_path)
+    if args.tolerance:
+        print(
+            f"Tolerance for comparing floating point (atol, rtol) = {tuple(args.tolerance)}"
+        )
+
     if args.verbose:
         print("Test run with arguments: ", vars(args))
     print("Torch MLIR build:", TORCH_MLIR_BUILD)
@@ -1412,7 +1462,7 @@ def main():
         else:
             if args.runupto == "iree-compile" or args.runupto == "inference":
                 print(
-                    f"Must have IREE in PATH or supply an IREE build using --ireebuild to runupto iree-compile or inference"
+                    f"ERROR: Must have IREE in PATH or supply an IREE build using --ireebuild to runupto iree-compile or inference"
                 )
                 sys.exit(1)
 
@@ -1438,7 +1488,7 @@ def main():
         frameworktotests_dict = {"pytorch": [], "onnx": [], "tensorflow": []}
         for testName in testsList:
             if not os.path.exists(testName):
-                print("Test", testName, "does not exist")
+                print("ERROR: Test", testName, "does not exist")
                 sys.exit(1)
             frameworkname = testName.split("/")[0]
             if frameworkname not in frameworktotests_dict:
@@ -1483,8 +1533,10 @@ def main():
 
     # When all processes are done, print
     print("\nCompleted run of e2e shark tests")
-    print("\nIf using the upload feature, you can find a map of the test name " +
-            "to azure urls for your uploaded artifacts in upload_urls.json")
+    print(
+        "\nIf using the upload feature, you can find a map of the test name "
+        + "to azure urls for your uploaded artifacts in upload_urls.json"
+    )
 
 
 if __name__ == "__main__":

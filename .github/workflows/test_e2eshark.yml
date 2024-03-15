@@ -74,15 +74,12 @@ jobs:
           bash build_tools/ci/install_python_deps.sh nightly
         working-directory: ./torch-mlir
 
-      - name: Build project and wheels
+      - name: Build
         run: |
-          TM_PYTHON_VERSIONS=cp311-cp311 TM_PACKAGES=torch-mlir ./build_tools/python_deploy/build_linux_packages.sh
-          mkdir torch-mlir-wheel
-          cp build_tools/python_deploy/wheelhouse/torch*.whl torch-mlir-wheel/
+          bash build_tools/ci/build_posix.sh
         working-directory: ./torch-mlir
   
   # iree:
-  # bash build_tools/ci/build_posix.sh
   #   strategy:
   #     matrix:
   #       version: [3.11]
@@ -175,5 +172,5 @@ jobs:
         run: |
           source ${E2E_VENV_DIR}/bin/activate
           cd e2eshark
-          python ./run.py -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine --tests pytorch/models/beit-base-patch16-224-pt22k-ft22k pytorch/models/bge-base-en-v1.5 pytorch/models/mit-b0 pytorch/models/bert-large-uncased pytorch/models/deit-small-distilled-patch16-224 --cleanup
+          python ./run.py -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup
         working-directory: ./test-suite

@@ -47,6 +47,8 @@ decoder_input_ids = model._shift_right(decoder_input_ids)
 attention_mask = torch.ones(1, 512).to("cpu")
 E2ESHARK_CHECK["input"] = [encoded_input_ids, attention_mask, decoder_input_ids]
 E2ESHARK_CHECK["output"] = model(input_ids=encoded_input_ids, attention_mask=attention_mask, decoder_input_ids=decoder_input_ids)
+# last hidden state (contextual info, sequence of hidden-states at the output of the last layer of the decoder of the model.)
+E2ESHARK_CHECK["output_for_validation"] = [E2ESHARK_CHECK["output"][0]]
 
 print("Input:", E2ESHARK_CHECK["input"])
 print("Output:", E2ESHARK_CHECK["output"])

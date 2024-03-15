@@ -81,7 +81,7 @@ jobs:
   
   # iree:
   # bash build_tools/ci/build_posix.sh
-  #   strategy
+  #   strategy:
   #     matrix:
   #       version: [3.11]
   #       os: [nodai-amdgpu-w7900-x86-64]

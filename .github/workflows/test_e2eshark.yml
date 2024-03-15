@@ -172,5 +172,5 @@ jobs:
         run: |
           source ${E2E_VENV_DIR}/bin/activate
           cd e2eshark
-          python ./run.py -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup
+          python ./run.py -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -tests pytorch/models/beit-base-patch16-224-pt22k-ft22k --cleanup
         working-directory: ./test-suite

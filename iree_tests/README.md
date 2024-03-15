@@ -61,7 +61,9 @@ $ python -m pip install -r iree_tests/requirements.txt
 To use `iree-compile` and `iree-run-module` from Python packages:
 
 ```bash
-$ python -m pip install iree-compiler iree-runtime
+$ python -m pip install --find-links https://iree.dev/pip-release-links.html \
+  iree-compiler iree-runtime --upgrade
+
 ```
 
 To use local versions of `iree-compile` and `iree-run-module`, put them on your
@@ -89,6 +91,9 @@ $ pytest iree_tests -n auto
 Run tests using custom config files:
 
 ```bash
+$ pytest iree_tests --config-files ./configs/config_gpu_vulkan.json
+
+# OR set an environment variable
 $ export IREE_TEST_CONFIG_FILES=/iree/config_cpu_llvm_sync.json;/iree/config_gpu_vulkan.json
 $ pytest iree_tests
 ```
@@ -122,7 +127,25 @@ collected 1047 items
 ======================== 1047 tests collected in 4.34s ========================
 ```
 
-Run a subset of tests (see
+Run tests from a specific subdirectory:
+
+```bash
+$ pytest iree_tests/simple
+
+======================================= test session starts =======================================
+platform win32 -- Python 3.11.2, pytest-8.0.2, pluggy-1.4.0
+rootdir: D:\dev\projects\SHARK-TestSuite\iree_tests
+configfile: pytest.ini
+plugins: retry-1.6.2, timeout-2.2.0, xdist-3.5.0
+collected 2 items
+
+simple\abs\simple_abs.mlir .                                                                 [ 50%]
+simple\abs_bc\simple_abs.mlirbc .                                                            [100%]
+
+======================================== 2 passed in 2.48s ========================================
+```
+
+Run a filtered subset of tests (see
 [Specifying which tests to run](https://docs.pytest.org/en/8.0.x/how-to/usage.html#specifying-which-tests-to-run)):
 
 ```bash
@@ -176,6 +199,11 @@ PASSED iree_tests/onnx/node/generated/test_clip_example/model.mlir::cpu
 
 ## Available test suites
 
+### Simple tests
+
+These are hand-authored tests demonstratating simple features about how the
+tools and test suite work.
+
 ### ONNX test suite
 
 The ONNX test suite is a conversion of the upstream test suite from
@@ -198,4 +226,112 @@ To regenerate the test cases:
 python -m pip install iree-compiler iree-runtime
 python -m pip install -r ./iree_tests/onnx/requirements.txt
 python ./iree_tests/onnx/import_tests.py
+```
+
+### PyTorch models
+
+#### Generating model test cases from e2eshark
+
+> [!WARNING]
+> UNDER CONSTRUCTION - this will change!
+
+1. Setup venv for the [e2eshark/](/e2eshark/) directory by following that README
+
+2. Run a test from e2eshark to generate artifact files:
+
+    ```bash
+    e2eshark$ python run.py \
+      --cachedir ${CACHE_DIR} \
+      -c ${TORCH_MLIR_BUILD_DIR} \
+      -i ${IREE_BUILD_DIR} \
+      --tests pytorch/models/resnet50 \
+      --mode turbine
+
+    e2eshark$ ls test-run/pytorch/models/resnet50/
+
+    __pycache__/        inference_input.0.bin           resnet50.default.input.pt
+    commands.log        inference_output.0.bin          resnet50.default.pytorch.torch.mlir
+    commonutils.py@     iree-compile.log                resnet50.default.vmfb
+    E2ESHARK_CHECK.pkl  model-run.log                   runmodel.py
+    inference.log       resnet50.default.goldoutput.pt  time.pkl
+    ```
+
+    We want the program `.mlir` and input/output `.pt` files.
+
+3. Run `import_from_e2eshark.py --model=[model_name]` to extract parameters
+   (both splats and real weights), convert to `.mlirbc`, and copy test files
+   into `iree_tests/`:
+
+   ```bash
+   iree_tests$ python ./pytorch/models/export_from_e2eshark.py resnet50
+   iree_tests$ ls ./pytorch/models/resnet50
+
+   opt-125M.mlirbc  splats.irpa
+   ```
+
+4. Add a `splat_data_flags.txt` matching the input signature and using
+    the splat parameters:
+
+    ```txt
+    --input="1x3x224x224xf32"
+    --parameters=splats.irpa
+    ```
+
+5. Upload `inference_input`, `inference_output`, and `real_weights.irpa` files
+   from the `test-run/` folder to Azure (e.g. using Azure Storage Explorer)
+
+6. Add a `real_weights_data_flags.txt` and `test_cases.json` file for real
+   weights, pointing at the uploaded remote files.
+
+## Appendix
+
+### Working with .mlirbc files
+
+The [MLIR Bytecode Format](https://mlir.llvm.org/docs/BytecodeFormat/) (often
+represented as `.mlirbc` files) can be used to store/transmit/load MLIR files
+efficiently, but it is harder to inspect than text (`.mlir`) files.
+
+To convert files IREE understands between `.mlir` and `.mlirbc`:
+
+```bash
+iree-ir-tool cp model.mlir --emit-bytecode -o model.mlirbc
+iree-ir-tool cp model.mlirbc -o model.mlir
+```
+
+You can also run through `-opt` tools like `torch-mlir-opt` with no options,
+if the tool includes all relevant MLIR dialects:
+
+```bash
+torch-mlir-opt model.mlirbc -o model.mlir
+```
+
+The
+[MLIR VSCode extension](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-mlir)
+can also edit `.mlirbc` files as text.
+
+### Working with large MLIR files
+
+To simply strip weights:
+
+```bash
+iree-ir-tool strip-data model.mlir -o model_stripped.mlir
+```
+
+### Working with parameter files
+
+To convert from .safetensors to .irpa (real weights):
+
+```bash
+iree-convert-parameters \
+  --parameters=path/to/file.safetensors \
+  --output=path/to/output.irpa
+```
+
+To strip constants and replace them with splats:
+
+```bash
+iree-convert-parameters \
+  --parameters=path/to/parameters.[safetensors,irpa] \
+  --strip \
+  --output=path/to/output.irpa
 ```

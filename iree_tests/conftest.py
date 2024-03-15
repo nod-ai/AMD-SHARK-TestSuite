@@ -13,6 +13,84 @@ import pytest
 import subprocess
 
 
+# --------------------------------------------------------------------------- #
+# pytest hooks
+# https://docs.pytest.org/en/stable/reference/reference.html#initialization-hooks
+# https://docs.pytest.org/en/stable/reference/reference.html#collection-hooks
+
+
+def pytest_addoption(parser):
+    # List of configuration files following this schema:
+    #   {
+    #     "config_name": str,
+    #     "iree_compile_flags": list of str,
+    #     "iree_run_module_flags": list of str,
+    #     "skip_compile_tests": list of str,
+    #     "skip_run_tests": list of str,
+    #     "expected_compile_failures": list of str,
+    #     "expected_run_failures": list of str
+    #   }
+    #
+    # For example, to test on CPU with the `llvm-cpu` backend and `local-task` device:
+    #   {
+    #     "config_name": "cpu_llvm_task",
+    #     "iree_compile_flags": ["--iree-hal-target-backends=llvm-cpu"],
+    #     "iree_run_module_flags": ["--device=local-task"],
+    #     "skip_compile_tests": [],
+    #     "skip_run_tests": [],
+    #     "expected_compile_failures": ["test_abs"],
+    #     "expected_run_failures": ["test_add"],
+    #   }
+    #
+    # The list of files can be specified in (by order of preference):
+    #   1. The `--config-files` argument
+    #       e.g. `pytest ... --config-files foo.json bar.json`
+    #   2. The `IREE_TEST_CONFIG_FILES` environment variable
+    #       e.g. `set IREE_TEST_CONFIG_FILES=foo.json;bar.json`
+    #   3. A default config file used for testing the test suite itself
+    default_config_files = [
+        f for f in os.getenv("IREE_TEST_CONFIG_FILES", "").split(";") if f
+    ]
+    if not default_config_files:
+        this_dir = Path(__file__).parent
+        repo_root = this_dir.parent
+        default_config_files = [
+            repo_root / "iree_tests/configs/config_cpu_llvm_sync.json",
+            # repo_root / "iree_tests/configs/config_gpu_vulkan.json",
+        ]
+    parser.addoption(
+        "--config-files",
+        action="store",
+        nargs="*",
+        default=default_config_files,
+        help="List of config JSON files used to build test cases",
+    )
+
+
+def pytest_sessionstart(session):
+    session.config.iree_test_configs = []
+    for config_file in session.config.getoption("config_files"):
+        with open(config_file) as f:
+            session.config.iree_test_configs.append(pyjson5.load(f))
+
+
+def pytest_collect_file(parent, file_path):
+    if file_path.name.endswith(".mlir") or file_path.name.endswith(".mlirbc"):
+        return MlirFile.from_parent(parent, path=file_path)
+
+
+# TODO(scotttodd): other hooks hook may help with updating XFAIL sets
+#
+#   * load config file(s) and lists of tests requested
+#     `pytest_collection_finish`
+#   * after each test finishes, record result
+#     `pytest_runtest_logfinish`
+#   * after all tests finish, join results back into a config file
+#     `pytest_sessionfinish`
+#   * let the user accept the new config file in place of their original
+
+# --------------------------------------------------------------------------- #
+
 @dataclass(frozen=True)
 class IreeCompileAndRunTestSpec:
     """Specification for an IREE "compile and run" test."""
@@ -20,17 +98,21 @@ class IreeCompileAndRunTestSpec:
     # Directory where test input files are located.
     test_directory: Path
 
-    # Name of input MLIR file in a format accepted by IREE (e.g. torch, tosa, or linalg dialect)
+    # Name of input MLIR file in a format accepted by IREE (e.g. torch, tosa, or linalg dialect).
+    # Including file suffix, e.g. 'model.mlir' or 'model.mlirbc'.
     input_mlir_name: str
+
+    # Stem of input MLIR file, excluding file suffix, e.g. 'model'.
+    input_mlir_stem: str
 
     # Name of flagfile in the same directory as the input MLIR, containing flags like:
     #   --input=@input_0.npy
     #   --expected_output=@output_0.npy
     data_flagfile_name: str
 
-    # Name of the test configuration, e.g. "cpu".
+    # Name of the test configuration, e.g. "cpu_splats".
     # This will be used in generated files and test case names.
-    config_name: str
+    test_name: str
 
     # Flags to pass to `iree-compile`, e.g. ["--iree-hal-target-backends=llvm-cpu"].
     iree_compile_flags: List[str]
@@ -48,37 +130,84 @@ class IreeCompileAndRunTestSpec:
     # True to only compile the test and skip running.
     skip_run: bool
 
-
-def pytest_collect_file(parent, file_path):
-    if file_path.name.endswith("model.mlir"):
-        return MlirFile.from_parent(parent, path=file_path)
+    # True to skip the test entirely (but still define it).
+    skip_test: bool
 
 
 class MlirFile(pytest.File):
     """Collector for MLIR files accompanied by input/output."""
 
+    @dataclass(frozen=True)
+    class TestCase:
+        name: str
+        runtime_flagfile: str
+        enabled: bool
+
+    def check_for_remote_files(self, test_case_json):
+        """Checks if all remote_files in a JSON test case exist on disk."""
+        have_all_files = True
+        for remote_file_group in test_case_json["remote_file_groups"]:
+            for remote_file in remote_file_group["files"]:
+                if not (self.path.parent / remote_file).exists():
+                    test_case_name = test_case_json["name"]
+                    print(
+                        f"Missing file '{remote_file}' for test {self.path.parent.name}::{test_case_name}"
+                    )
+                    have_all_files = False
+                    break
+        return have_all_files
+
+    def discover_test_cases(self):
+        """Discovers test cases in either test_data_flags.txt or test_cases.json."""
+        test_cases = []
+
+        test_data_flagfile_name = "test_data_flags.txt"
+        if (self.path.parent / test_data_flagfile_name).exists():
+            test_cases.append(
+                MlirFile.TestCase(
+                    name="test",
+                    runtime_flagfile=test_data_flagfile_name,
+                    enabled=True,
+                )
+            )
+
+        test_cases_name = "test_cases.json"
+        test_cases_path = self.path.parent / test_cases_name
+        if not test_cases_path.exists():
+            return test_cases
+
+        with open(test_cases_path) as f:
+            test_cases_json = pyjson5.load(f)
+            for test_case_json in test_cases_json["test_cases"]:
+                test_case_name = test_case_json["name"]
+                have_all_files = self.check_for_remote_files(test_case_json)
+                test_cases.append(
+                    MlirFile.TestCase(
+                        name=test_case_name,
+                        runtime_flagfile=test_case_json["runtime_flagfile"],
+                        enabled=have_all_files,
+                    )
+                )
+
+        return test_cases
+
     def collect(self):
         # Expected directory structure:
         #   path/to/test_some_ml_operator/
-        #     - model.mlir
-        #     - test_data_flags.txt
+        #     - *.mlir[bc]
+        #     - test_data_flags.txt OR test_cases.json
         #   path/to/test_some_ml_model/
         #     ...
 
         test_directory = self.path.parent
         test_name = test_directory.name
 
-        # Note: this could be a glob() if we want to support multiple
-        # input/output test cases per test folder.
-        test_data_flagfile_name = "test_data_flags.txt"
-        if not (self.path.parent / test_data_flagfile_name).exists():
-            # TODO(scotttodd): support just compiling but not testing by omitting
-            #   data flags? May need another config file next to the .mlir.
-            print(f"Missing test_data_flags.txt for test '{test_name}'")
+        test_cases = self.discover_test_cases()
+        if len(test_cases) == 0:
+            print(f"No test cases for '{test_name}'")
             return []
 
-        global _iree_test_configs
-        for config in _iree_test_configs:
+        for config in self.config.iree_test_configs:
             if test_name in config["skip_compile_tests"]:
                 continue
 
@@ -88,18 +217,25 @@ class MlirFile(pytest.File):
             expect_run_success = test_name not in config["expected_run_failures"]
             skip_run = test_name in config["skip_run_tests"]
             config_name = config["config_name"]
-            spec = IreeCompileAndRunTestSpec(
-                test_directory=test_directory,
-                input_mlir_name=self.path.name,
-                data_flagfile_name=test_data_flagfile_name,
-                config_name=config_name,
-                iree_compile_flags=config["iree_compile_flags"],
-                iree_run_module_flags=config["iree_run_module_flags"],
-                expect_compile_success=expect_compile_success,
-                expect_run_success=expect_run_success,
-                skip_run=skip_run,
-            )
-            yield IreeCompileRunItem.from_parent(self, name=config_name, spec=spec)
+
+            # TODO(scotttodd): don't compile once per test case?
+            #   try pytest-dependency or pytest-depends
+            for test_case in test_cases:
+                test_name = config_name + "_" + test_case.name
+                spec = IreeCompileAndRunTestSpec(
+                    test_directory=test_directory,
+                    input_mlir_name=self.path.name,
+                    input_mlir_stem=self.path.stem,
+                    data_flagfile_name=test_case.runtime_flagfile,
+                    test_name=test_name,
+                    iree_compile_flags=config["iree_compile_flags"],
+                    iree_run_module_flags=config["iree_run_module_flags"],
+                    expect_compile_success=expect_compile_success,
+                    expect_run_success=expect_run_success,
+                    skip_run=skip_run,
+                    skip_test=not test_case.enabled,
+                )
+                yield IreeCompileRunItem.from_parent(self, name=test_name, spec=spec)
 
 
 class IreeCompileRunItem(pytest.Item):
@@ -113,9 +249,9 @@ class IreeCompileRunItem(pytest.Item):
 
         # TODO(scotttodd): swap cwd for a temp path?
         self.test_cwd = self.spec.test_directory
-        vmfb_name = f"model_{self.spec.config_name}.vmfb"
+        vmfb_name = f"{self.spec.input_mlir_stem}_{self.spec.test_name}.vmfb"
 
-        self.compile_args = ["iree-compile", str(self.spec.input_mlir_name)]
+        self.compile_args = ["iree-compile", self.spec.input_mlir_name]
         self.compile_args.extend(self.spec.iree_compile_flags)
         self.compile_args.extend(["-o", str(vmfb_name)])
 
@@ -124,6 +260,9 @@ class IreeCompileRunItem(pytest.Item):
         self.run_args.append(f"--flagfile={self.spec.data_flagfile_name}")
 
     def runtest(self):
+        if self.spec.skip_test:
+            pytest.skip()
+
         if not self.spec.expect_compile_success:
             self.add_marker(
                 pytest.mark.xfail(
@@ -217,54 +356,3 @@ class IreeRunException(Exception):
             f"Run with:\n"
             f"  cd {cwd} && {' '.join(process.args)}\n\n"
         )
-
-
-# TODO(scotttodd): move this setup code into a (scoped) function?
-#   Is there some way to share state across pytest functions?
-
-# Load a list of configuration files following this schema:
-#   {
-#     "config_name": str,
-#     "iree_compile_flags": list of str,
-#     "iree_run_module_flags": list of str,
-#     "skip_compile_tests": list of str,
-#     "skip_run_tests": list of str,
-#     "expected_compile_failures": list of str,
-#     "expected_run_failures": list of str
-#   }
-#
-# For example, to test the on CPU with the `llvm-cpu`` backend on the `local-task` device:
-#   {
-#     "config_name": "cpu",
-#     "iree_compile_flags": ["--iree-hal-target-backends=llvm-cpu"],
-#     "iree_run_module_flags": ["--device=local-task"],
-#     "skip_compile_tests": [],
-#     "skip_run_tests": [],
-#     "expected_compile_failures": ["test_abs"],
-#     "expected_run_failures": ["test_add"],
-#   }
-#
-# TODO(scotttodd): expand schema with more flexible include_tests/exclude_tests fields.
-#   * One use case is wanting to run only a small, controlled subset of tests, without needing to
-#     manually exclude any new tests that might be added in the future.
-#
-# First check for the `IREE_TEST_CONFIG_FILES` environment variable. If defined,
-# this should point to a semicolon-delimited list of config file paths, e.g.
-# `export IREE_TEST_CONFIG_FILES=/iree/config_cpu.json;/iree/config_gpu.json`.
-_iree_test_configs = []
-_iree_test_config_files = [
-    config for config in os.getenv("IREE_TEST_CONFIG_FILES", "").split(";") if config
-]
-
-# If no config files were specified via the environment variable, default to in-tree config files.
-if not _iree_test_config_files:
-    THIS_DIR = Path(__file__).parent
-    REPO_ROOT = THIS_DIR.parent
-    _iree_test_config_files = [
-        REPO_ROOT / "iree_tests/configs/config_cpu_llvm_sync.json",
-        # REPO_ROOT / "iree_tests/configs/config_gpu_vulkan.json",
-    ]
-
-for config_file in _iree_test_config_files:
-    with open(config_file) as f:
-        _iree_test_configs.append(pyjson5.load(f))

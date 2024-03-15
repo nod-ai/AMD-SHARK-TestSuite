@@ -459,18 +459,9 @@ def runCodeGeneration(
 
 # ∣input−other∣ ≤ atol + rtol × ∣other∣
 # returns (atol, rtol)
-# Pytorch torch.testing defaults:
-#    bf16: atol=1e-05, rtol=1.6e-02
-#    fp16: atol=1e-05, rtol=1e-03
-#    fp32: atol=1e-05, rtol=1.3e-06
-def getTolerances(torchdtype):
-    if torchdtype == torch.bfloat16:
-        return (1e-02, 1e-01)
-    elif torchdtype == torch.float16:
-        return (1e-04, 1e-03)
-    else:
-        return (1e-04, 1e-04)
-
+# Pytorch torch.testing:
+def getTolerances(args):
+    return (args.atol, args.rtol)
 
 def compareOutputs(args, goldoutput, infoutput, dtype):
     # if shapes do not match, we have a problem as comparison routines may crash
@@ -486,7 +477,7 @@ def compareOutputs(args, goldoutput, infoutput, dtype):
             # If each element matches exactly only then torch.equal is true
             inferencematched = torch.equal(infoutput, goldoutput)
         else:
-            atol, rtol = getTolerances(dtype)
+            atol, rtol = getTolerances(args)
             inferencematched = torch.allclose(infoutput, goldoutput, rtol, atol)
     return inferencematched
 
@@ -1343,6 +1334,18 @@ def main():
         help="Space efficient testing (removing the large mlir, vmfb files during the model runs)",
         action="store_true",
         default=False,
+    )
+    parser.add_argument(
+        "--rtol",
+        help="Set rtol tolerance parameter",
+        type=float,
+        default=1e-04,
+    )
+    parser.add_argument(
+        "--atol",
+        help="Set atol tolerance parameter",
+        type=float,
+        default=1e-04,
     )
 
     args = parser.parse_args()

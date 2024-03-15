@@ -76,6 +76,7 @@ jobs:
 
       - name: Build project and wheels
         run: |
+          curl -sSL https://get.docker.com/ | sudo sh
           TM_PYTHON_VERSIONS=cp311-cp311 TM_PACKAGES=torch-mlir ./build_tools/python_deploy/build_linux_packages.sh
           mkdir torch-mlir-wheel
           cp build_tools/python_deploy/wheelhouse/torch*.whl torch-mlir-wheel/

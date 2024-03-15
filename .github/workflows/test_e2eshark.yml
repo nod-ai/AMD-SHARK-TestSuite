@@ -76,11 +76,11 @@ jobs:
 
       - name: Build project and wheels
         run: |
-          bash build_tools/ci/build_posix.sh
-          bash build_tools/build_python_wheels.sh
+          PYTHON="$(which python)" bash build_tools/build_python_wheels.sh
         working-directory: ./torch-mlir
   
   # iree:
+  # bash build_tools/ci/build_posix.sh
   #   strategy
   #     matrix:
   #       version: [3.11]

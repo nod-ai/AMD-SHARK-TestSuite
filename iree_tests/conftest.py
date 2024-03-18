@@ -143,6 +143,16 @@ class MlirFile(pytest.File):
         runtime_flagfile: str
         enabled: bool
 
+    def check_for_lfs_files(self):
+        """Checks if git LFS files are checked out."""
+        have_lfs_files = True
+        if self.path.stat().st_size < 1000:
+            with open(self.path, "rt") as f:
+                first_line = f.readline()
+                if "git-lfs" in first_line:
+                    have_lfs_files = False
+        return have_lfs_files
+
     def check_for_remote_files(self, test_case_json):
         """Checks if all remote_files in a JSON test case exist on disk."""
         have_all_files = True
@@ -161,13 +171,15 @@ class MlirFile(pytest.File):
         """Discovers test cases in either test_data_flags.txt or test_cases.json."""
         test_cases = []
 
+        have_lfs_files = self.check_for_lfs_files()
+
         test_data_flagfile_name = "test_data_flags.txt"
         if (self.path.parent / test_data_flagfile_name).exists():
             test_cases.append(
                 MlirFile.TestCase(
                     name="test",
                     runtime_flagfile=test_data_flagfile_name,
-                    enabled=True,
+                    enabled=have_lfs_files,
                 )
             )
 
@@ -185,7 +197,7 @@ class MlirFile(pytest.File):
                     MlirFile.TestCase(
                         name=test_case_name,
                         runtime_flagfile=test_case_json["runtime_flagfile"],
-                        enabled=have_all_files,
+                        enabled=have_lfs_files and have_all_files,
                     )
                 )
 

@@ -28,6 +28,7 @@ prompt = "What is nature of our existence?"
 encoding = tokenizer(prompt, return_tensors="pt")
 E2ESHARK_CHECK["input"] = encoding["input_ids"].cpu()
 E2ESHARK_CHECK["output"] = model(E2ESHARK_CHECK["input"])
+E2ESHARK_CHECK["output_for_validation"] = [E2ESHARK_CHECK["output"][0]]
 model_response = model.generate(
     E2ESHARK_CHECK["input"],
     do_sample=True,
@@ -43,3 +44,13 @@ print("Output:", E2ESHARK_CHECK["output"])
 # For geneartive AI models, input is int and should be kept that way for
 # casted models as well
 E2ESHARK_CHECK["inputtodtype"] = False
+
+# Post process output to do:
+# torch.nn.functional.softmax(output, -1)
+# The output logits is the shape of (B, S, V).
+# (batch size, sequence length, unormalized scores for each possible token in vocabulary)
+# This way we create a probability distribution for each possible token (vocabulary)
+# for each position in the sequence by doing softmax over the last dimension.
+E2ESHARK_CHECK["postprocess"] = [
+    (torch.nn.functional.softmax, [-1], False, 0),
+]

@@ -665,10 +665,8 @@ def runInference(
             torch.set_printoptions(profile="full")
             print(f"Gold reference[output[{i}]]:\n{goldoutput}\n", file=failedinflog)
             print(f"Inference Output[output[{i}]]:\n{infoutput}:\n", file=failedinflog)
-            diff = torch.eq(
-                infoutput,
-                goldoutput,
-            )
+            atol, rtol = getTolerances(args, infoutput.dtype)
+            diff = torch.abs(infoutput - goldoutput) <= (atol + rtol * torch.abs(goldoutput))
             print(f"Element-wise difference[output[{i}]]:\n{diff}\n", file=failedinflog)
             percentdiff = torch.sum(diff).item() / diff.nelement() * 100
             print(

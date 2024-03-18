@@ -160,8 +160,8 @@ jobs:
           source ${E2E_VENV_DIR}/bin/activate
           git submodule update --init
           pip install --upgrade pip
-          pip install -r /home/esaimana/torch-mlir/requirements.txt
-          pip install -r /home/esaimana/torch-mlir/torchvision-requirements.txt
+          pip install -r ../torch-mlir/requirements.txt
+          pip install -r ../torch-mlir/torchvision-requirements.txt
           pip install torch-mlir -f https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
           pip install -r ./e2eshark/requirements.txt
           pip install -e ../turbine/core[testing]
@@ -172,5 +172,5 @@ jobs:
         run: |
           source ${E2E_VENV_DIR}/bin/activate
           cd e2eshark
-          python ./run.py -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -tests pytorch/models/beit-base-patch16-224-pt22k-ft22k --cleanup
+          python ./run.py -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine --tests pytorch/models/beit-base-patch16-224-pt22k-ft22k --cleanup
         working-directory: ./test-suite

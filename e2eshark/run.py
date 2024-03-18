@@ -475,16 +475,13 @@ def runCodeGeneration(
 #    fp16: atol=1e-05, rtol=1e-03
 #    fp32: atol=1e-05, rtol=1.3e-06
 def getTolerances(args, torchdtype):
-    atol, rtol = (1e-05, 1.3e-06)
     if args.tolerance:
-        atol, rtol = tuple(args.tolerance)
+        return tuple(args.tolerance)
     elif torchdtype == torch.bfloat16:
-        atol, rtol = (1e-02, 1e-01)
+        return (1e-02, 1e-01)
     elif torchdtype == torch.float16:
-        atol, rtol = (1e-04, 1e-03)
-    else:
-        atol, rtol = (1e-04, 1e-04)
-    return (atol, rtol)
+        return (1e-04, 1e-03)
+    return (1e-04, 1e-04)
 
 
 def compareOutputs(args, goldoutput, infoutput, dtype):

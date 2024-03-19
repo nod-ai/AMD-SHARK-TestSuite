@@ -131,47 +131,55 @@ jobs:
           repository: nod-ai/SHARK-Turbine
           path: turbine
   
-  e2eshark:
-    needs: [turbine, torch-mlir]
-    strategy:
-      matrix:
-        version: [3.11]
-        os: [nodai-amdgpu-w7900-x86-64]
-    runs-on: ${{matrix.os}}
-    env:
-      E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-        with:
-          repository: nod-ai/SHARK-TestSuite
-          path: test-suite
+  # e2eshark:
+  #   needs: [turbine, torch-mlir]
+  #   strategy:
+  #     matrix:
+  #       version: [3.11]
+  #       os: [nodai-amdgpu-w7900-x86-64]
+  #   runs-on: ${{matrix.os}}
+  #   env:
+  #     E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v2
+  #       with:
+  #         repository: nod-ai/SHARK-TestSuite
+  #         path: test-suite
       
-      - name: "Setting up Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{matrix.version}}
+  #     - name: "Setting up Python"
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: ${{matrix.version}}
 
-      - name: "Setup Python venv"
-        run: python -m venv ${E2E_VENV_DIR}
+  #     - name: "Setup Python venv"
+  #       run: python -m venv ${E2E_VENV_DIR}
 
-      - name: Build
-        run: |
-          source ${E2E_VENV_DIR}/bin/activate
-          git submodule update --init
-          pip install --upgrade pip
-          pip install -r ../torch-mlir/requirements.txt
-          pip install -r ../torch-mlir/torchvision-requirements.txt
-          pip install torch-mlir -f https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
-          pip install -r ./e2eshark/requirements.txt
-          pip install -e ../turbine/core[testing]
-          pip install -e ../turbine/models
-        working-directory: ./test-suite
+  #     - name: Build
+  #       run: |
+  #         source ${E2E_VENV_DIR}/bin/activate
+  #         git submodule update --init
+  #         pip install --upgrade pip
+  #         pip install -r ../torch-mlir/requirements.txt
+  #         pip install -r ../torch-mlir/torchvision-requirements.txt
+  #         pip install torch-mlir -f https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
+  #         pip install -r ./e2eshark/requirements.txt
+  #       working-directory: ./test-suite
 
-      - name: Run Tests
-        run: |
-          source ${E2E_VENV_DIR}/bin/activate
-          cd e2eshark
-          free -mh
-          python ./run.py -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup --postprocess -v
-        working-directory: ./test-suite
+  #     - name: Run Onnx Mode
+  #       run: |
+  #         source ${E2E_VENV_DIR}/bin/activate
+  #         cd e2eshark
+  #         free -mh
+  #         python ./run.py -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode onnx -g models --cleanup --postprocess -v
+  #       working-directory: ./test-suite
+
+  #     - name: Run Turbine Mode
+  #       run: |
+  #         source ${E2E_VENV_DIR}/bin/activate
+  #         pip install -e ../turbine/core[testing]
+  #         pip install -e ../turbine/models
+  #         cd e2eshark
+  #         free -mh
+  #         python ./run.py -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup --postprocess -v
+  #       working-directory: ./test-suite

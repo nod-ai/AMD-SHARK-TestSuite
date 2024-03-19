@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import transformers
 from transformers import LlamaForCausalLM, LlamaTokenizer
+import os
 
 # import from e2eshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
@@ -14,12 +15,16 @@ E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
 
 # model origin: https://huggingface.co/meta-llama/Llama-2-7b-hf
 test_modelname = "meta-llama/Llama-2-7b-hf"
-tokenizer = LlamaTokenizer.from_pretrained(test_modelname)
+token = os.getenv("HF_TOKEN", "")
+if token == "":
+    print(f"Huggingface token is required for this model ({test_modelname}). Please set using HF_TOKEN environment variable")
+tokenizer = LlamaTokenizer.from_pretrained(test_modelname, token=token)
 model = LlamaForCausalLM.from_pretrained(
     test_modelname,
     low_cpu_mem_usage=True,
     attn_implementation="eager",
     torchscript=True,
+    token=token,
 )
 model.to("cpu")
 model.eval()

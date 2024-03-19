@@ -9,9 +9,9 @@ git clone https://github.com/nod-ai/SHARK-Turbine
 Now, go back to the TestSuite Repo, and create a python environment in TestSuite/e2eshark (`python -m venv e2e_venv` and `source e2e_venv/bin/activate`)
 
 ```
-pip install -f https://openxla.github.io/iree/pip-release-links.html --upgrade -r 'your local SHARK Turbine repo'/core/iree-requirements.txt
-pip install -e 'your local SHARK Turbine repo'/core[testing]
-pip install -e 'your local SHARK Turbine repo'/models
+pip install -f https://openxla.github.io/iree/pip-release-links.html --upgrade -r 'path to your local SHARK Turbine repo'/core/iree-requirements.txt
+pip install -e 'path to your local SHARK Turbine repo'/core[testing]
+pip install -e 'path to your local SHARK Turbine repo'/models
 ```
 
 ## Overview

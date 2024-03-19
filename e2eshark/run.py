@@ -1528,10 +1528,11 @@ def main():
 
     # When all processes are done, print
     print("\nCompleted run of e2e shark tests")
-    print(
-        "\nIf using the upload feature, you can find a map of the test name "
-        + "to azure urls for your uploaded artifacts in upload_urls.json"
-    )
+    if args.uploadtestsfile:
+        print(
+            "\nIf using the upload feature, you can find a map of the test name "
+            + "to azure urls for your uploaded artifacts in upload_urls.json"
+        )
 
 
 if __name__ == "__main__":

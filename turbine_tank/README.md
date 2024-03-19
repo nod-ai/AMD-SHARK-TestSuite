@@ -1,5 +1,19 @@
 # Turbine Tank
 
+## Setup
+
+```
+git clone https://github.com/nod-ai/SHARK-Turbine
+```
+
+Now, go back to the TestSuite Repo, and create a python environment in TestSuite/e2eshark
+
+```
+pip install -f https://openxla.github.io/iree/pip-release-links.html --upgrade -r 'your local SHARK Turbine repo'/core/iree-requirements.txt
+pip install -e 'your local SHARK Turbine repo'/core[testing]
+pip install -e 'your local SHARK Turbine repo'/models
+```
+
 Turbine tank allows us to currently run llama, sd models, and 30 other models e2e and upload torch mlir artifacts to Azure. Both inline weights and external parameter versions are uploaded (take a look at `classic_flow` and `param_flow` in tank_util.py).
 
 If interested in how the azure side of uploading and downloading while maintaining versioning (date + git_sha) please take a look at this file: [azure handling](https://github.com/nod-ai/SHARK-Turbine/blob/main/models/turbine_models/turbine_tank/turbine_tank.py), which is a part of the turbine changes needed for turbine tank to work.

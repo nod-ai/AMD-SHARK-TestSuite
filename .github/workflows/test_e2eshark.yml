@@ -18,32 +18,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # torch-mlir:
-  #   strategy:
-  #     matrix:
-  #       version: [3.11]
-  #       os: [nodai-amdgpu-w7900-x86-64]
-  #   runs-on: ${{matrix.os}}
-  #   steps:
-  #     - name: "Checking out repository"
-  #       uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
-  #       with:
-  #         submodules: true
-  #         repository: saienduri/torch-mlir-fork
-  #         path: torch-mlir
+  torch-mlir:
+    strategy:
+      matrix:
+        version: [3.11]
+        os: [nodai-amdgpu-w7900-x86-64]
+    runs-on: ${{matrix.os}}
+    steps:
+      - name: "Checking out repository"
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        with:
+          submodules: true
+          repository: saienduri/torch-mlir-fork
+          path: torch-mlir
 
-  #     - name: Install python deps (nightly)
-  #       run: |
-  #         bash build_tools/ci/install_python_deps.sh nightly
-  #         python3 -m pip uninstall -y PyYAML
-  #         python3 -m pip install PyYAML==6.0.1
-  #         python3 -m pip list
-  #       working-directory: ./torch-mlir
+      - name: Install python deps (nightly)
+        run: |
+          bash build_tools/ci/install_python_deps.sh nightly
+          python3 -m pip uninstall -y PyYAML
+          python3 -m pip install PyYAML==6.0.1
+          python3 -m pip list
+        working-directory: ./torch-mlir
 
-  #     - name: Build
-  #       run: |
-  #         bash build_tools/ci/build_posix.sh
-  #       working-directory: ./torch-mlir
+      - name: Build
+        run: |
+          bash build_tools/e2eshark_build.sh
+        working-directory: ./torch-mlir
   
   turbine:
     strategy:
@@ -58,7 +58,7 @@ jobs:
           path: turbine
   
   e2eshark:
-    needs: [turbine]
+    needs: [turbine, torch-mlir]
     strategy:
       matrix:
         version: [3.11]
@@ -97,7 +97,7 @@ jobs:
           source ${E2E_VENV_DIR}/bin/activate
           cd e2eshark
           free -mh
-          python ./run.py -r ./test-onnx -c /home/esaimana/torch-mlir/build --report --cachedir ~/.cache/huggingface --mode onnx --tests pytorch/models/bert-large-uncased --cleanup --postprocess --ci -v
+          python ./run.py -r ./test-onnx -c /home/esaimana/torch-mlir/build --report --cachedir ~/.cache/huggingface --mode onnx -g models --cleanup --postprocess --ci -v
         working-directory: ./test-suite
 
       - name: Run Turbine Mode
@@ -108,17 +108,7 @@ jobs:
           pip install -e ../turbine/models
           cd e2eshark
           free -mh
-          python ./run.py -r ./test-turbine -c /home/esaimana/torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine --tests pytorch/models/bert-large-uncased --cleanup --postprocess --ci -v
-          cd ci_reports
-          ls
-          date=$(date '+%Y-%m-%d')
-          cd $date
-          ls
-          cd onnx_reports
-          ls
-          cd ..
-          cd turbine_reports
-          ls
+          python ./run.py -r ./test-turbine -c /home/esaimana/torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup --postprocess --ci -v
         working-directory: ./test-suite
   
   upload_artifacts:

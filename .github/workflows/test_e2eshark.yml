@@ -80,7 +80,7 @@ jobs:
           bash build_tools/ci/build_posix.sh
         working-directory: ./torch-mlir
   
-  # iree
+  # iree:
   #   strategy:
   #     matrix:
   #       version: [3.11]

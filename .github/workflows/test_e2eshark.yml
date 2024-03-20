@@ -120,3 +120,25 @@ jobs:
           cd turbine_reports
           ls
         working-directory: ./test-suite
+  
+  upload_artifacts:
+    needs: [e2eshark]
+    strategy:
+      matrix:
+        os: [nodai-amdgpu-w7900-x86-64]
+    runs-on: ${{matrix.os}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          repository: saienduri/e2eshark-reports
+          path: e2eshark-reports
+      
+      - name: Push artifacts
+        run: |
+          date=$(date '+%Y-%m-%d')
+          cd ../test-suite/e2eshark/ci_reports
+          mv $date ../../../e2eshark-reports
+          cd ../../../e2eshark-reports
+          ls
+        working-directory: ./e2eshark-reports

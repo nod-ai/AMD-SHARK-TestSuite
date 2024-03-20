@@ -132,6 +132,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: saienduri/e2eshark-reports
+          ref: 'main'
+          token: ${{ secrets.E2ESHARK_GITHUB_TOKEN }}
           path: e2eshark-reports
       
       - name: Push artifacts
@@ -140,12 +142,9 @@ jobs:
           cd ../test-suite/e2eshark/ci_reports
           mv $date ../../../e2eshark-reports
           cd ../../../e2eshark-reports
-          ls
-          cd $date
-          ls
-          cd onnx_reports
-          ls
-          cd ..
-          cd turbine_reports
-          ls
+          git config user.name "saienduri"
+          git config user.email "enduri.sai@gmail.com"
+          git add $date
+          git commit -m "add CI reports for e2eshark"
+          git push origin main
         working-directory: ./e2eshark-reports

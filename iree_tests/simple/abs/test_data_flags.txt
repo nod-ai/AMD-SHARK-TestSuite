@@ -1,0 +1,2 @@
+--input="f32=-5"
+--expected_output="f32=5"

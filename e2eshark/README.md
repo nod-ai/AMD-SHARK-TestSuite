@@ -163,9 +163,14 @@ Note that the --cachedir command line argument is necessary for any run command.
 
 Run the tests in operators, combinations folders of the default framework (i.e. pytorch),
 Use framework to onnx to torch MLIR path (--mode onnx) and run upto inference (default) using llvm-cpu backend (default),
-use four processor cores (default --jobs 4) on your machine, generate report file after finishing test run
+use four processor cores (default --jobs 4) on your machine, generate report file after finishing test run.
+
+If the model you are running requires a huggingface token (llama, gemma), set the HF_TOKEN env variable as well.
+Either set environment in shell (`export HF_TOKEN=your_token`) or add it on in command line
+as shown below.
+
 ```
-python ./run.py -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir'
+HF_TOKEN=your_token python ./run.py -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir'
 --report --cachedir 'path_to_your_cache_dir'
 ```
 You can see logs of test run inside test-run/'test sub-directory'. Start with commands.log file. 

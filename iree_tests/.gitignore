@@ -5,3 +5,8 @@
 
 # Leftovers from an older iteration of compile/run test scripts.
 config_*.txt
+
+# Large files fetched on-demand
+*.bin
+real_weights.irpa
+pytorch/models/**/*.npy

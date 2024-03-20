@@ -114,4 +114,9 @@ jobs:
           date=$(date '+%Y-%m-%d')
           cd $date
           ls
+          cd onnx_reports
+          ls
+          cd ..
+          cd turbine_reports
+          ls
         working-directory: ./test-suite

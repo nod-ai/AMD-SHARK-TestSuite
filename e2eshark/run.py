@@ -1014,7 +1014,7 @@ def runFrameworkTests(
     [uniqueTestList.append(test) for test in testsList if test not in uniqueTestList]
     if not uniqueTestList:
         return
-    uniqueTestList.remove("pytorch/models/vicuna-13b-v1.3")
+    # uniqueTestList.remove("pytorch/models/vicuna-13b-v1.3")
     uploadDict = Manager().dict({})
     dateAndTime = str(datetime.datetime.now(datetime.timezone.utc))
     tupleOfListArg = []

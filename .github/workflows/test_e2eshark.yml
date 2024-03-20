@@ -72,6 +72,8 @@ jobs:
       - name: Install python deps (nightly)
         run: |
           bash build_tools/ci/install_python_deps.sh nightly
+          python3 -m pip uninstall -y PyYAML
+          python3 -m pip install PyYAML==6.0.1
           python3 -m pip list
         working-directory: ./torch-mlir
 

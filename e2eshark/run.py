@@ -1028,16 +1028,17 @@ def runFrameworkTests(
     if args.verbose:
         print("Following tests will be run:", uniqueTestList)
     
-    for i in range(0, len(tupleOfListArg)):
-        initializer(TORCH_MLIR_BUILD, IREE_BUILD)
-        runTest(tupleOfListArg[i])
+    if args.ci:
+        for i in range(0, len(tupleOfListArg)):
+            initializer(TORCH_MLIR_BUILD, IREE_BUILD)
+            runTest(tupleOfListArg[i])
+    else:
+        with Pool(poolSize, initializer, (TORCH_MLIR_BUILD, IREE_BUILD)) as p:
+            result = p.map_async(runTest, tupleOfListArg)
+            result.wait()
+            if args.verbose:
+                print("All tasks submitted to process pool completed")
 
-    # with Pool(poolSize, initializer, (TORCH_MLIR_BUILD, IREE_BUILD)) as p:
-    #     print("BEGIN")
-    #     result = p.map_async(runTest, tupleOfListArg)
-    #     result.wait()
-    #     if args.verbose:
-    #         print("All tasks submitted to process pool completed")
     with open('upload_urls.json', 'w') as convert_file: 
         # convert_file.write(json.dumps(uploadDict._getvalue()))
         convert_file.write(
@@ -1396,6 +1397,12 @@ def main():
         action="store_true",
         default=False,
     )
+    parser.add_argument(
+        "--ci",
+        help="Adjusted behavior, so that CI works and artifacts are in right place",
+        action="store_true",
+        default=False,
+    )
 
     args = parser.parse_args()
     cache_dir = args.cachedir
@@ -1536,6 +1543,18 @@ def main():
     # report generation
     if args.report:
         generateReport(run_dir, totalTestList, args)
+    
+    if args.ci:
+        today = datetime.date.today()
+        path = script_dir + "/" + today
+        if not os.path.exists(path):
+            os.mkdir(path)
+        mode_path = path + f"/{args.mode}_reports"
+        if not os.path.exists(mode_path):
+            os.mkdir(mode_path)
+        shutil.move(run_dir + "/statusreport.md", mode_path + "/statusreport.md")
+        shutil.move(run_dir + "/summaryreport.md", mode_path + "/summaryreport.md")
+        shutil.move(run_dir + "/timereport.md", mode_path + "/timereport.md")
 
     # When all processes are done, print
     print("\nCompleted run of e2e shark tests")

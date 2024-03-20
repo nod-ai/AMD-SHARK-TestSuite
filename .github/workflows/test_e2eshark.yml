@@ -72,6 +72,7 @@ jobs:
       - name: Install python deps (nightly)
         run: |
           bash build_tools/ci/install_python_deps.sh nightly
+          python3 -m pip list
         working-directory: ./torch-mlir
 
       - name: Build
@@ -79,7 +80,7 @@ jobs:
           bash build_tools/ci/build_posix.sh
         working-directory: ./torch-mlir
   
-  # iree:
+  # iree
   #   strategy:
   #     matrix:
   #       version: [3.11]

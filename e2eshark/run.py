@@ -1546,7 +1546,10 @@ def main():
     
     if args.ci:
         today = datetime.date.today()
-        path = script_dir + "/" + today
+        path = script_dir + "/ci_reports"
+        if not os.path.exists(path):
+            os.mkdir(path)
+        path += "/" + str(today)
         if not os.path.exists(path):
             os.mkdir(path)
         mode_path = path + f"/{args.mode}_reports"

@@ -110,5 +110,3 @@ jobs:
           free -mh
           python ./run.py -r ./test-turbine -c /home/esaimana/torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine --tests pytorch/models/bert-large-uncased --cleanup --postprocess --ci -v
         working-directory: ./test-suite
-      
-      -name: Upload Artifacts

@@ -142,8 +142,8 @@ jobs:
           cd ../test-suite/e2eshark/ci_reports
           mv $date ../../../e2eshark-reports
           cd ../../../e2eshark-reports
-          git config user.name "saienduri"
-          git config user.email "enduri.sai@gmail.com"
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
           git add $date
           git commit -m "add CI reports for e2eshark"
           git push origin main

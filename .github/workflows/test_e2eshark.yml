@@ -109,7 +109,6 @@ jobs:
           cd e2eshark
           free -mh
           python ./run.py -r ./test-turbine -c /home/esaimana/torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine --tests pytorch/models/bert-large-uncased --cleanup --postprocess --ci -v
-          cd ..
           cd ci_reports
           ls
           date=$(date '+%Y-%m-%d')

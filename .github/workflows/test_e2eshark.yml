@@ -86,9 +86,9 @@ jobs:
           source ${E2E_VENV_DIR}/bin/activate
           git submodule update --init
           pip install --upgrade pip
-          pip install -r /home/esaimana/torch-mlir/requirements.txt
-          pip install -r /home/esaimana/torch-mlir/torchvision-requirements.txt
-          pip install /home/esaimana/torch-mlir/torch-mlir-wheel/torch_mlir-0.0.1-cp311-cp311-linux_x86_64.whl
+          pip install -r ../torch-mlir/requirements.txt
+          pip install -r ../torch-mlir/torchvision-requirements.txt
+          pip install ../torch-mlir/torch-mlir-wheel/torch_mlir-0.0.1-cp311-cp311-linux_x86_64.whl
           pip install -r ./e2eshark/requirements.txt
         working-directory: ./test-suite
 
@@ -97,7 +97,7 @@ jobs:
           source ${E2E_VENV_DIR}/bin/activate
           cd e2eshark
           free -mh
-          python ./run.py -r ./test-onnx -c /home/esaimana/torch-mlir/build --report --cachedir ~/.cache/huggingface --mode onnx -g models --cleanup --postprocess --ci -v
+          python ./run.py -r ./test-onnx -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode onnx -g models --cleanup --postprocess --ci -v
         working-directory: ./test-suite
 
       - name: Run Turbine Mode
@@ -108,7 +108,7 @@ jobs:
           pip install -e ../turbine/models
           cd e2eshark
           free -mh
-          python ./run.py -r ./test-turbine -c /home/esaimana/torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup --postprocess --ci -v
+          python ./run.py -r ./test-turbine -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup --postprocess --ci -v
         working-directory: ./test-suite
   
   upload_artifacts:

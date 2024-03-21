@@ -97,7 +97,7 @@ jobs:
           source ${E2E_VENV_DIR}/bin/activate
           cd e2eshark
           free -mh
-          python ./run.py -r ./test-onnx -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode onnx -g models --cleanup --postprocess --ci -v
+          HF_TOKEN=${{ secrets.HF_TOKEN }} python ./run.py -r ./test-onnx -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode onnx -g models --cleanup --postprocess --ci -v
         working-directory: ./test-suite
 
       - name: Run Turbine Mode
@@ -108,7 +108,7 @@ jobs:
           pip install -e ../turbine/models
           cd e2eshark
           free -mh
-          python ./run.py -r ./test-turbine -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup --postprocess --ci -v
+          HF_TOKEN=${{ secrets.HF_TOKEN }} python ./run.py -r ./test-turbine -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup --postprocess --ci -v
         working-directory: ./test-suite
   
   upload_artifacts:
@@ -138,4 +138,3 @@ jobs:
           git commit -m "add CI reports for e2eshark"
           git push origin main
         working-directory: ./e2eshark-reports
-# comment to try again

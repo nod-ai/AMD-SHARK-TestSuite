@@ -66,6 +66,20 @@ def pytest_addoption(parser):
         help="List of config JSON files used to build test cases",
     )
 
+    parser.addoption(
+        "--ignore-xfails",
+        action="store_true",
+        default=False,
+        help="Ignores expected compile/run failures from configs, to print all error output",
+    )
+
+    parser.addoption(
+        "--skip-all-runs",
+        action="store_true",
+        default=False,
+        help="Skips all 'run' tests, overriding 'skip_run_tests' in configs",
+    )
+
 
 def pytest_sessionstart(session):
     session.config.iree_test_configs = []
@@ -90,6 +104,7 @@ def pytest_collect_file(parent, file_path):
 #   * let the user accept the new config file in place of their original
 
 # --------------------------------------------------------------------------- #
+
 
 @dataclass(frozen=True)
 class IreeCompileAndRunTestSpec:
@@ -224,10 +239,17 @@ class MlirFile(pytest.File):
                 continue
 
             expect_compile_success = (
-                test_name not in config["expected_compile_failures"]
+                self.config.getoption("ignore_xfails")
+                or test_name not in config["expected_compile_failures"]
             )
-            expect_run_success = test_name not in config["expected_run_failures"]
-            skip_run = test_name in config["skip_run_tests"]
+            expect_run_success = (
+                self.config.getoption("ignore_xfails")
+                or test_name not in config["expected_run_failures"]
+            )
+            skip_run = (
+                self.config.getoption("skip_all_runs")
+                or test_name in config["skip_run_tests"]
+            )
             config_name = config["config_name"]
 
             # TODO(scotttodd): don't compile once per test case?

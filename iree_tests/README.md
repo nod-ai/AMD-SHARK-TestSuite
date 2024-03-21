@@ -91,11 +91,27 @@ $ pytest iree_tests -n auto
 Run tests using custom config files:
 
 ```bash
-$ pytest iree_tests --config-files ./configs/config_gpu_vulkan.json
+$ pytest iree_tests --config-files ./iree_tests/configs/config_gpu_vulkan.json
 
 # OR set an environment variable
 $ export IREE_TEST_CONFIG_FILES=/iree/config_cpu_llvm_sync.json;/iree/config_gpu_vulkan.json
 $ pytest iree_tests
+```
+
+Run ONNX tests on CPU and print all errors:
+
+```bash
+$ pytest iree_tests/onnx -n auto \
+    --ignore-xfails \
+    --config-files ./iree_tests/configs/config_cpu_llvm_sync.json
+```
+
+Run ONNX compilation tests only and print all errors:
+
+```bash
+$ pytest iree_tests/onnx -n auto \
+    --ignore-xfails --skip-all-runs \
+    --config-files ./iree_tests/configs/config_cpu_llvm_sync.json
 ```
 
 ### Advanced pytest usage tips

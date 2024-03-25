@@ -1,0 +1,70 @@
+# Copyright 2024 Advanced Micro Devices
+#
+# Licensed under the Apache License v2.0 with LLVM Exceptions.
+# See https://llvm.org/LICENSE.txt for license information.
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+
+name: Turbine Tank
+on:
+  workflow_dispatch:
+  pull_request:
+
+concurrency:
+  # A PR number if a pull request and otherwise the commit hash. This cancels
+  # queued and in-progress runs for the same PR (presubmit) or commit
+  # (postsubmit). The workflow name is prepended to avoid conflicts between
+  # different workflows.
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  turbine:
+    strategy:
+      matrix:
+        os: [nodai-amdgpu-w7900-x86-64]
+    runs-on: ${{matrix.os}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          repository: nod-ai/SHARK-Turbine
+          ref: tank-update
+          path: turbine
+  
+  e2eshark:
+    needs: [turbine]
+    strategy:
+      matrix:
+        version: [3.11]
+        os: [nodai-amdgpu-w7900-x86-64]
+    runs-on: ${{matrix.os}}
+    env:
+      E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
+      AZURE_CONNECTION_STRING: ${{ secrets.TANK_CONNECTION_STRING }}
+      AZURE_CONTAINER_NAME: "tankturbine"
+      TURBINE_TANK_ACTION: "upload"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          repository: nod-ai/SHARK-TestSuite
+          path: test-suite
+      
+      - name: Build
+        run: |
+          source ${E2E_VENV_DIR}/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu \
+            -r ../turbine/core/pytorch-cpu-requirements.txt \
+            -r ../turbine/core/torchvision-requirements.txt
+          pip install --upgrade -r ../turbine/core/requirements.txt
+          pip install -e ../turbine/core[testing]
+          pip install -e ../turbine/models
+        working-directory: ./test-suite
+
+      - name: Run Turbine Tank
+        run: |
+          source ${E2E_VENV_DIR}/bin/activate
+          cd turbine_tank
+          python turbine_tank/run_tank.py
+        working-directory: ./test-suite

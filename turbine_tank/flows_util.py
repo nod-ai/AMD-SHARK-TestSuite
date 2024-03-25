@@ -69,7 +69,7 @@ def param_flow(model, model_name, model_type, input, out, run_e2e, expected_err)
         f.write(module_str)
 
     model_name_upload = model_name.replace("/", "_")
-    turbine_tank.uploadToBlobStorage(
+    blob_name = turbine_tank.uploadToBlobStorage(
         str(os.path.abspath(mlir_name)),
         f"{model_name_upload}/{model_name_upload}-params.mlir",
     )
@@ -94,6 +94,11 @@ def param_flow(model, model_name, model_type, input, out, run_e2e, expected_err)
     # clean up
     os.remove(vmfb_name + ".vmfb")
     os.remove(weight_name)
+
+    if err < expected_err:
+        new_blob_name = blob_name.split(".")
+        new_blob_name = new_blob_name[0] + "-pass.mlir"
+        turbine_tank.changeBlobName(blob_name, new_blob_name)
 
     # accuracy
     assert err < expected_err

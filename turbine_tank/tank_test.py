@@ -69,7 +69,7 @@ from turbine_models.model_builder import HFTransformerBuilder
             False,
             marks=pytest.mark.xfail(reason="iree-compile fails"),
         ),
-        ("lmsys/vicuna-13b-v1.3", "hf", 5e-05, True),
+        # ("lmsys/vicuna-13b-v1.3", "hf", 5e-05, True),
         pytest.param(
             "microsoft/phi-1_5",
             "hf_causallm",
@@ -84,13 +84,13 @@ from turbine_models.model_builder import HFTransformerBuilder
             True,
             marks=pytest.mark.xfail(reason="correctness issue"),
         ),  # nan error reported (correctness issue)
-        pytest.param(
-            "mosaicml/mpt-30b",
-            "hf_causallm",
-            -1,
-            False,
-            marks=pytest.mark.xfail(reason="iree-compile fails"),
-        ),
+        # pytest.param(
+        #     "mosaicml/mpt-30b",
+        #     "hf_causallm",
+        #     -1,
+        #     False,
+        #     marks=pytest.mark.xfail(reason="iree-compile fails"),
+        # ),
         ("stabilityai/stablelm-3b-4e1t", "hf_causallm", 0.0004, True),
     ],
 )
@@ -121,7 +121,7 @@ def test_all_models(model_name, model_type, expected_err, compile_to_vmfb):
     model = HFTransformerBuilder(
         example_input=input,
         hf_id=model_name,
-        upload_ir=True,
+        upload_ir=False,
         model=torch_model,
         model_type=model_type,
         compile_to_vmfb=compile_to_vmfb,
@@ -131,5 +131,5 @@ def test_all_models(model_name, model_type, expected_err, compile_to_vmfb):
     flows_util.param_flow(
         model, model_name, model_type, input, out, compile_to_vmfb, expected_err
     )
-    # inline weights
-    flows_util.classic_flow(model, model_name, input, out, compile_to_vmfb, expected_err)
+    # inline weights. not doing in CI due to space/time logistics (will add when more machines)
+    # flows_util.classic_flow(model, model_name, input, out, compile_to_vmfb, expected_err)

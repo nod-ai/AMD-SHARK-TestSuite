@@ -52,6 +52,7 @@ jobs:
       
       - name: Build
         run: |
+          python -m venv ${E2E_VENV_DIR}
           source ${E2E_VENV_DIR}/bin/activate
           pip install --upgrade pip
           pip install --index-url https://download.pytorch.org/whl/cpu \

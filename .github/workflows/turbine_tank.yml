@@ -66,5 +66,5 @@ jobs:
         run: |
           source ${E2E_VENV_DIR}/bin/activate
           cd turbine_tank
-          python turbine_tank/run_tank.py
+          python run_tank.py
         working-directory: ./test-suite

@@ -106,6 +106,8 @@ jobs:
           pip install -f https://openxla.github.io/iree/pip-release-links.html --upgrade -r ../turbine/core/iree-requirements.txt
           pip install -e ../turbine/core[testing]
           pip install -e ../turbine/models
+          pip uninstall -y transformers
+          pip install transformers --no-dependencies
           cd e2eshark
           free -mh
           HF_TOKEN=${{ secrets.HF_TOKEN }} python ./run.py -r ./test-turbine -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup --postprocess --ci -v

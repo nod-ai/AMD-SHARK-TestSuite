@@ -12,7 +12,7 @@
         {
           "azure_account_url": "https://sharkpublic.blob.core.windows.net",
           "azure_container_name": "sharkpublic",
-          "azure_base_blob_name": "sai/llama-tank/",
+          "azure_base_blob_name": "sai/sd-unet-tank/",
           "files": [
             "inference_input.0.bin",
             "inference_input.1.bin",

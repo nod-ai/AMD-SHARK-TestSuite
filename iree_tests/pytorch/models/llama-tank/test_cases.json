@@ -1,0 +1,99 @@
+{
+  "test_cases": [
+    {
+      "name": "splats",
+      "runtime_flagfile": "splat_data_flags.txt",
+      "remote_file_groups": [
+        {
+          "azure_account_url": "https://sharkpublic.blob.core.windows.net",
+          "azure_container_name": "sharkpublic",
+          "azure_base_blob_name": "sai/llama-tank/",
+          "files": [
+            "llama-tank.mlirbc"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real_weights",
+      "runtime_flagfile": "real_weights_data_flags.txt",
+      "remote_file_groups": [
+        {
+          "azure_account_url": "https://sharkpublic.blob.core.windows.net",
+          "azure_container_name": "sharkpublic",
+          "azure_base_blob_name": "sai/llama-tank/",
+          "files": [
+            "inference_input.0.bin",
+            "inference_output.0.bin",
+            "inference_output.1.bin",
+            "inference_output.2.bin",
+            "inference_output.3.bin",
+            "inference_output.4.bin",
+            "inference_output.5.bin",
+            "inference_output.6.bin",
+            "inference_output.7.bin",
+            "inference_output.8.bin",
+            "inference_output.9.bin",
+            "inference_output.10.bin",
+            "inference_output.11.bin",
+            "inference_output.12.bin",
+            "inference_output.13.bin",
+            "inference_output.14.bin",
+            "inference_output.15.bin",
+            "inference_output.16.bin",
+            "inference_output.17.bin",
+            "inference_output.18.bin",
+            "inference_output.19.bin",
+            "inference_output.20.bin",
+            "inference_output.21.bin",
+            "inference_output.22.bin",
+            "inference_output.23.bin",
+            "inference_output.24.bin",
+            "inference_output.25.bin",
+            "inference_output.26.bin",
+            "inference_output.27.bin",
+            "inference_output.28.bin",
+            "inference_output.29.bin",
+            "inference_output.30.bin",
+            "inference_output.31.bin",
+            "inference_output.32.bin",
+            "inference_output.33.bin",
+            "inference_output.34.bin",
+            "inference_output.35.bin",
+            "inference_output.36.bin",
+            "inference_output.37.bin",
+            "inference_output.38.bin",
+            "inference_output.39.bin",
+            "inference_output.40.bin",
+            "inference_output.41.bin",
+            "inference_output.42.bin",
+            "inference_output.43.bin",
+            "inference_output.44.bin",
+            "inference_output.45.bin",
+            "inference_output.46.bin",
+            "inference_output.47.bin",
+            "inference_output.48.bin",
+            "inference_output.49.bin",
+            "inference_output.50.bin",
+            "inference_output.51.bin",
+            "inference_output.52.bin",
+            "inference_output.53.bin",
+            "inference_output.54.bin",
+            "inference_output.55.bin",
+            "inference_output.56.bin",
+            "inference_output.57.bin",
+            "inference_output.58.bin",
+            "inference_output.59.bin",
+            "inference_output.60.bin",
+            "inference_output.61.bin",
+            "inference_output.62.bin",
+            "inference_output.63.bin",
+            "inference_output.64.bin",
+            "real_weights.irpa",
+            "llama-tank.mlirbc"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -3,7 +3,16 @@
     {
       "name": "splats",
       "runtime_flagfile": "splat_data_flags.txt",
-      "remote_file_groups": []
+      "remote_file_groups": [
+        {
+          "azure_account_url": "https://sharkpublic.blob.core.windows.net",
+          "azure_container_name": "sharkpublic",
+          "azure_base_blob_name": "sai/sd-vae-decode-tank/",
+          "files": [
+            "sd-vae-decode-tank.mlirbc"
+          ]
+        }
+      ]
     },
     {
       "name": "real_weights",

@@ -62,10 +62,10 @@ jobs:
           source ${VENV_DIR}/bin/activate
           pytest iree_tests/simple --durations=0
 
-      # - name: "Running the generated ONNX test suite"
-      #   run: |
-      #     source ${VENV_DIR}/bin/activate
-      #     pytest iree_tests/onnx/node/generated -n auto -rpfE --timeout=30 --retries 2 --retry-delay 5 --durations=10
+      - name: "Running the generated ONNX test suite"
+        run: |
+          source ${VENV_DIR}/bin/activate
+          pytest iree_tests/onnx/node/generated -n auto -rpfE --timeout=30 --retries 2 --retry-delay 5 --durations=10
 
       # TODO(scotttodd): add a local cache for these large files to a persistent runner
       - name: "Downloading remote files for real weight model tests"

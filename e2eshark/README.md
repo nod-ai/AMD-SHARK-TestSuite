@@ -310,6 +310,8 @@ variable. You can find this connection string here: https://portal.azure.com/#@a
 Then, setup an upload_list.txt file with the names of the models you want to upload on. There is already one
 setup at e2eshark/gold/upload_list.txt. You can just modify that one.
 
+Optional: If you want to change what type of files are being uploaded, simply tweak `upload_list = ["mlir"]` in e2eshark/run.py to change or add more file types you want to upload (`upload_list = ["mlir", "log"]` for example).
+
 
 With this connection string and upload list file, you can now run command like this:
 ```

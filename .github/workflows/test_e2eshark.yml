@@ -97,20 +97,21 @@ jobs:
           source ${E2E_VENV_DIR}/bin/activate
           cd e2eshark
           free -mh
-          HF_TOKEN=${{ secrets.HF_TOKEN }} python ./run.py -r ./test-onnx -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode onnx -g models --cleanup --postprocess --ci -v
+          HF_TOKEN=${{ secrets.HF_TOKEN }} python ./run.py -r ./test-onnx -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode onnx -f onnx pytorch -g combinations operators models --tolerance .001 .001 --cleanup --postprocess --ci -v
         working-directory: ./test-suite
 
       - name: Run Turbine Mode
         run: |
           source ${E2E_VENV_DIR}/bin/activate
-          pip install -f https://openxla.github.io/iree/pip-release-links.html --upgrade -r ../turbine/core/iree-requirements.txt
-          pip install -e ../turbine/core[testing]
-          pip install -e ../turbine/models
+          pip install -r ../turbine/core/pytorch-cpu-requirements.txt --no-dependencies
+          pip install --pre --upgrade -r ../turbine/core/requirements.txt
+          pip install --pre -e ../turbine/core[testing]
+          pip install --pre -e ../turbine/models
           pip uninstall -y transformers
           pip install transformers --no-dependencies
           cd e2eshark
           free -mh
-          HF_TOKEN=${{ secrets.HF_TOKEN }} python ./run.py -r ./test-turbine -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup --postprocess --ci -v
+          HF_TOKEN=${{ secrets.HF_TOKEN }} python ./run.py -r ./test-turbine -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g combinations operators models --cleanup --postprocess --ci -v
         working-directory: ./test-suite
   
   upload_artifacts:

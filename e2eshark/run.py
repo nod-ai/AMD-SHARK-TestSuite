@@ -949,7 +949,9 @@ def runTest(aTuple):
     # set up upload utilities
     uploadtestsList = []
     if args.uploadtestsfile:
-        uploadtestsList = getTestsListFromFile(args.uploadtestsfile)
+        uploadtestsfile = os.path.expanduser(args.uploadtestsfile)
+        uploadtestsfile = os.path.abspath(uploadtestsfile)
+        uploadtestsList = getTestsListFromFile(uploadtestsfile)
 
     # Open files to log commands run and time taken
     commandslog = open("commands.log", "w")

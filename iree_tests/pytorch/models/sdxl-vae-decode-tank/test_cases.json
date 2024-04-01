@@ -12,10 +12,10 @@
         {
           "azure_account_url": "https://sharkpublic.blob.core.windows.net",
           "azure_container_name": "sharkpublic",
-          "azure_base_blob_name": "scotttodd/iree_tests/2024-03-12/resnet50/",
+          "azure_base_blob_name": "sai/sdxl-vae-decode/",
           "files": [
             "inference_input.0.bin",
-            "inference_output.0.bin",
+            "output0.npy",
             "real_weights.irpa"
           ]
         }

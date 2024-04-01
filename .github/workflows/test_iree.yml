@@ -22,8 +22,11 @@ concurrency:
 
 jobs:
   linux_x86_64:
+    strategy:
+      matrix:
+        os: [nodai-amdgpu-w7900-x86-64]
     name: Linux (x86_64)
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
     steps:

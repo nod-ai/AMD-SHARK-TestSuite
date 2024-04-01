@@ -10,8 +10,8 @@
     "iree_run_module_flags": [
       "--device=local-task"
     ],
-    "skip_compile_tests": ["iree_tests/pytorch/models/sdxl-vae-decode-tank/model.mlirbc"],
-    "skip_run_tests": ["iree_tests/pytorch/models/sdxl-vae-decode-tank/model.mlirbc"],
+    "skip_compile_tests": ["pytorch/models/sdxl-vae-decode-tank/model.mlirbc"],
+    "skip_run_tests": ["pytorch/models/sdxl-vae-decode-tank/model.mlirbc"],
     "expected_compile_failures": [],
     "expected_run_failures": []
   }

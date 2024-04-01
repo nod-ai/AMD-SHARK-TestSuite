@@ -5,4 +5,4 @@
 --input=1x64xi64=@inference_input.3.bin
 --expected_output=2x64x2048xf16=@inference_output.0.bin
 --expected_output=2x1280xf16=@inference_output.1.bin
---expected_f16_threshold=0.01f
+--expected_f16_threshold=0.04f

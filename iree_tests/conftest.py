@@ -229,8 +229,6 @@ class MlirFile(pytest.File):
         test_directory = self.path.parent
         test_name = test_directory.name
 
-        print(f"TEST NAME: {test_name}")
-
         test_cases = self.discover_test_cases()
         if len(test_cases) == 0:
             print(f"No test cases for '{test_name}'")
@@ -285,9 +283,9 @@ class IreeCompileRunItem(pytest.Item):
 
         # TODO(scotttodd): swap cwd for a temp path?
         self.test_cwd = self.spec.test_directory
-        # self.vae_decode_path = os.path.dirname(self.test_cwd) + "/sdxl-vae-decode-tank"
-        # self.scheduled_unet_path = os.path.dirname(self.test_cwd) + "/sdxl-scheduled-unet-tank"
-        # self.prompt_encoder_path = os.path.dirname(self.test_cwd) + "/sdxl-prompt-encoder-tank"
+        vae_decode_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-vae-decode-tank"
+        scheduled_unet_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-scheduled-unet-tank"
+        prompt_encoder_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-prompt-encoder-tank"
         vmfb_name = f"{self.spec.input_mlir_stem}_{self.spec.test_name}.vmfb"
 
         self.compile_args = ["iree-compile", self.spec.input_mlir_name]
@@ -298,7 +296,7 @@ class IreeCompileRunItem(pytest.Item):
         self.run_args.extend(self.spec.iree_run_module_flags)
         self.run_args.append(f"--flagfile={self.spec.data_flagfile_name}")
 
-        # self.benchmark_args = ["iree-benchmark-module", "--device=local-task", f"--module={self.prompt_encoder_path}/model_sdxl_cpu_llvm_task_real_weights.vmfb", f"--parameters=model={self.prompt_encoder_path}/real_weights.irpa", f"--module={self.scheduled_unet_path}/model_sdxl_cpu_llvm_task_real_weights.vmfb", f"--parameters=model={self.scheduled_unet_path}/real_weights.irpa", f"--module={self.vae_decode_path}/model_sdxl_cpu_llvm_task_real_weights.vmfb", f"--parameters=model={self.vae_decode_path}/real_weights.irpa", f"--module={vmfb_name}", "--function=tokens_to_image", "--input=1x4x128x128xf16", "--input=1xf16", "--input=1x64xi64", "--input=1x64xi64", "--input=1x64xi64", "--input=1x64xi64"]
+        self.benchmark_args = ["iree-benchmark-module", "--device=local-task", f"--module={prompt_encoder_path}/model_sdxl_cpu_llvm_task_real_weights.vmfb", f"--parameters=model={prompt_encoder_path}/real_weights.irpa", f"--module={scheduled_unet_path}/model_sdxl_cpu_llvm_task_real_weights.vmfb", f"--parameters=model={scheduled_unet_path}/real_weights.irpa", f"--module={vae_decode_path}/model_sdxl_cpu_llvm_task_real_weights.vmfb", f"--parameters=model={vae_decode_path}/real_weights.irpa", f"--module={vmfb_name}", "--function=tokens_to_image", "--input=1x4x128x128xf16", "--input=1xf16", "--input=1x64xi64", "--input=1x64xi64", "--input=1x64xi64", "--input=1x64xi64"]
 
     def runtest(self):
         if self.spec.skip_test:
@@ -326,10 +324,10 @@ class IreeCompileRunItem(pytest.Item):
                 )
             )
         self.test_run()
-        # if self.spec.test_directory.name == "pytorch/models/sdxl-pipeline-benchmark":
-        #     self.test_benchmark()
-        # else:
-        #     self.test_run()
+        if self.spec.test_directory.name == "sdxl-pipeline-benchmark":
+            self.test_benchmark()
+        else:
+            self.test_run()
 
     def test_compile(self):
         proc = subprocess.run(self.compile_args, capture_output=True, cwd=self.test_cwd)

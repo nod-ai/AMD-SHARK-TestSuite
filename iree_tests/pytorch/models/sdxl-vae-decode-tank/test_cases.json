@@ -15,7 +15,7 @@
           "azure_base_blob_name": "sai/sdxl-vae-decode/",
           "files": [
             "inference_input.0.bin",
-            "output0.npy",
+            "inference_output.0.bin",
             "real_weights.irpa"
           ]
         }

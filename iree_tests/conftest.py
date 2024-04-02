@@ -7,6 +7,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
+from numpy import load
+from numpy.testing import assert_allclose
 import pyjson5
 import os
 import pytest
@@ -293,6 +295,9 @@ class IreeCompileRunItem(pytest.Item):
         self.run_args.extend(self.spec.iree_run_module_flags)
         self.run_args.append(f"--flagfile={self.spec.data_flagfile_name}")
 
+        self.atol=1e-05
+        self.rtol=1e-06
+
     def runtest(self):
         if self.spec.skip_test:
             pytest.skip()
@@ -313,7 +318,7 @@ class IreeCompileRunItem(pytest.Item):
         if not self.spec.expect_run_success:
             self.add_marker(
                 pytest.mark.xfail(
-                    raises=IreeRunException,
+                    raises=(IreeRunException, AssertionError),
                     strict=True,
                     reason="Expected run to fail",
                 )
@@ -327,8 +332,23 @@ class IreeCompileRunItem(pytest.Item):
 
     def test_run(self):
         proc = subprocess.run(self.run_args, capture_output=True, cwd=self.test_cwd)
+        # iree-run-module execution failure
         if proc.returncode != 0:
             raise IreeRunException(proc, self.test_cwd, self.compile_args)
+        # TODO: add support for comparison of non numpy supported dtypes. using iree-run-module
+        # numerical error
+        self.test_numerical_accuracy()
+
+    def test_numerical_accuracy(self):
+        num_iree_output_files = len(list(self.test_cwd.glob("iree_output_*.npy")))
+        num_output_files = len(list(self.test_cwd.glob("output_*.npy")))
+        if num_iree_output_files != num_output_files:
+            raise AssertionError(f"Number of golden outputs ({num_output_files}) and iree outputs ({num_iree_output_files}) dont match")
+
+        for i in range(num_output_files):
+            iree_output = load((self.test_cwd / f"iree_output_{i}.npy"))
+            golden_output = load((self.test_cwd / f"output_{i}.npy"))
+            assert_allclose(iree_output, golden_output, atol=self.atol, rtol=self.rtol, equal_nan=False)
 
     def repr_failure(self, excinfo):
         """Called when self.runtest() raises an exception."""

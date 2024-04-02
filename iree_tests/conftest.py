@@ -283,14 +283,10 @@ class IreeCompileRunItem(pytest.Item):
 
         # TODO(scotttodd): swap cwd for a temp path?
         self.test_cwd = self.spec.test_directory
-        print("CWD: " + str(self.test_cwd))
         vae_decode_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-vae-decode-tank"
-        scheduled_unet_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-scheduled-unet-tank"
+        scheduled_unet_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-scheduled-unet-30-tank"
         prompt_encoder_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-prompt-encoder-tank"
         vmfb_name = f"{self.spec.input_mlir_stem}_{self.spec.test_name}.vmfb"
-        print("VAE: " + str(vae_decode_path))
-        print("UNET: " + str(scheduled_unet_path))
-        print("CLIP: " + str(prompt_encoder_path))
 
         self.compile_args = ["iree-compile", self.spec.input_mlir_name]
         self.compile_args.extend(self.spec.iree_compile_flags)
@@ -348,6 +344,8 @@ class IreeCompileRunItem(pytest.Item):
         proc = subprocess.run(self.benchmark_args, capture_output=True, cwd=self.test_cwd)
         if proc.returncode != 0:
             raise IreeRunException(proc, self.test_cwd, self.compile_args)
+        outs = proc.stdout.decode("utf-8")
+        print(f"Stdout diagnostics:\n{outs}\n")
 
     def repr_failure(self, excinfo):
         """Called when self.runtest() raises an exception."""

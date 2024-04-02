@@ -28,6 +28,7 @@
 *.safetensors
 *.gguf
 *.vmfb
+iree_tests/onnx/node/generated/test_*/iree_output_*.npy
 
 # Test report files
 test-run

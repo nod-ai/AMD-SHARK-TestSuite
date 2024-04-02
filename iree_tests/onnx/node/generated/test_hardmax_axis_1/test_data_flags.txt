@@ -1,2 +1,2 @@
 --input=@input_0.npy
---expected_output=@output_0.npy
+--output=@iree_output_0.npy

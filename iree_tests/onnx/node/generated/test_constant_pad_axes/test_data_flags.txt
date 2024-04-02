@@ -2,4 +2,4 @@
 --input=@input_1.npy
 --input=@input_2.npy
 --input=@input_3.npy
---expected_output=@output_0.npy
+--output=@iree_output_0.npy

@@ -3,6 +3,6 @@
 --input=@input_2.npy
 --input=@input_3.npy
 --input=@input_4.npy
---expected_output=@output_0.npy
---expected_output=@output_1.npy
---expected_output=@output_2.npy
+--output=@iree_output_0.npy
+--output=@iree_output_1.npy
+--output=@iree_output_2.npy

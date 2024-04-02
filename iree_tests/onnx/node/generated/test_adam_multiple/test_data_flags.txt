@@ -8,9 +8,9 @@
 --input=@input_7.npy
 --input=@input_8.npy
 --input=@input_9.npy
---expected_output=@output_0.npy
---expected_output=@output_1.npy
---expected_output=@output_2.npy
---expected_output=@output_3.npy
---expected_output=@output_4.npy
---expected_output=@output_5.npy
+--output=@iree_output_0.npy
+--output=@iree_output_1.npy
+--output=@iree_output_2.npy
+--output=@iree_output_3.npy
+--output=@iree_output_4.npy
+--output=@iree_output_5.npy

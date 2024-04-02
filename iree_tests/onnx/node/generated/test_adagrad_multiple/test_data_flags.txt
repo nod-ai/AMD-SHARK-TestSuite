@@ -6,7 +6,7 @@
 --input=@input_5.npy
 --input=@input_6.npy
 --input=@input_7.npy
---expected_output=@output_0.npy
---expected_output=@output_1.npy
---expected_output=@output_2.npy
---expected_output=@output_3.npy
+--output=@iree_output_0.npy
+--output=@iree_output_1.npy
+--output=@iree_output_2.npy
+--output=@iree_output_3.npy

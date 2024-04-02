@@ -41,6 +41,13 @@ with `.mlir` files and native (C/C++) tools. Each test suite or test case may
 also have its own import logic, with all test suites converging onto the
 standard format described above.
 
+Some large files are stored using [Git LFS](https://git-lfs.com/). When working
+with these files please ensure that you have Git LFS installed:
+
+```bash
+$ git lfs install
+```
+
 ## Running tests
 
 Tests are run using the [pytest](https://docs.pytest.org/en/stable/) framework.

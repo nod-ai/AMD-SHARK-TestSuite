@@ -71,10 +71,10 @@ jobs:
       #     pytest iree_tests/onnx/node/generated -n auto -rpfE --timeout=30 --retries 2 --retry-delay 5 --durations=10
 
       # TODO(scotttodd): add a local cache for these large files to a persistent runner
-      # - name: "Downloading remote files for real weight model tests"
-      #   run: |
-      #     source ${VENV_DIR}/bin/activate
-      #     python3 iree_tests/download_remote_files.py
+      - name: "Downloading remote files for real weight model tests"
+        run: |
+          source ${VENV_DIR}/bin/activate
+          python3 iree_tests/download_remote_files.py
       - name: "Running real weight model tests"
         env:
             IREE_TEST_CONFIG_FILES: iree_tests/configs/config_sdxl_cpu_llvm_task.json

@@ -10,8 +10,8 @@
     "iree_run_module_flags": [
       "--device=local-task"
     ],
-    "skip_compile_tests": ["llama-tank", "opt-125M", "resnet50", "sd-clip-tank", "sd-unet-tank", "sd-vae-decode-tank"],
-    "skip_run_tests": ["sdxl-scheduled-unet-tank", "llama-tank", "opt-125M", "resnet50", "sd-clip-tank", "sd-unet-tank", "sd-vae-decode-tank"],
+    "skip_compile_tests": ["llama-tank", "opt-125M", "resnet50", "sd-clip-tank", "sd-unet-tank", "sd-vae-decode-tank", "sdxl-vae-decode-tank", "sdxl-prompt-encoder-tank"],
+    "skip_run_tests": ["llama-tank", "opt-125M", "resnet50", "sd-clip-tank", "sd-unet-tank", "sd-vae-decode-tank", "sdxl-vae-decode-tank", "sdxl-prompt-encoder-tank"],
     "expected_compile_failures": [],
     "expected_run_failures": []
   }

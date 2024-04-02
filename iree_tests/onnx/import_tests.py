@@ -131,8 +131,8 @@ def import_onnx_files(test_dir_path, imported_dir_path):
 
     # Convert input_*.pb and output_*.pb to .npy files.
     test_data_dir = test_data_dirs[0]
-    test_inputs = list(test_data_dir.glob("input_*.pb"))
-    test_outputs = list(test_data_dir.glob("output_*.pb"))
+    test_inputs = sorted(list(test_data_dir.glob("input_*.pb")))
+    test_outputs = sorted(list(test_data_dir.glob("output_*.pb")))
     model = onnx.load(converted_model_path)
     for i in range(len(test_inputs)):
         test_input = test_inputs[i]
@@ -149,7 +149,7 @@ def import_onnx_files(test_dir_path, imported_dir_path):
             return False
         output_path = (imported_dir_path / test_output.stem).with_suffix(".npy")
         np.save(output_path, t)
-        test_data_flagfile_lines.append(f"--expected_output=@{output_path.name}\n")
+        test_data_flagfile_lines.append(f"--output=@iree_{output_path.name}\n")
 
     with open(test_data_flagfile_path, "wt") as f:
         f.writelines(test_data_flagfile_lines)

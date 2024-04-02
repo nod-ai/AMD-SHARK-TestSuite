@@ -48,7 +48,7 @@ Tests are run using the [pytest](https://docs.pytest.org/en/stable/) framework.
 A [`conftest.py`](conftest.py) file collects test cases from subdirectories,
 wrapping each directory matching the format described above to one test case
 per test configuration. Test configurations are defined in JSON config files
-like [`configs/config_cpu_llvm_sync.json`](./configs/config_cpu_llvm_sync.json).
+like [`configs/config_onnx_cpu_llvm_sync.json`](./configs/config_onnx_cpu_llvm_sync.json).
 
 ### Common venv setup with deps
 
@@ -103,7 +103,7 @@ Run ONNX tests on CPU and print all errors:
 ```bash
 $ pytest iree_tests/onnx -n auto \
     --ignore-xfails \
-    --config-files ./iree_tests/configs/config_cpu_llvm_sync.json
+    --config-files ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
 ```
 
 Run ONNX compilation tests only and print all errors:
@@ -111,7 +111,7 @@ Run ONNX compilation tests only and print all errors:
 ```bash
 $ pytest iree_tests/onnx -n auto \
     --ignore-xfails --skip-all-runs \
-    --config-files ./iree_tests/configs/config_cpu_llvm_sync.json
+    --config-files ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
 ```
 
 ### Advanced pytest usage tips

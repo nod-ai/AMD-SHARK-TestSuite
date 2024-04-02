@@ -283,10 +283,14 @@ class IreeCompileRunItem(pytest.Item):
 
         # TODO(scotttodd): swap cwd for a temp path?
         self.test_cwd = self.spec.test_directory
+        print("CWD: " + str(self.test_cwd))
         vae_decode_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-vae-decode-tank"
         scheduled_unet_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-scheduled-unet-tank"
         prompt_encoder_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-prompt-encoder-tank"
         vmfb_name = f"{self.spec.input_mlir_stem}_{self.spec.test_name}.vmfb"
+        print("VAE: " + str(vae_decode_path))
+        print("UNET: " + str(scheduled_unet_path))
+        print("CLIP: " + str(prompt_encoder_path))
 
         self.compile_args = ["iree-compile", self.spec.input_mlir_name]
         self.compile_args.extend(self.spec.iree_compile_flags)
@@ -323,8 +327,9 @@ class IreeCompileRunItem(pytest.Item):
                     reason="Expected run to fail",
                 )
             )
-        self.test_run()
-        if self.spec.test_directory.name == "sdxl-pipeline-benchmark":
+        # self.test_run()
+        print("TEST DIR NAME: " + str(self.spec.test_directory.name))
+        if self.spec.test_directory.name == "sdxl-benchmark":
             self.test_benchmark()
         else:
             self.test_run()

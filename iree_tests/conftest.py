@@ -284,7 +284,7 @@ class IreeCompileRunItem(pytest.Item):
         # TODO(scotttodd): swap cwd for a temp path?
         self.test_cwd = self.spec.test_directory
         vae_decode_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-vae-decode-tank"
-        scheduled_unet_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-scheduled-unet-30-tank"
+        scheduled_unet_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-scheduled-unet-3-tank"
         prompt_encoder_path = os.path.dirname(os.path.dirname(self.test_cwd)) + "/pytorch/models/sdxl-prompt-encoder-tank"
         vmfb_name = f"{self.spec.input_mlir_stem}_{self.spec.test_name}.vmfb"
 
@@ -345,7 +345,7 @@ class IreeCompileRunItem(pytest.Item):
         if proc.returncode != 0:
             raise IreeRunException(proc, self.test_cwd, self.compile_args)
         outs = proc.stdout.decode("utf-8")
-        print(f"Stdout diagnostics:\n{outs}\n")
+        print(f"Stdout benchmark:\n{outs}\n")
 
     def repr_failure(self, excinfo):
         """Called when self.runtest() raises an exception."""

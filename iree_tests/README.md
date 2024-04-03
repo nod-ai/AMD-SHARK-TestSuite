@@ -41,6 +41,13 @@ with `.mlir` files and native (C/C++) tools. Each test suite or test case may
 also have its own import logic, with all test suites converging onto the
 standard format described above.
 
+Some large files are stored using [Git LFS](https://git-lfs.com/). When working
+with these files please ensure that you have Git LFS installed:
+
+```bash
+$ git lfs install
+```
+
 ## Running tests
 
 Tests are run using the [pytest](https://docs.pytest.org/en/stable/) framework.
@@ -48,7 +55,7 @@ Tests are run using the [pytest](https://docs.pytest.org/en/stable/) framework.
 A [`conftest.py`](conftest.py) file collects test cases from subdirectories,
 wrapping each directory matching the format described above to one test case
 per test configuration. Test configurations are defined in JSON config files
-like [`configs/config_cpu_llvm_sync.json`](./configs/config_cpu_llvm_sync.json).
+like [`configs/config_onnx_cpu_llvm_sync.json`](./configs/config_onnx_cpu_llvm_sync.json).
 
 ### Common venv setup with deps
 
@@ -103,7 +110,7 @@ Run ONNX tests on CPU and print all errors:
 ```bash
 $ pytest iree_tests/onnx -n auto \
     --ignore-xfails \
-    --config-files ./iree_tests/configs/config_cpu_llvm_sync.json
+    --config-files ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
 ```
 
 Run ONNX compilation tests only and print all errors:
@@ -111,7 +118,7 @@ Run ONNX compilation tests only and print all errors:
 ```bash
 $ pytest iree_tests/onnx -n auto \
     --ignore-xfails --skip-all-runs \
-    --config-files ./iree_tests/configs/config_cpu_llvm_sync.json
+    --config-files ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
 ```
 
 ### Advanced pytest usage tips

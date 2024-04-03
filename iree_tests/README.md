@@ -306,6 +306,24 @@ python ./iree_tests/onnx/import_tests.py
 6. Add a `real_weights_data_flags.txt` and `test_cases.json` file for real
    weights, pointing at the uploaded remote files.
 
+#### Generating model test cases from turbine/tank
+
+As seen in iree_tests/pytorch/models, there are some models with the "-tank" suffix.
+This refers to tests that were generated using the normal turbine flow.
+For custom models, such as sd, sdxl, or stateless_llama, you can clone the turbine repo 
+and follow the setup instructions there (https://github.com/nod-ai/SHARK-Turbine).
+Then, simply run the respective model with the appropriate command line args (for sd, sdxl edit this: https://github.com/nod-ai/SHARK-Turbine/blob/ean-sd-fp16/models/turbine_models/custom_models/sdxl_inference/sdxl_cmd_opts.py. otherwise, just direct command line args for llama. make sure to --compile_to vmfb).
+Just as a side note, the unet_scheduler model requires diffusers dep changes, so make sure to use changes
+in this branch: https://github.com/aviator19941/diffusers/tree/pndm_fx_v2.
+Example run command (`python models/turbine_models/custom_models/sdxl_inference/sdxl_prompt_encoder.py`).
+There is no easy way to get `.bin` or `.npy` files for your inputs and outputs.
+You will have to edit the model runner files to convert the input and output tensors into `.bin` files, 
+so those are saved when running the flow. (example runner:
+`models/turbine_models/custom_models/sdxl_inference/sdxl_prompt_encoder_runner.py`).
+Then, run the runner with the appropriate command line args (vmfb path, device flags).
+You should have all the artifacts needed to add to this TestSuite at that point.
+Make sure to follow to follow appendix instructions to convert between different file types for weights and mlir.
+
 ## Appendix
 
 ### Working with .mlirbc files

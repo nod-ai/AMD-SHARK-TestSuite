@@ -1,5 +1,0 @@
---parameters=model=real_weights.irpa
---input=1x4x64x64xf32=@inference_input.0.bin
---input=1xf32=@inference_input.1.bin
---input=2x77x768xf32=@inference_input.2.bin
---expected_output=1x4x64x64xf32=@inference_output.0.bin

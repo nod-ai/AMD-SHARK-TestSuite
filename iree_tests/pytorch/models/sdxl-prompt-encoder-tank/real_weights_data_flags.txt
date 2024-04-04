@@ -1,0 +1,8 @@
+--parameters=model=real_weights.irpa
+--input=1x64xi64=@inference_input.0.bin
+--input=1x64xi64=@inference_input.1.bin
+--input=1x64xi64=@inference_input.2.bin
+--input=1x64xi64=@inference_input.3.bin
+--expected_output=2x64x2048xf16=@inference_output.0.bin
+--expected_output=2x1280xf16=@inference_output.1.bin
+--expected_f16_threshold=1.0f

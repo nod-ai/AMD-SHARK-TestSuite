@@ -67,7 +67,7 @@ jobs:
           path: turbine
   
   e2eshark:
-    needs: [turbine]
+    needs: [turbine, torch-mlir]
     strategy:
       matrix:
         version: [3.11]

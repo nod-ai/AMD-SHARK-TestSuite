@@ -26,6 +26,7 @@ jobs:
         version: [3.11]
         os: [nodai-amdgpu-mi210-x86-64]
     runs-on: ${{matrix.os}}
+    steps:
       - name: Checkout repo
         uses: actions/checkout@v2
         with:

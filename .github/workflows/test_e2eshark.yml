@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         version: [3.11]
-        os: [nodai-amdgpu-w7900-x86-64]
+        os: [nodai-amdgpu-mi210-x86-64]
     runs-on: ${{matrix.os}}
     steps:
       - name: "Setting up Python"
@@ -57,7 +57,7 @@ jobs:
   turbine:
     strategy:
       matrix:
-        os: [nodai-amdgpu-w7900-x86-64]
+        os: [nodai-amdgpu-mi210-x86-64]
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout repo
@@ -71,7 +71,7 @@ jobs:
     strategy:
       matrix:
         version: [3.11]
-        os: [nodai-amdgpu-w7900-x86-64]
+        os: [nodai-amdgpu-mi210-x86-64]
     runs-on: ${{matrix.os}}
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
@@ -127,7 +127,7 @@ jobs:
     needs: [e2eshark]
     strategy:
       matrix:
-        os: [nodai-amdgpu-w7900-x86-64]
+        os: [nodai-amdgpu-mi210-x86-64]
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout repo

@@ -1,5 +1,5 @@
 {
-    "config_name": "sdxl_cpu_llvm_task",
+    "config_name": "cpu_llvm_task",
     "iree_compile_flags" : [
       "--iree-hal-target-backends=llvm-cpu",
       "--iree-llvmcpu-target-cpu-features=host",

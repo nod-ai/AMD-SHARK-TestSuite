@@ -4,8 +4,6 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#test
-
 name: E2ESHARK Test Suite
 on:
   workflow_dispatch:
@@ -24,9 +22,14 @@ jobs:
     strategy:
       matrix:
         version: [3.11]
-        os: [nodai-amdgpu-w7900-x86-64]
+        os: [nodai-ubuntu-builder-large]
     runs-on: ${{matrix.os}}
     steps:
+      - name: "Setting up Python"
+        uses: actions/setup-python@75f3110429a8c05be0e1bf360334e4cced2b63fa # v2.3.3
+        with:
+          python-version: 3.11
+
       - name: "Checking out repository"
         uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
         with:
@@ -36,15 +39,18 @@ jobs:
 
       - name: Install python deps (nightly)
         run: |
+          python -m venv test_mlir_venv
+          source test_mlir_venv/bin/activate
           bash build_tools/ci/install_python_deps.sh nightly
-          python3 -m pip install --upgrade pip
-          python3 -m pip uninstall -y PyYAML
-          python3 -m pip install PyYAML==6.0.1
-          python3 -m pip list
+          python -m pip install --upgrade pip
+          pip uninstall -y PyYAML
+          pip install PyYAML==6.0.1
+          pip list
         working-directory: ./torch-mlir
 
       - name: Build
         run: |
+          source test_mlir_venv/bin/activate
           bash build_tools/e2eshark_build.sh
         working-directory: ./torch-mlir
   

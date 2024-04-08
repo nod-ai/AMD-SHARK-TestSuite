@@ -26,12 +26,6 @@ jobs:
         version: [3.11]
         os: [nodai-amdgpu-mi210-x86-64]
     runs-on: ${{matrix.os}}
-    steps:
-      - name: "Setting up Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{matrix.version}}
-
       - name: "Checking out repository"
         uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
         with:
@@ -83,11 +77,6 @@ jobs:
         with:
           repository: nod-ai/SHARK-TestSuite
           path: test-suite
-      
-      - name: "Setting up Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{matrix.version}}
 
       - name: "Setup Python venv"
         run: python -m venv ${E2E_VENV_DIR}

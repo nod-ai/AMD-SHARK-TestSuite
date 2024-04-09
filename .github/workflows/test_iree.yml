@@ -22,6 +22,7 @@ concurrency:
 
 jobs:
   linux_x86_64_onnx:
+    if: false  # DO NOT SUBMIT (testing just one job)
     name: Linux (x86_64) Onnx
     runs-on: ubuntu-latest
     env:
@@ -102,6 +103,7 @@ jobs:
           pytest iree_tests/onnx/node/generated -rpfE --timeout=30 --durations=10
 
   linux_x86_64_w7900_gpu_models:
+    if: false  # DO NOT SUBMIT (testing just one job)
     name: Linux (x86_64 w7900) Models GPU
     runs-on: nodai-amdgpu-w7900-x86-64
     env:

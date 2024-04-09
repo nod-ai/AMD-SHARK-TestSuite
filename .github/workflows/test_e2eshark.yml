@@ -99,7 +99,7 @@ jobs:
           source ${E2E_VENV_DIR}/bin/activate
           cd e2eshark
           free -mh
-          HF_TOKEN=${{ secrets.HF_TOKEN }} python ./run.py -r ./test-onnx -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode onnx -f pytorch -g models --tolerance .001 .001 --cleanup --postprocess --ci -v
+          HF_TOKEN=${{ secrets.HF_TOKEN }} python ./run.py -r ./test-onnx -c ../../torch-mlir/build --report --cachedir /home/huggingface_cache --mode onnx -f pytorch -g models --tolerance .001 .001 --cleanup --postprocess --ci -v
         working-directory: ./test-suite
 
       - name: Run Turbine Mode
@@ -113,7 +113,7 @@ jobs:
           pip install transformers --no-dependencies
           cd e2eshark
           free -mh
-          HF_TOKEN=${{ secrets.HF_TOKEN }} python ./run.py -r ./test-turbine -c ../../torch-mlir/build --report --cachedir ~/.cache/huggingface --mode turbine -g models --cleanup --postprocess --ci -v
+          HF_TOKEN=${{ secrets.HF_TOKEN }} python ./run.py -r ./test-turbine -c ../../torch-mlir/build --report --cachedir /home/huggingface_cache --mode turbine -g models --cleanup --postprocess --ci -v
         working-directory: ./test-suite
   
   upload_artifacts:

@@ -33,6 +33,7 @@ jobs:
           submodules: true
           repository: llvm/torch-mlir
           path: torch-mlir
+          ref: wheel-error
 
       - name: Install python deps (nightly)
         run: |

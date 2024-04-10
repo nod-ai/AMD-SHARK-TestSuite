@@ -21,11 +21,9 @@ concurrency:
 
 jobs:
   torch-mlir:
-    strategy:
-      matrix:
-        version: [3.11]
-        os: [nodai-amdgpu-mi210-x86-64]
-    runs-on: ${{matrix.os}}
+    runs-on: nodai-amdgpu-mi210-x86-64
+    env:
+      MLIR_VENV_DIR: ${{ github.workspace }}/mlir_venv
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -33,12 +31,11 @@ jobs:
           submodules: true
           repository: llvm/torch-mlir
           path: torch-mlir
-          ref: wheel-error
 
       - name: Install python deps (nightly)
         run: |
-          python -m venv test_mlir_venv
-          source test_mlir_venv/bin/activate
+          python -m venv ${MLIR_VENV_DIR}
+          source ${MLIR_VENV_DIR}/bin/activate
           bash build_tools/ci/install_python_deps.sh nightly
           python -m pip install --upgrade pip
           pip uninstall -y PyYAML
@@ -48,15 +45,12 @@ jobs:
 
       - name: Build
         run: |
-          source test_mlir_venv/bin/activate
+          source ${MLIR_VENV_DIR}/bin/activate
           bash build_tools/e2eshark_build.sh
         working-directory: ./torch-mlir
   
   turbine:
-    strategy:
-      matrix:
-        os: [nodai-amdgpu-mi210-x86-64]
-    runs-on: ${{matrix.os}}
+    runs-on: nodai-amdgpu-mi210-x86-64
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -66,11 +60,7 @@ jobs:
   
   e2eshark:
     needs: [turbine, torch-mlir]
-    strategy:
-      matrix:
-        version: [3.11]
-        os: [nodai-amdgpu-mi210-x86-64]
-    runs-on: ${{matrix.os}}
+    runs-on: nodai-amdgpu-mi210-x86-64
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
     steps:
@@ -118,10 +108,7 @@ jobs:
   
   upload_artifacts:
     needs: [e2eshark]
-    strategy:
-      matrix:
-        os: [nodai-amdgpu-mi210-x86-64]
-    runs-on: ${{matrix.os}}
+    runs-on: nodai-amdgpu-mi210-x86-64
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2

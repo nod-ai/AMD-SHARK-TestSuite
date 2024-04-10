@@ -100,7 +100,7 @@ jobs:
             IREE_TEST_CONFIG_FILES: iree_tests/configs/config_onnx_gpu_rocm_rdna3.json
         run: |
           source ${VENV_DIR}/bin/activate
-          pytest iree_tests/onnx/node/generated -rpfE -n 4 --timeout=30 --durations=10
+          pytest iree_tests/onnx/node/generated -rpfE -n 2 --timeout=30 --durations=10
 
   linux_x86_64_w7900_gpu_models:
     if: false  # DO NOT SUBMIT (testing just one job)

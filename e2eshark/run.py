@@ -318,23 +318,39 @@ def runTorchMLIRGeneration(
     end = time.time()
     resultdict[curphase] = ["passed", end - start]
     if mode == "onnx" or mode == "ort":
-        torch_mlir_pythonpath = (
-            SHARED_TORCH_MLIR_BUILD + "/tools/torch-mlir/python_packages/torch_mlir"
-        )
         # start phases[1]
         curphase = phases[1]
         # Import ONNX into torch MLIR as torch.operator custom OP
         torchonnxfilename = modelname + "." + args.todtype + ".torch-onnx.mlir"
         logfilename = curphase + ".log"
-        scriptcommand = (
-            f"PYTHONPATH={torch_mlir_pythonpath} python -m torch_mlir.tools.import_onnx "
-            + onnxfilename
-            + " -o "
-            + torchonnxfilename
-            + " 1> "
-            + logfilename
-            + " 2>&1"
-        )
+        if SHARED_TORCH_MLIR_BUILD:
+            torch_mlir_pythonpath = (
+                SHARED_TORCH_MLIR_BUILD + "/tools/torch-mlir/python_packages/torch_mlir"
+            )
+            scriptcommand = (
+                f"PYTHONPATH={torch_mlir_pythonpath} python -m torch_mlir.tools.import_onnx "
+                + onnxfilename
+                + " -o "
+                + torchonnxfilename
+                + " 1> "
+                + logfilename
+                + " 2>&1"
+            )
+        else:
+            if args.torchtolinalg:
+                print("INFO: Not able to pass linalg to iree-compile because no torch-mlir build provided")
+            scriptcommand = ""
+            if SHARED_IREE_BUILD:
+                scriptcommand += SHARED_IREE_BUILD + "/tools/"
+            scriptcommand += (
+                "iree-import-onnx "
+                + onnxfilename
+                + " -o "
+                + torchmlirfilename
+                + " 1> "
+                + logfilename
+                + " 2>&1"
+            )
         start = time.time()
         if launchCommand(args, scriptcommand, commandslog):
             print("Test", testName, "failed [" + curphase + "]")
@@ -354,49 +370,51 @@ def runTorchMLIRGeneration(
         end = time.time()
         resultdict[curphase] = ["passed", end - start]
 
-        # Lower torch ONNX to torch MLIR
-        # start phases[2]
-        curphase = phases[2]
-        logfilename = curphase + ".log"
-        commandstring = "/bin/torch-mlir-opt"
-        if args.torchtolinalg:
-            commandstring += " -pass-pipeline='builtin.module(func.func(convert-torch-onnx-to-torch),"
-            commandstring += (
-                "torch-lower-to-backend-contract,func.func(cse,canonicalize),"
+        # This phase is already part of the iree-import-onnx command
+        if SHARED_TORCH_MLIR_BUILD:
+            # Lower torch ONNX to torch MLIR
+            # start phases[2]
+            curphase = phases[2]
+            logfilename = curphase + ".log"
+            commandstring = "/bin/torch-mlir-opt"
+            if args.torchtolinalg:
+                commandstring += " -pass-pipeline='builtin.module(func.func(convert-torch-onnx-to-torch),"
+                commandstring += (
+                    "torch-lower-to-backend-contract,func.func(cse,canonicalize),"
+                )
+                commandstring += "torch-backend-to-linalg-on-tensors-backend-pipeline)' "
+            else:
+                commandstring += " -convert-torch-onnx-to-torch "
+
+            # TORCH_MLIR_BUILD = path_config["TORCH_MLIR_BUILD"]
+            # print(f"In RunTest - torch mlir build - {SHARED_TORCH_MLIR_BUILD}")
+            scriptcommand = (
+                SHARED_TORCH_MLIR_BUILD
+                + commandstring
+                + torchonnxfilename
+                + " > "
+                + torchmlirfilename
+                + " 2>"
+                + logfilename
             )
-            commandstring += "torch-backend-to-linalg-on-tensors-backend-pipeline)' "
-        else:
-            commandstring += " -convert-torch-onnx-to-torch "
 
-        # TORCH_MLIR_BUILD = path_config["TORCH_MLIR_BUILD"]
-        # print(f"In RunTest - torch mlir build - {SHARED_TORCH_MLIR_BUILD}")
-        scriptcommand = (
-            SHARED_TORCH_MLIR_BUILD
-            + commandstring
-            + torchonnxfilename
-            + " > "
-            + torchmlirfilename
-            + " 2>"
-            + logfilename
-        )
-
-        start = time.time()
-        if launchCommand(args, scriptcommand, commandslog):
-            print("Test", testName, "failed [" + curphase + "]")
+            start = time.time()
+            if launchCommand(args, scriptcommand, commandslog):
+                print("Test", testName, "failed [" + curphase + "]")
+                end = time.time()
+                resultdict[curphase] = ["failed", end - start]
+                return logAndReturn(
+                    commandslog,
+                    timelog,
+                    resultdict,
+                    1,
+                    uploadtestsList,
+                    cleanup,
+                    testName,
+                    uploadDict,
+                    dateAndTime,
+                )
             end = time.time()
-            resultdict[curphase] = ["failed", end - start]
-            return logAndReturn(
-                commandslog,
-                timelog,
-                resultdict,
-                1,
-                uploadtestsList,
-                cleanup,
-                testName,
-                uploadDict,
-                dateAndTime,
-            )
-        end = time.time()
         resultdict[curphase] = ["passed", end - start]
     return 0
 
@@ -1274,7 +1292,6 @@ def main():
     parser.add_argument(
         "-c",
         "--torchmlirbuild",
-        required=True,
         help="Path to the torch-mlir build directory",
     )
     parser.add_argument(
@@ -1433,12 +1450,6 @@ def main():
     run_dir = os.path.abspath(args.rundirectory)
     frameworks = args.frameworks
     TORCH_MLIR_BUILD, IREE_BUILD = checkBuild(run_dir, args)
-    # assert
-    if TORCH_MLIR_BUILD == "":
-        print(
-            "ERROR: Torch MLIR build path is required to be set using --torchmlirbuild"
-        )
-        sys.exit(1)
 
     print("Starting e2eshark tests. Using", args.jobs, "processes")
     print("Cache Directory: " + cache_path)
@@ -1449,7 +1460,8 @@ def main():
 
     if args.verbose:
         print("Test run with arguments: ", vars(args))
-    print("Torch MLIR build:", TORCH_MLIR_BUILD)
+    if TORCH_MLIR_BUILD:
+        print("Torch MLIR build:", TORCH_MLIR_BUILD)
     if IREE_BUILD:
         print("IREE build:", IREE_BUILD)
     else:

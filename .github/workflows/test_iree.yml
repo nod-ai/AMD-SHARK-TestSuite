@@ -73,6 +73,7 @@ jobs:
     runs-on: nodai-amdgpu-w7900-x86-64
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
+      LD_LIBRARY_PATH: /home/esaimana/TheRock/install/lib
     steps:
       - name: "Checking out repository"
         uses: actions/checkout@v4

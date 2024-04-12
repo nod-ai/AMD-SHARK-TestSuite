@@ -65,7 +65,7 @@ def download_onxx_model_from_azure_storage(cache_dir, script_dir, testList):
         dest_file = cache_dir + "/" + blob_name
         e2eshark_file = script_dir + "/" + model + "/model.onnx"
         if os.path.exists(dest_file) or os.path.exists(e2eshark_file):
-            # model already in cache dir, skip download.
+            # model already in cache dir or checked in, skip download.
             # TODO: skip model downloading based on some comparison / update flag
             continue
         if not os.path.exists(cache_dir):

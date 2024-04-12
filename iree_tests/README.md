@@ -41,6 +41,13 @@ with `.mlir` files and native (C/C++) tools. Each test suite or test case may
 also have its own import logic, with all test suites converging onto the
 standard format described above.
 
+Some large files are stored using [Git LFS](https://git-lfs.com/). When working
+with these files please ensure that you have Git LFS installed:
+
+```bash
+$ git lfs install
+```
+
 ## Running tests
 
 Tests are run using the [pytest](https://docs.pytest.org/en/stable/) framework.
@@ -48,7 +55,7 @@ Tests are run using the [pytest](https://docs.pytest.org/en/stable/) framework.
 A [`conftest.py`](conftest.py) file collects test cases from subdirectories,
 wrapping each directory matching the format described above to one test case
 per test configuration. Test configurations are defined in JSON config files
-like [`configs/config_cpu_llvm_sync.json`](./configs/config_cpu_llvm_sync.json).
+like [`configs/config_onnx_cpu_llvm_sync.json`](./configs/config_onnx_cpu_llvm_sync.json).
 
 ### Common venv setup with deps
 
@@ -91,11 +98,27 @@ $ pytest iree_tests -n auto
 Run tests using custom config files:
 
 ```bash
-$ pytest iree_tests --config-files ./configs/config_gpu_vulkan.json
+$ pytest iree_tests --config-files ./iree_tests/configs/config_gpu_vulkan.json
 
 # OR set an environment variable
 $ export IREE_TEST_CONFIG_FILES=/iree/config_cpu_llvm_sync.json;/iree/config_gpu_vulkan.json
 $ pytest iree_tests
+```
+
+Run ONNX tests on CPU and print all errors:
+
+```bash
+$ pytest iree_tests/onnx -n auto \
+    --ignore-xfails \
+    --config-files ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
+```
+
+Run ONNX compilation tests only and print all errors:
+
+```bash
+$ pytest iree_tests/onnx -n auto \
+    --ignore-xfails --skip-all-runs \
+    --config-files ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
 ```
 
 ### Advanced pytest usage tips
@@ -282,6 +305,24 @@ python ./iree_tests/onnx/import_tests.py
 
 6. Add a `real_weights_data_flags.txt` and `test_cases.json` file for real
    weights, pointing at the uploaded remote files.
+
+#### Generating model test cases from turbine/tank
+
+As seen in iree_tests/pytorch/models, there are some models with the "-tank" suffix.
+This refers to tests that were generated using the normal turbine flow.
+For custom models, such as sd, sdxl, or stateless_llama, you can clone the turbine repo 
+and follow the setup instructions there (https://github.com/nod-ai/SHARK-Turbine).
+Then, simply run the respective model with the appropriate command line args (for sd, sdxl edit this: https://github.com/nod-ai/SHARK-Turbine/blob/ean-sd-fp16/models/turbine_models/custom_models/sdxl_inference/sdxl_cmd_opts.py. otherwise, just direct command line args for llama. make sure to --compile_to vmfb).
+Just as a side note, the unet_scheduler model requires diffusers dep changes, so make sure to use changes
+in this branch: https://github.com/aviator19941/diffusers/tree/pndm_fx_v2.
+Example run command (`python models/turbine_models/custom_models/sdxl_inference/sdxl_prompt_encoder.py`).
+There is no easy way to get `.bin` or `.npy` files for your inputs and outputs.
+You will have to edit the model runner files to convert the input and output tensors into `.bin` files, 
+so those are saved when running the flow. (example runner:
+`models/turbine_models/custom_models/sdxl_inference/sdxl_prompt_encoder_runner.py`).
+Then, run the runner with the appropriate command line args (vmfb path, device flags).
+You should have all the artifacts needed to add to this TestSuite at that point.
+Make sure to follow to follow appendix instructions to convert between different file types for weights and mlir.
 
 ## Appendix
 

@@ -1,0 +1,17 @@
+onnx/models/resnet50_vaiq_int8
+pytorch/models/opt-125M
+pytorch/models/resnet50
+pytorch/models/opt-1.3b
+pytorch/models/beit-base-patch16-224-pt22k-ft22k
+pytorch/models/bert-large-uncased
+pytorch/models/bge-base-en-v1.5
+pytorch/models/gpt2-xl
+pytorch/models/gpt2
+pytorch/models/miniLM-L12-H384-uncased
+pytorch/models/opt-350m
+pytorch/models/t5-base
+pytorch/models/t5-large
+pytorch/models/vicuna-13b-v1.3
+pytorch/models/whisper-base
+pytorch/models/whisper-medium
+pytorch/models/whisper-small

@@ -1,4 +1,4 @@
-# Copyright 2024 Advanced Micro Devices
+# Copyright 2024 Advanced Micro Devices, Inc.
 #
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
 # See https://llvm.org/LICENSE.txt for license information.
@@ -37,11 +37,11 @@ model = T5Model.from_pretrained(
 model.to("cpu")
 model.eval()
 tokenizer("Studies have been shown that owning a dog is good for you", **tokenization_kwargs)
-encoded_input_ids = tokenizer("Studies have been shown that owning a dog is good for you", 
-    **tokenization_kwargs
+encoded_input_ids = tokenizer(
+    "Studies have been shown that owning a dog is good for you", **tokenization_kwargs
 ).input_ids.cpu()
-decoder_input_ids = tokenizer("Studies show that", 
-    **tokenization_kwargs
+decoder_input_ids = tokenizer(
+    "Studies show that", **tokenization_kwargs
 ).input_ids.cpu()
 decoder_input_ids = model._shift_right(decoder_input_ids)
 attention_mask = torch.ones(1, 512).to("cpu")

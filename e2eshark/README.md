@@ -163,9 +163,14 @@ Note that the --cachedir command line argument is necessary for any run command.
 
 Run the tests in operators, combinations folders of the default framework (i.e. pytorch),
 Use framework to onnx to torch MLIR path (--mode onnx) and run upto inference (default) using llvm-cpu backend (default),
-use four processor cores (default --jobs 4) on your machine, generate report file after finishing test run
+use four processor cores (default --jobs 4) on your machine, generate report file after finishing test run.
+
+If the model you are running requires a huggingface token (llama, gemma), set the HF_TOKEN env variable as well.
+Either set environment in shell (`export HF_TOKEN=your_token`) or add it on in command line
+as shown below.
+
 ```
-python ./run.py -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir'
+HF_TOKEN=your_token python ./run.py -c 'path_to_your_torch_mlir_build_dir' -i 'path_to_your_iree_build_dir'
 --report --cachedir 'path_to_your_cache_dir'
 ```
 You can see logs of test run inside test-run/'test sub-directory'. Start with commands.log file. 
@@ -295,6 +300,25 @@ The diff report for summary (time in seconds) of runs: fp32, bf16, fp32
 if more than two runs are diffed, then when values differ the comma separated differing values are shown
 ```
 The -1 under inference indicates, one test regressed in inference
+
+### Running tests with upload
+
+If you are interested in running tests, but want to upload the mlir files generated to Azure 
+to share with others or for yourself, first you will have to set the AZURE_CONNECTION_STRING environment
+variable. You can find this connection string here: https://portal.azure.com/#@amdcloud.onmicrosoft.com/resource/subscriptions/8c190d1b-eb91-48d5-bec5-3e7cb7412e6c/resourceGroups/pdue-nod-ai-rg/providers/Microsoft.Storage/storageAccounts/e2esharkuserartifacts/keys. If you don't have access to link above, you can ask Sai Enduri for the connection string.
+
+Then, setup an upload_list.txt file with the names of the models you want to upload on. There is already one
+setup at e2eshark/gold/upload_list.txt. You can just modify that one.
+
+Optional: If you want to change what type of files are being uploaded, simply tweak `upload_list = ["mlir"]` in e2eshark/run.py to change or add more file types you want to upload (`upload_list = ["mlir", "log"]` for example).
+
+
+With this connection string and upload list file, you can now run command like this:
+```
+python ./run.py -c ../../torch-mlir/build -i ../../iree-build --report --cachedir ~/.cache/huggingface --mode direct --tests pytorch/models/beit-base-patch16-224-pt22k-ft22k pytorch/models/bge-base-en-v1.5 pytorch/models/mit-b0 pytorch/models/bert-large-uncased pytorch/models/deit-small-distilled-patch16-224 --uploadtestsfile /home/sai/SHARK-TestSuite-fork/e2eshark/gold/upload_list.txt --cleanup
+```
+
+You can then find a json file (`upload_urls.json` in e2eshark directory) with the model names and links to the files uploaded for each model. You can just wget these links to download as it is public, so should be easy to share with others.
 
 ### Adding new tests
 

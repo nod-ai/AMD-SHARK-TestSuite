@@ -1,4 +1,4 @@
-# Copyright 2024 Advanced Micro Devices
+# Copyright 2024 Advanced Micro Devices, Inc.
 #
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
 # See https://llvm.org/LICENSE.txt for license information.
@@ -18,6 +18,8 @@ from azure.storage.blob import BlobServiceClient
 import simplejson
 import json
 from multiprocessing import Manager
+from tools.aztestsetup import download_onxx_model_from_azure_storage
+from zipfile import ZipFile
 
 # Need to allow invocation of run.py from anywhere
 sys.path.append(Path(__file__).parent)
@@ -221,10 +223,14 @@ def unpackBytearray(barray, num_elem, dtype):
         temptensor = torch.tensor(num_array, dtype=torch.int16)
         rettensor = temptensor.view(dtype=torch.float16)
         return rettensor
+    elif dtype == torch.int32:
+        num_array = struct.unpack("l" * num_elem, barray)
     elif dtype == torch.int16:
         num_array = struct.unpack("h" * num_elem, barray)
     elif dtype == torch.int8:
         num_array = struct.unpack("b" * num_elem, barray)
+    elif dtype == torch.uint8:
+        num_array = struct.unpack("B" * num_elem, barray)
     elif dtype == torch.bool:
         num_array = struct.unpack("?" * num_elem, barray)
     else:
@@ -475,16 +481,13 @@ def runCodeGeneration(
 #    fp16: atol=1e-05, rtol=1e-03
 #    fp32: atol=1e-05, rtol=1.3e-06
 def getTolerances(args, torchdtype):
-    atol, rtol = (1e-05, 1.3e-06)
     if args.tolerance:
-        atol, rtol = tuple(args.tolerance)
+        return tuple(args.tolerance)
     elif torchdtype == torch.bfloat16:
-        atol, rtol = (1e-02, 1e-01)
+        return (1e-02, 1e-01)
     elif torchdtype == torch.float16:
-        atol, rtol = (1e-04, 1e-03)
-    else:
-        atol, rtol = (1e-04, 1e-04)
-    return (atol, rtol)
+        return (1e-04, 1e-03)
+    return (1e-04, 1e-04)
 
 
 def compareOutputs(args, goldoutput, infoutput, dtype):
@@ -665,10 +668,8 @@ def runInference(
             torch.set_printoptions(profile="full")
             print(f"Gold reference[output[{i}]]:\n{goldoutput}\n", file=failedinflog)
             print(f"Inference Output[output[{i}]]:\n{infoutput}:\n", file=failedinflog)
-            diff = torch.eq(
-                infoutput,
-                goldoutput,
-            )
+            atol, rtol = getTolerances(args, infoutput.dtype)
+            diff = torch.abs(infoutput - goldoutput) <= (atol + rtol * torch.abs(goldoutput))
             print(f"Element-wise difference[output[{i}]]:\n{diff}\n", file=failedinflog)
             percentdiff = torch.sum(diff).item() / diff.nelement() * 100
             print(
@@ -952,7 +953,9 @@ def runTest(aTuple):
     # set up upload utilities
     uploadtestsList = []
     if args.uploadtestsfile:
-        uploadtestsList = getTestsListFromFile(args.uploadtestsfile)
+        uploadtestsfile = os.path.expanduser(args.uploadtestsfile)
+        uploadtestsfile = os.path.abspath(uploadtestsfile)
+        uploadtestsList = getTestsListFromFile(uploadtestsfile)
 
     # Open files to log commands run and time taken
     commandslog = open("commands.log", "w")
@@ -1516,6 +1519,18 @@ def main():
             testsList = frameworktotests_dict[framework]
             testsList = [test for test in testsList if not test in skiptestslist]
             totalTestList += testsList
+            if framework == "onnx":
+                # for the testList download all the models in cache_path
+                download_onxx_model_from_azure_storage(cache_path, testsList)
+                # if the the model exists for the test in the test dir, do nothing.
+                # if it doesn't exist in the test directory but exists in cache dir, simply unzip cached model
+                for test_name in testsList:
+                    model_file_path_test = script_dir + '/' + test_name + '/model.onnx'
+                    model_file_path_cache = cache_path + '/e2eshark/' + test_name + '/model.onnx.zip'
+                    if not os.path.exists(model_file_path_test):
+                        # Unzip the model in the model test dir
+                        with ZipFile(model_file_path_cache, 'r') as zf:
+                            zf.extract(test_name + '/model.onnx', path=script_dir) # onnx/model/testname already present in the zip file structure
             if not args.norun:
                 runFrameworkTests(
                     framework,
@@ -1531,6 +1546,14 @@ def main():
             testsList = getTestsList(framework, args.groups)
             testsList = [test for test in testsList if not test in skiptestslist]
             totalTestList += testsList
+            if framework == "onnx":
+                download_onxx_model_from_azure_storage(cache_path, testsList)
+                for test_name in testsList:
+                    model_file_path_test = script_dir + '/' + test_name + '/model.onnx'
+                    model_file_path_cache = cache_path + '/e2eshark/' + test_name + '/model.onnx.zip'
+                    if not os.path.exists(model_file_path_test):
+                        with ZipFile(model_file_path_cache, 'r') as zf:
+                            zf.extract(test_name + '/model.onnx', path=script_dir)
             if not args.norun:
                 runFrameworkTests(
                     framework,
@@ -1563,10 +1586,11 @@ def main():
 
     # When all processes are done, print
     print("\nCompleted run of e2e shark tests")
-    print(
-        "\nIf using the upload feature, you can find a map of the test name "
-        + "to azure urls for your uploaded artifacts in upload_urls.json"
-    )
+    if args.uploadtestsfile:
+        print(
+            "\nIf using the upload feature, you can find a map of the test name "
+            + "to azure urls for your uploaded artifacts in upload_urls.json"
+        )
 
 
 if __name__ == "__main__":

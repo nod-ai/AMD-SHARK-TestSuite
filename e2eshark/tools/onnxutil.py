@@ -1,4 +1,4 @@
-# Copyright 2024 Advanced Micro Devices
+# Copyright 2024 Advanced Micro Devices, Inc.
 #
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
 # See https://llvm.org/LICENSE.txt for license information.
@@ -42,6 +42,9 @@ if __name__ == "__main__":
         "-p", "--print", action="store_true", help="Print in human readable format"
     )
     parser.add_argument(
+        "-s", "--signature", action="store_true", help="Get model input output information"
+    )
+    parser.add_argument(
         "-f",
         "--frequency",
         action="store_true",
@@ -77,3 +80,11 @@ if __name__ == "__main__":
                 print(k, ":", v)
                 count += v
             print("Total instances of ops: ", count)
+        if args.signature:
+            # Get the input and output nodes of the model
+            ofilename = os.path.basename(onnxfile) + "signature.json"
+            with open(ofilename, "w") as ofile:
+                print("INPUTS: \n", file=ofile)
+                print(model.graph.input, file=ofile)
+                print("------------------------\nOUTPUTS: \n", file=ofile)
+                print(model.graph.output, file=ofile)

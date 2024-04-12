@@ -1,4 +1,4 @@
-# Copyright 2024 Advanced Micro Devices
+# Copyright 2024 Advanced Micro Devices, Inc.
 #
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
 # See https://llvm.org/LICENSE.txt for license information.
@@ -55,8 +55,7 @@ def pytest_addoption(parser):
         this_dir = Path(__file__).parent
         repo_root = this_dir.parent
         default_config_files = [
-            repo_root / "iree_tests/configs/config_cpu_llvm_sync.json",
-            # repo_root / "iree_tests/configs/config_gpu_vulkan.json",
+            repo_root / "iree_tests/configs/config_onnx_cpu_llvm_sync.json",
         ]
     parser.addoption(
         "--config-files",
@@ -64,6 +63,20 @@ def pytest_addoption(parser):
         nargs="*",
         default=default_config_files,
         help="List of config JSON files used to build test cases",
+    )
+
+    parser.addoption(
+        "--ignore-xfails",
+        action="store_true",
+        default=False,
+        help="Ignores expected compile/run failures from configs, to print all error output",
+    )
+
+    parser.addoption(
+        "--skip-all-runs",
+        action="store_true",
+        default=False,
+        help="Skips all 'run' tests, overriding 'skip_run_tests' in configs",
     )
 
 
@@ -90,6 +103,7 @@ def pytest_collect_file(parent, file_path):
 #   * let the user accept the new config file in place of their original
 
 # --------------------------------------------------------------------------- #
+
 
 @dataclass(frozen=True)
 class IreeCompileAndRunTestSpec:
@@ -143,6 +157,16 @@ class MlirFile(pytest.File):
         runtime_flagfile: str
         enabled: bool
 
+    def check_for_lfs_files(self):
+        """Checks if git LFS files are checked out."""
+        have_lfs_files = True
+        if self.path.stat().st_size < 1000:
+            with open(self.path, "rt") as f:
+                first_line = f.readline()
+                if "git-lfs" in first_line:
+                    have_lfs_files = False
+        return have_lfs_files
+
     def check_for_remote_files(self, test_case_json):
         """Checks if all remote_files in a JSON test case exist on disk."""
         have_all_files = True
@@ -161,13 +185,15 @@ class MlirFile(pytest.File):
         """Discovers test cases in either test_data_flags.txt or test_cases.json."""
         test_cases = []
 
+        have_lfs_files = self.check_for_lfs_files()
+
         test_data_flagfile_name = "test_data_flags.txt"
         if (self.path.parent / test_data_flagfile_name).exists():
             test_cases.append(
                 MlirFile.TestCase(
                     name="test",
                     runtime_flagfile=test_data_flagfile_name,
-                    enabled=True,
+                    enabled=have_lfs_files,
                 )
             )
 
@@ -185,7 +211,7 @@ class MlirFile(pytest.File):
                     MlirFile.TestCase(
                         name=test_case_name,
                         runtime_flagfile=test_case_json["runtime_flagfile"],
-                        enabled=have_all_files,
+                        enabled=have_lfs_files and have_all_files,
                     )
                 )
 
@@ -212,10 +238,17 @@ class MlirFile(pytest.File):
                 continue
 
             expect_compile_success = (
-                test_name not in config["expected_compile_failures"]
+                self.config.getoption("ignore_xfails")
+                or test_name not in config["expected_compile_failures"]
             )
-            expect_run_success = test_name not in config["expected_run_failures"]
-            skip_run = test_name in config["skip_run_tests"]
+            expect_run_success = (
+                self.config.getoption("ignore_xfails")
+                or test_name not in config["expected_run_failures"]
+            )
+            skip_run = (
+                self.config.getoption("skip_all_runs")
+                or test_name in config["skip_run_tests"]
+            )
             config_name = config["config_name"]
 
             # TODO(scotttodd): don't compile once per test case?
@@ -263,28 +296,59 @@ class IreeCompileRunItem(pytest.Item):
         if self.spec.skip_test:
             pytest.skip()
 
+        # We want to test two phases: 'compile', and 'run'.
+        # A test can be marked as expected to fail at either stage, with these
+        # possible outcomes:
+
+        # Expect 'compile' | Expect 'run' | Actual 'compile' | Actual 'run' | Result
+        # ---------------- | ------------ | ---------------- | ------------ | ------
+        #
+        # PASS             | PASS         | PASS             | PASS         | PASS
+        # PASS             | PASS         | FAIL             | N/A          | FAIL
+        # PASS             | PASS         | PASS             | FAIL         | FAIL
+        #
+        # PASS             | FAIL         | PASS             | PASS         | XPASS
+        # PASS             | FAIL         | FAIL             | N/A          | FAIL
+        # PASS             | FAIL         | PASS             | FAIL         | XFAIL
+        #
+        # FAIL             | N/A          | PASS             | PASS         | XPASS
+        # FAIL             | N/A          | FAIL             | N/A          | XFAIL
+        # FAIL             | N/A          | PASS             | FAIL         | XPASS
+
+        # * XFAIL and PASS are acceptable outcomes - they mean that the list of
+        #   expected failures in the config file matched the test run.
+        # * FAIL means that something expected to work did not. That's an error.
+        # * XPASS means that a test is newly passing and can be removed from the
+        #   expected failures list.
+
         if not self.spec.expect_compile_success:
             self.add_marker(
                 pytest.mark.xfail(
                     raises=IreeCompileException,
                     strict=True,
-                    reason="Expected compilation to fail",
+                    reason="Expected compilation to fail (remove from 'expected_compile_failures')",
                 )
             )
-        self.test_compile()
-
-        if not self.spec.expect_compile_success or self.spec.skip_run:
-            return
-
         if not self.spec.expect_run_success:
             self.add_marker(
                 pytest.mark.xfail(
                     raises=IreeRunException,
                     strict=True,
-                    reason="Expected run to fail",
+                    reason="Expected run to fail (remove from 'expected_run_failures')",
                 )
             )
-        self.test_run()
+
+        self.test_compile()
+
+        if self.spec.skip_run:
+            return
+
+        try:
+            self.test_run()
+        except IreeRunException as e:
+            if not self.spec.expect_compile_success:
+                raise IreeXFailCompileRunException from e
+            raise e
 
     def test_compile(self):
         proc = subprocess.run(self.compile_args, capture_output=True, cwd=self.test_cwd)
@@ -300,6 +364,11 @@ class IreeCompileRunItem(pytest.Item):
         """Called when self.runtest() raises an exception."""
         if isinstance(excinfo.value, (IreeCompileException, IreeRunException)):
             return "\n".join(excinfo.value.args)
+        if isinstance(excinfo.value, IreeXFailCompileRunException):
+            return (
+                "Expected compile failure but run failed (move to 'expected_run_failures'):\n"
+                + "\n".join(excinfo.value.__cause__.args)
+            )
         # TODO(scotttodd): XFAIL tests spew a ton of logs here when run with `pytest -rA`. Fix?
         return super().repr_failure(excinfo)
 
@@ -356,3 +425,7 @@ class IreeRunException(Exception):
             f"Run with:\n"
             f"  cd {cwd} && {' '.join(process.args)}\n\n"
         )
+
+
+class IreeXFailCompileRunException(Exception):
+    pass

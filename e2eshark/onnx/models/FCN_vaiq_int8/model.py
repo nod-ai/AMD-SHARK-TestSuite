@@ -30,7 +30,7 @@ outputs = session.get_outputs()
 
 
 model_output = session.run(
-    [outputs[0].name],
+    [outputs[0].name, outputs[1].name],
     {inputs[0].name: model_input_X},
 )[0]
 E2ESHARK_CHECK["input"] = [torch.from_numpy(model_input_X)]

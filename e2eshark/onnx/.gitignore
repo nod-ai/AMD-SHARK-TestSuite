@@ -1,2 +1,4 @@
 # Model artifacts
 operators/*/model.onnx
+models/*/model.onnx
+models/*/model.onnxsignature.json

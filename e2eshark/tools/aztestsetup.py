@@ -37,40 +37,49 @@ def cleanup_e2eshark_test(testList, e2eshark_test_dir):
             os.remove(onnxmodelzip)
 
 
-def download_test_from_azure_storage(
-    account_url, container_name, cache_dir, e2eshark_test_dir, testList
-):
-    for model in testList:
-        blob_dir = e2eshark_test_dir + "/" + model
-        cache_blob_dir = cache_dir + "/" + blob_dir
-        if not os.path.exists(cache_blob_dir):
-            try:
-                os.mkdir(cache_blob_dir)
-            except OSError as errormsg:
-                print(
-                    "ERROR: Could not make run directory",
-                    cache_blob_dir,
-                    " Error message: ",
-                    errormsg,
-                )
-                return
-        blob_name = blob_dir + "/model.onnx.zip"
-        dest_file = cache_dir + "/" + blob_name
-        print(
-            f"Downloading {blob_name} from {account_url}/{container_name} to {dest_file}"
-        )
-
-        with ContainerClient(
+def download_azure_blob(account_url, container_name, blob_name, dest_file):
+    with ContainerClient(
             account_url,
             container_name,
             max_chunk_get_size=1024 * 1024 * 32,  # 32 MiB
             max_single_get_size=1024 * 1024 * 32,  # 32 MiB
         ) as container_client:
-            with open(dest_file, mode="wb") as local_blob:
-                download_stream = container_client.download_blob(
+        with open(dest_file, mode="wb") as local_blob:
+            download_stream = container_client.download_blob(
                     blob_name, max_concurrency=4
                 )
-                local_blob.write(download_stream.readall())
+            local_blob.write(download_stream.readall())
+
+
+def download_onxx_model_from_azure_storage(cache_dir, testList):
+    # Utility to download specified models (zip files) to cache dir
+    # testList : expected to contain list of test names of the format `onnx/model/testName`
+
+    # Azure Storage Creds for Public Onnx Models
+    account_url = "https://onnxstorage.blob.core.windows.net"
+    container_name = "onnxstorage"
+
+    for model in testList:
+        blob_dir =  "e2eshark/" + model
+        blob_name = blob_dir + "/model.onnx.zip"
+        dest_file = cache_dir + "/" + blob_name
+        if os.path.exists(dest_file):
+            # model already in cache dir, skip download.
+            # TODO: skip model downloading based on some comparison / update flag
+            continue
+        if not os.path.exists(cache_dir):
+            print(f"ERROR : cache_dir path: {cache_dir}, does not exist!")
+            sys.exit(1)
+        if not os.path.isdir(cache_dir + "/" + blob_dir):
+            print(f"DIR not found creating new {blob_dir}")
+            os.makedirs(cache_dir + "/" + blob_dir, exist_ok=True)
+
+        # TODO: better organisation of models in tank and cache
+        print(
+            f"Downloading {blob_name} from {account_url}/{container_name} to {dest_file}"
+        )
+
+        download_azure_blob(account_url, container_name, blob_name, dest_file)
 
 
 def setup_e2eshark_test(modelpy, testList, sourcedir, model_root_dir):
@@ -218,6 +227,4 @@ if __name__ == "__main__":
             print(f"The directory {cachedir} does not exist")
             sys.exit(1)
 
-        download_test_from_azure_storage(
-            account_url, container_name, cachedir, e2eshark_test_dir, testList
-        )
+        download_onxx_model_from_azure_storage(cachedir, testList)

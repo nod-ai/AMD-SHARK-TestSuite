@@ -31,7 +31,8 @@ outputs = session.get_outputs()
 
 model_output = session.run(
     [outputs[0].name],
-    {inputs[0].name: model_input_X, inputs[1].name: model_input_Y},
+    {inputs[0].name: model_input_X,
+     inputs[1].name: model_input_Y},
 )[0]
 E2ESHARK_CHECK["inputs"] = [torch.from_numpy(model_input_X), torch.from_numpy(model_input_Y)]
 E2ESHARK_CHECK["outputs"] = [torch.from_numpy(arr) for arr in model_output]
@@ -39,4 +40,11 @@ E2ESHARK_CHECK["outputs"] = [torch.from_numpy(arr) for arr in model_output]
 print("Input:", E2ESHARK_CHECK["inputs"])
 print("Output:", E2ESHARK_CHECK["outputs"])
 
-# may need to add postprocess here #
+# Post process output to do:
+# sort(topk(torch.nn.functional.softmax(output, 0), 2)[1])[0]
+# Top most probability
+# E2ESHARK_CHECK["postprocess"] = [
+#     (torch.nn.functional.softmax, [0], False, 0),
+#     (torch.topk, [2], True, 1),
+#     (torch.sort, [], True, 0),
+# ]

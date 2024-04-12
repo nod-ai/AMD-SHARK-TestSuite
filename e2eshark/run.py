@@ -223,6 +223,8 @@ def unpackBytearray(barray, num_elem, dtype):
         temptensor = torch.tensor(num_array, dtype=torch.int16)
         rettensor = temptensor.view(dtype=torch.float16)
         return rettensor
+    elif dtype == torch.int32:
+        num_array = struct.unpack("l" * num_elem, barray)
     elif dtype == torch.int16:
         num_array = struct.unpack("h" * num_elem, barray)
     elif dtype == torch.int8:

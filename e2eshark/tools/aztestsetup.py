@@ -51,7 +51,7 @@ def download_azure_blob(account_url, container_name, blob_name, dest_file):
             local_blob.write(download_stream.readall())
 
 
-def download_onxx_model_from_azure_storage(cache_dir, testList):
+def download_onxx_model_from_azure_storage(cache_dir, script_dir, testList):
     # Utility to download specified models (zip files) to cache dir
     # testList : expected to contain list of test names of the format `onnx/model/testName`
 
@@ -63,7 +63,8 @@ def download_onxx_model_from_azure_storage(cache_dir, testList):
         blob_dir =  "e2eshark/" + model
         blob_name = blob_dir + "/model.onnx.zip"
         dest_file = cache_dir + "/" + blob_name
-        if os.path.exists(dest_file):
+        e2eshark_file = script_dir + "/" + model + "/model.onnx"
+        if os.path.exists(dest_file) or os.path.exists(e2eshark_file):
             # model already in cache dir, skip download.
             # TODO: skip model downloading based on some comparison / update flag
             continue

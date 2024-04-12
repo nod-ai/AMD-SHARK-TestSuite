@@ -1506,7 +1506,7 @@ def main():
             totalTestList += testsList
             if framework == "onnx":
                 # for the testList download all the models in cache_path
-                download_onxx_model_from_azure_storage(cache_path, testsList)
+                download_onxx_model_from_azure_storage(cache_path, script_dir, testsList)
                 # if the the model exists for the test in the test dir, do nothing.
                 # if it doesn't exist in the test directory but exists in cache dir, simply unzip cached model
                 for test_name in testsList:
@@ -1532,7 +1532,7 @@ def main():
             testsList = [test for test in testsList if not test in skiptestslist]
             totalTestList += testsList
             if framework == "onnx":
-                download_onxx_model_from_azure_storage(cache_path, testsList)
+                download_onxx_model_from_azure_storage(cache_path, script_dir, testsList)
                 for test_name in testsList:
                     model_file_path_test = script_dir + '/' + test_name + '/model.onnx'
                     model_file_path_cache = cache_path + '/e2eshark/' + test_name + '/model.onnx.zip'

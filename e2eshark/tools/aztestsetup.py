@@ -68,7 +68,7 @@ def download_azure_blob(account_url, container_name, blob_name, dest_file):
                 local_blob.write(download_stream.readall())
 
 
-def download_onxx_model_from_azure_storage(cache_dir, testList):
+def download_and_setup_onnxmodels(cache_dir, testList):
     # Utility to download specified models (zip files) to cache dir
     # testList : expected to contain list of test names of the format `onnx/model/testName`
     # Download failure should not stop tests running entirely.
@@ -125,7 +125,7 @@ def pre_test_onnx_models_azure_download(testsList, cache_path, script_dir):
 
     # for the testList download all the onnx/models in cache_path
     model_tests_list = [test for test in testsList if 'models' in test]
-    download_onxx_model_from_azure_storage(cache_path, model_tests_list)
+    download_and_setup_onnxmodels(cache_path, model_tests_list)
 
     # if the the model exists for the test in the test dir, do nothing.
     # if it doesn't exist in the test directory but exists in cache dir, simply unzip cached model
@@ -288,4 +288,4 @@ if __name__ == "__main__":
             print(f"The directory {cachedir} does not exist")
             sys.exit(1)
 
-        download_onxx_model_from_azure_storage(cachedir, testList)
+        download_and_setup_onnxmodels(cachedir, testList)

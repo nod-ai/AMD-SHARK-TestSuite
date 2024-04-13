@@ -18,7 +18,7 @@ from azure.storage.blob import BlobServiceClient
 import simplejson
 import json
 from multiprocessing import Manager
-from tools.aztestsetup import download_onxx_model_from_azure_storage
+from tools.aztestsetup import pre_test_onnx_models_azure_download
 from zipfile import ZipFile
 
 # Need to allow invocation of run.py from anywhere
@@ -1505,17 +1505,7 @@ def main():
             testsList = [test for test in testsList if not test in skiptestslist]
             totalTestList += testsList
             if framework == "onnx":
-                # for the testList download all the models in cache_path
-                download_onxx_model_from_azure_storage(cache_path, testsList)
-                # if the the model exists for the test in the test dir, do nothing.
-                # if it doesn't exist in the test directory but exists in cache dir, simply unzip cached model
-                for test_name in testsList:
-                    model_file_path_test = script_dir + '/' + test_name + '/model.onnx'
-                    model_file_path_cache = cache_path + '/e2eshark/' + test_name + '/model.onnx.zip'
-                    if not os.path.exists(model_file_path_test):
-                        # Unzip the model in the model test dir
-                        with ZipFile(model_file_path_cache, 'r') as zf:
-                            zf.extract(test_name + '/model.onnx', path=script_dir) # onnx/model/testname already present in the zip file structure
+                pre_test_onnx_models_azure_download(testsList, cache_path, script_dir)
             if not args.norun:
                 runFrameworkTests(
                     framework,
@@ -1532,13 +1522,7 @@ def main():
             testsList = [test for test in testsList if not test in skiptestslist]
             totalTestList += testsList
             if framework == "onnx":
-                download_onxx_model_from_azure_storage(cache_path, testsList)
-                for test_name in testsList:
-                    model_file_path_test = script_dir + '/' + test_name + '/model.onnx'
-                    model_file_path_cache = cache_path + '/e2eshark/' + test_name + '/model.onnx.zip'
-                    if not os.path.exists(model_file_path_test):
-                        with ZipFile(model_file_path_cache, 'r') as zf:
-                            zf.extract(test_name + '/model.onnx', path=script_dir)
+                pre_test_onnx_models_azure_download(testsList, cache_path, script_dir)
             if not args.norun:
                 runFrameworkTests(
                     framework,

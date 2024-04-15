@@ -21,7 +21,7 @@ session = onnxruntime.InferenceSession("model.onnx", None)
 
 # Even if model is quantized, the inputs and outputs are
 # not, so apply float32
-model_input_X = numpy.random.rand(1, 3, 224, 224).astype(numpy.float32)
+model_input_X = numpy.random.rand(1, 3, 320, 320).astype(numpy.float32)
 
 # gets X in inputs[0] and Y in inputs[1]
 inputs = session.get_inputs()
@@ -30,7 +30,15 @@ outputs = session.get_outputs()
 
 
 model_output = session.run(
-    [outputs[0].name],
+    [
+        outputs[0].name,
+        outputs[1].name,
+        outputs[2].name,
+        outputs[3].name,
+        outputs[4].name,
+        outputs[5].name,
+        outputs[6].name,
+    ],
     {inputs[0].name: model_input_X},
 )[0]
 E2ESHARK_CHECK["input"] = [torch.from_numpy(model_input_X)]

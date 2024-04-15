@@ -21,7 +21,7 @@ session = onnxruntime.InferenceSession("model.onnx", None)
 
 # Even if model is quantized, the inputs and outputs are
 # not, so apply float32
-model_input_X = numpy.random.rand(1, 1, 64, 224, 224).astype(numpy.float32)
+model_input_X = numpy.random.rand(1, 1, 64, 128, 128).astype(numpy.float32)
 
 # gets X in inputs[0] and Y in inputs[1]
 inputs = session.get_inputs()

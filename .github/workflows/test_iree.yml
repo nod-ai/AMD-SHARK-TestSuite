@@ -69,7 +69,7 @@ jobs:
 
   linux_x86_64_w7900_gpu_models:
     name: Linux (x86_64 w7900) Models GPU
-    runs-on: nodai-amdgpu-w7900-x86-64
+    runs-on: nodai-amdgpu-mi250-x86-64
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
     steps:

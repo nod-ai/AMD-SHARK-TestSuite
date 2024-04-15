@@ -61,11 +61,11 @@ def download_azure_blob(account_url, container_name, blob_name, dest_file):
                 max_chunk_get_size=1024 * 1024 * 32,  # 32 MiB
                 max_single_get_size=1024 * 1024 * 32,  # 32 MiB
             ) as container_client:
-            with open(dest_file, mode="wb") as local_blob:
                 download_stream = container_client.download_blob(
                         blob_name, max_concurrency=4
                     )
-                local_blob.write(download_stream.readall())
+                with open(dest_file, mode="wb") as local_blob:
+                    local_blob.write(download_stream.readall())
 
 
 def download_and_setup_onnxmodels(cache_dir, testList):

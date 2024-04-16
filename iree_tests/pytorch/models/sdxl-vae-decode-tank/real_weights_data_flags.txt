@@ -1,4 +1,4 @@
---parameters=model=real_weights.irpa
---input=1x4x128x128xf16=@inference_input.0.bin
---expected_output=1x3x1024x1024xf16=@inference_output.0.bin
+--parameters=model=${IREE_TEST_FILES}/iree_tests/pytorch/models/sdxl-vae-decode-tank/real_weights.irpa
+--input=1x4x128x128xf16=@${IREE_TEST_FILES}/iree_tests/pytorch/models/sdxl-vae-decode-tank/inference_input.0.bin
+--expected_output=1x3x1024x1024xf16=@${IREE_TEST_FILES}/iree_tests/pytorch/models/sdxl-vae-decode-tank/inference_output.0.bin
 --expected_f16_threshold=0.02f

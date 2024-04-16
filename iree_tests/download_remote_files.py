@@ -11,8 +11,10 @@ import hashlib
 import mmap
 import pyjson5
 import re
+import os
 
 THIS_DIR = Path(__file__).parent
+REPO_ROOT = Path(__file__).parent.parent
 
 
 def human_readable_size(size, decimal_places=2):
@@ -74,13 +76,25 @@ def download_azure_remote_file(test_dir: Path, remote_file: str):
     ) as blob_client:
         blob_properties = blob_client.get_blob_properties()
 
-        local_file_path = test_dir / remote_file_name
+        cache_location = os.getenv("IREE_TEST_FILES", "")
+        if cache_location == "":
+            os.environ["IREE_TEST_FILES"] = REPO_ROOT
+            cache_location = REPO_ROOT
+        if cache_location == REPO_ROOT or remote_file_name.split(".")[1] == "mlirbc":
+            local_dir_path = test_dir
+            local_file_path = test_dir / remote_file_name
+        else:
+            local_dir_path = cache_location + "/iree_tests/" + relative_dir
+            local_file_path = cache_location + "/iree_tests/" + relative_dir + "/" + remote_file_name
         if check_azure_remote_file_matching_local(blob_properties, local_file_path):
             print(f"  Skipping '{remote_file_name}' download (local MD5 hash matches)")
             return
 
         size_str = human_readable_size(blob_properties.size)
         print(f"  Downloading '{remote_file_name}' ({size_str}) to '{relative_dir}'")
+        
+        if not os.path.isdir(local_dir_path):
+            os.makedirs(local_dir_path)
         with open(local_file_path, mode="wb") as local_blob:
             download_stream = blob_client.download_blob(max_concurrency=4)
             local_blob.write(download_stream.readall())

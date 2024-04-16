@@ -72,6 +72,7 @@ jobs:
     runs-on: nodai-amdgpu-w7900-x86-64
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
+      IREE_TEST_FILES: ~/iree_tests_cache
     steps:
       - name: "Checking out repository"
         uses: actions/checkout@v4

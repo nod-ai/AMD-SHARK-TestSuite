@@ -12,8 +12,10 @@ import logging
 import mmap
 import pyjson5
 import re
+import os
 
 THIS_DIR = Path(__file__).parent
+REPO_ROOT = Path(__file__).parent.parent
 logger = logging.getLogger(__name__)
 
 
@@ -81,13 +83,28 @@ def download_azure_remote_file(test_dir: Path, remote_file: str):
         blob_size_str = human_readable_size(blob_properties.size)
         remote_md5 = get_remote_md5(remote_file, blob_properties)
 
-        local_file_path = test_dir / remote_file_name
+        cache_location = os.getenv("IREE_TEST_FILES", default="")
+        if cache_location == "":
+            os.environ["IREE_TEST_FILES"] = str(REPO_ROOT)
+            cache_location = REPO_ROOT
+        if cache_location == REPO_ROOT:
+            local_dir_path = test_dir
+            local_file_path = test_dir / remote_file_name
+        else:
+            cache_location = Path(os.path.expanduser(cache_location)).resolve()
+            local_dir_path = cache_location / "iree_tests" / relative_dir
+            local_file_path = cache_location / "iree_tests" / relative_dir / remote_file_name
+
         local_md5 = get_local_md5(local_file_path)
 
         if remote_md5 and remote_md5 == local_md5:
             logger.info(
                 f"  Skipping '{remote_file_name}' download ({blob_size_str}) "
                 "- local MD5 hash matches"
+            )
+            os.symlink(local_file_path, test_dir / remote_file_name)
+            logger.info(
+                f"  Created symlink for '{local_file_path}' to '{test_dir / remote_file_name}'"
             )
             return
 
@@ -102,9 +119,16 @@ def download_azure_remote_file(test_dir: Path, remote_file: str):
                 f"to '{relative_dir}' (local MD5 does not match)"
             )
 
+        if not os.path.isdir(local_dir_path):
+            os.makedirs(local_dir_path)
         with open(local_file_path, mode="wb") as local_blob:
             download_stream = blob_client.download_blob(max_concurrency=4)
             local_blob.write(download_stream.readall())
+        if str(cache_location) != str(REPO_ROOT):
+            os.symlink(local_file_path, test_dir / remote_file_name)
+            logger.info(
+                f"  Created symlink for '{local_file_path}' to '{test_dir / remote_file_name}'"
+            )
 
 
 def download_generic_remote_file(test_dir: Path, remote_file: str):

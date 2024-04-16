@@ -72,6 +72,7 @@ jobs:
     runs-on: nodai-amdgpu-w7900-x86-64
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
+      IREE_TEST_FILES: ~/iree_tests_cache
     steps:
       - name: "Checking out repository"
         uses: actions/checkout@v4
@@ -109,7 +110,6 @@ jobs:
       - name: "Running real weight model tests"
         env:
             IREE_TEST_CONFIG_FILES: iree_tests/configs/config_pytorch_models_cpu_llvm_task.json
-            IREE_TEST_FILES: ~/iree_tests_cache
         run: |
           source ${VENV_DIR}/bin/activate
           pytest iree_tests/pytorch/models -s -n 4 -k real_weights -rpfE --timeout=1200 --retries 2 --retry-delay 5 --durations=0

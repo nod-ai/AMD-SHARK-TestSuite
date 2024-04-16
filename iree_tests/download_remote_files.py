@@ -78,7 +78,7 @@ def download_azure_remote_file(test_dir: Path, remote_file: str):
 
         cache_location = os.getenv("IREE_TEST_FILES", "")
         if cache_location == "":
-            os.environ["IREE_TEST_FILES"] = REPO_ROOT
+            os.environ["IREE_TEST_FILES"] = str(REPO_ROOT)
             cache_location = REPO_ROOT
         if cache_location == REPO_ROOT or remote_file_name.split(".")[1] == "mlirbc":
             local_dir_path = test_dir

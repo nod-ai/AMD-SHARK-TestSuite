@@ -84,6 +84,7 @@ def download_azure_remote_file(test_dir: Path, remote_file: str):
             local_dir_path = test_dir
             local_file_path = test_dir / remote_file_name
         else:
+            cache_location = os.path.expanduser(cache_location)
             local_dir_path = Path(cache_location) / "iree_tests" / relative_dir
             local_file_path = Path(cache_location) / "iree_tests" / relative_dir / remote_file_name
         if check_azure_remote_file_matching_local(blob_properties, local_file_path):

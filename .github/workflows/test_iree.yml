@@ -79,12 +79,6 @@ jobs:
           submodules: false
           lfs: true
 
-      # not supported for Ubuntu 23.1
-      # - name: "Setting up Python"
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: '3.11'
-
       - name: "Setup Python venv"
         run: python3 -m venv ${VENV_DIR}
 

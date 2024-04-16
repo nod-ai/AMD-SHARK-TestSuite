@@ -1,48 +1,42 @@
 {
+  "file_format": "test_cases_v0",
   "test_cases": [
     {
       "name": "splats",
       "runtime_flagfile": "splat_data_flags.txt",
-      "remote_file_groups": []
+      "remote_files": []
     },
     {
       "name": "real_weights",
       "runtime_flagfile": "real_weights_data_flags.txt",
-      "remote_file_groups": [
-        {
-          "azure_account_url": "https://sharkpublic.blob.core.windows.net",
-          "azure_container_name": "sharkpublic",
-          "azure_base_blob_name": "scotttodd/iree_tests/2024-03-12/opt-125M/",
-          "files": [
-            "inference_input.0.bin",
-            "inference_output.0.bin",
-            "inference_output.1.bin",
-            "inference_output.2.bin",
-            "inference_output.3.bin",
-            "inference_output.4.bin",
-            "inference_output.5.bin",
-            "inference_output.6.bin",
-            "inference_output.7.bin",
-            "inference_output.8.bin",
-            "inference_output.9.bin",
-            "inference_output.10.bin",
-            "inference_output.11.bin",
-            "inference_output.12.bin",
-            "inference_output.13.bin",
-            "inference_output.14.bin",
-            "inference_output.15.bin",
-            "inference_output.16.bin",
-            "inference_output.17.bin",
-            "inference_output.18.bin",
-            "inference_output.19.bin",
-            "inference_output.20.bin",
-            "inference_output.21.bin",
-            "inference_output.22.bin",
-            "inference_output.23.bin",
-            "inference_output.24.bin",
-            "real_weights.irpa"
-          ]
-        }
+      "remote_files": [
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_input.0.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.0.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.1.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.2.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.3.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.4.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.5.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.6.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.7.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.8.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.9.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.10.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.11.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.12.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.13.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.14.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.15.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.16.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.17.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.18.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.19.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.20.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.21.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.22.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.23.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/inference_output.24.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024-03-12/opt-125M/real_weights.irpa"
       ]
     }
   ]

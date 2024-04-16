@@ -1,34 +1,19 @@
 {
+  "file_format": "test_cases_v0",
   "test_cases": [
     {
       "name": "splats",
       "runtime_flagfile": "splat_data_flags.txt",
-      "remote_file_groups": [
-        {
-          "azure_account_url": "https://sharkpublic.blob.core.windows.net",
-          "azure_container_name": "sharkpublic",
-          "azure_base_blob_name": "sai/sd-vae-decode-tank/",
-          "files": [
-            "sd-vae-decode-tank.mlirbc"
-          ]
-        }
-      ]
+      "remote_files": []
     },
     {
       "name": "real_weights",
       "runtime_flagfile": "real_weights_data_flags.txt",
-      "remote_file_groups": [
-        {
-          "azure_account_url": "https://sharkpublic.blob.core.windows.net",
-          "azure_container_name": "sharkpublic",
-          "azure_base_blob_name": "sai/sd-vae-decode-tank/",
-          "files": [
-            "inference_input.0.bin",
-            "inference_output.0.bin",
-            "real_weights.irpa",
-            "sd-vae-decode-tank.mlirbc"
-          ]
-        }
+      "remote_files": [
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/sai/sd-vae-decode-tank/inference_input.0.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/sai/sd-vae-decode-tank/inference_output.0.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/sai/sd-vae-decode-tank/real_weights.irpa",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/sai/sd-vae-decode-tank/sd-vae-decode-tank.mlirbc"
       ]
     }
   ]

@@ -84,7 +84,20 @@ def pytest_sessionstart(session):
     session.config.iree_test_configs = []
     for config_file in session.config.getoption("config_files"):
         with open(config_file) as f:
-            session.config.iree_test_configs.append(pyjson5.load(f))
+            test_config = pyjson5.load(f)
+
+            # Sanity check the config file structure before going any further.
+            def check_field(field_name):
+                if field_name not in test_config:
+                    raise ValueError(
+                        f"config file '{config_file}' is missing a '{field_name}' field"
+                    )
+
+            check_field("config_name")
+            check_field("iree_compile_flags")
+            check_field("iree_run_module_flags")
+
+            session.config.iree_test_configs.append(test_config)
 
 
 def pytest_collect_file(parent, file_path):
@@ -169,20 +182,23 @@ class MlirFile(pytest.File):
 
     def check_for_remote_files(self, test_case_json):
         """Checks if all remote_files in a JSON test case exist on disk."""
+        if "remote_files" not in test_case_json:
+            return True
+
         have_all_files = True
-        for remote_file_group in test_case_json["remote_file_groups"]:
-            for remote_file in remote_file_group["files"]:
-                if not (self.path.parent / remote_file).exists():
-                    test_case_name = test_case_json["name"]
-                    print(
-                        f"Missing file '{remote_file}' for test {self.path.parent.name}::{test_case_name}"
-                    )
-                    have_all_files = False
-                    break
+        for remote_file_url in test_case_json["remote_files"]:
+            remote_file = remote_file_url.rsplit("/", 1)[-1]
+            if not (self.path.parent / remote_file).exists():
+                test_case_name = test_case_json["name"]
+                print(
+                    f"Missing file '{remote_file}' for test {self.path.parent.name}::{test_case_name}"
+                )
+                have_all_files = False
+                break
         return have_all_files
 
     def discover_test_cases(self):
-        """Discovers test cases in either test_data_flags.txt or test_cases.json."""
+        """Discovers test cases in either test_data_flags.txt or *.json files."""
         test_cases = []
 
         have_lfs_files = self.check_for_lfs_files()
@@ -197,23 +213,21 @@ class MlirFile(pytest.File):
                 )
             )
 
-        test_cases_name = "test_cases.json"
-        test_cases_path = self.path.parent / test_cases_name
-        if not test_cases_path.exists():
-            return test_cases
-
-        with open(test_cases_path) as f:
-            test_cases_json = pyjson5.load(f)
-            for test_case_json in test_cases_json["test_cases"]:
-                test_case_name = test_case_json["name"]
-                have_all_files = self.check_for_remote_files(test_case_json)
-                test_cases.append(
-                    MlirFile.TestCase(
-                        name=test_case_name,
-                        runtime_flagfile=test_case_json["runtime_flagfile"],
-                        enabled=have_lfs_files and have_all_files,
+        for test_cases_path in self.path.parent.glob("*.json"):
+            with open(test_cases_path) as f:
+                test_cases_json = pyjson5.load(f)
+                if test_cases_json.get("file_format", "") != "test_cases_v0":
+                    continue
+                for test_case_json in test_cases_json["test_cases"]:
+                    test_case_name = test_case_json["name"]
+                    have_all_files = self.check_for_remote_files(test_case_json)
+                    test_cases.append(
+                        MlirFile.TestCase(
+                            name=test_case_name,
+                            runtime_flagfile=test_case_json["runtime_flagfile"],
+                            enabled=have_lfs_files and have_all_files,
+                        )
                     )
-                )
 
         return test_cases
 
@@ -234,21 +248,18 @@ class MlirFile(pytest.File):
             return []
 
         for config in self.config.iree_test_configs:
-            if test_name in config["skip_compile_tests"]:
+            if test_name in config.get("skip_compile_tests", []):
                 continue
 
-            expect_compile_success = (
-                self.config.getoption("ignore_xfails")
-                or test_name not in config["expected_compile_failures"]
-            )
-            expect_run_success = (
-                self.config.getoption("ignore_xfails")
-                or test_name not in config["expected_run_failures"]
-            )
-            skip_run = (
-                self.config.getoption("skip_all_runs")
-                or test_name in config["skip_run_tests"]
-            )
+            expect_compile_success = self.config.getoption(
+                "ignore_xfails"
+            ) or test_name not in config.get("expected_compile_failures", [])
+            expect_run_success = self.config.getoption(
+                "ignore_xfails"
+            ) or test_name not in config.get("expected_run_failures", [])
+            skip_run = self.config.getoption(
+                "skip_all_runs"
+            ) or test_name in config.get("skip_run_tests", [])
             config_name = config["config_name"]
 
             # TODO(scotttodd): don't compile once per test case?

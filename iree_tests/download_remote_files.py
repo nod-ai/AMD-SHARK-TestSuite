@@ -76,7 +76,7 @@ def download_azure_remote_file(test_dir: Path, remote_file: str):
     ) as blob_client:
         blob_properties = blob_client.get_blob_properties()
 
-        cache_location = os.getenv("IREE_TEST_FILES", "")
+        cache_location = os.getenv("IREE_TEST_FILES", default="")
         if cache_location == "":
             os.environ["IREE_TEST_FILES"] = str(REPO_ROOT)
             cache_location = REPO_ROOT
@@ -98,6 +98,7 @@ def download_azure_remote_file(test_dir: Path, remote_file: str):
         with open(local_file_path, mode="wb") as local_blob:
             download_stream = blob_client.download_blob(max_concurrency=4)
             local_blob.write(download_stream.readall())
+        print(cache_location)
         if cache_location != REPO_ROOT:
             os.symlink(local_file_path, test_dir / remote_file_name)
 

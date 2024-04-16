@@ -98,6 +98,8 @@ def download_azure_remote_file(test_dir: Path, remote_file: str):
         with open(local_file_path, mode="wb") as local_blob:
             download_stream = blob_client.download_blob(max_concurrency=4)
             local_blob.write(download_stream.readall())
+        if cache_location != REPO_ROOT:
+            os.symlink(local_file_path, test_dir / remote_file_name)
 
 
 def download_generic_remote_file(test_dir: Path, remote_file: str):

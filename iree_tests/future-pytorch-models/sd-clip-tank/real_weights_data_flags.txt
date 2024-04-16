@@ -1,4 +1,4 @@
---parameters=model=${IREE_TEST_FILES}/iree_tests/pytorch/models/sd-clip-tank/real_weights.irpa
---input=1x77xi64=@${IREE_TEST_FILES}/iree_tests/pytorch/models/sd-clip-tank/inference_input.0.bin
---expected_output=1x77x768xf32=@${IREE_TEST_FILES}/iree_tests/pytorch/models/sd-clip-tank/inference_output.0.bin
---expected_output=1x768xf32=@${IREE_TEST_FILES}/iree_tests/pytorch/models/sd-clip-tank/inference_output.1.bin
+--parameters=model=real_weights.irpa
+--input=1x77xi64=@inference_input.0.bin
+--expected_output=1x77x768xf32=@inference_output.0.bin
+--expected_output=1x768xf32=@inference_output.1.bin

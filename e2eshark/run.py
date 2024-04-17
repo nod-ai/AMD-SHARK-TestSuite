@@ -202,6 +202,8 @@ def getShapeString(torchtensor):
         inputshapestring += "xbf16"
     elif dtype == torch.int8:
         inputshapestring += "xi8"
+    elif dtype == torch.bool:
+        inputshapestring += "xi1"
     else:
         print("In getShapeString, found an unsupported data type", dtype)
     return inputshapestring
@@ -271,6 +273,8 @@ def packTensor(modelinput):
         bytearr = struct.pack("%sh" % len(mylist), *mylist)
     elif dtype == torch.int8:
         bytearr = struct.pack("%sb" % len(mylist), *mylist)
+    elif dtype == torch.bool:
+        bytearr = struct.pack("%s?" % len(mylist), *mylist)
     else:
         print("In packTensor, found an unsupported data type", dtype)
     return bytearr

@@ -1,0 +1,15 @@
+{
+    "config_name": "rocm_llvm_task",
+    "iree_compile_flags" : [
+      "--iree-hal-target-backends=rocm",
+      "--iree-rocm-target-chip=gfx90a",
+      "--verify=false"
+    ],
+    "iree_run_module_flags": [
+      "--device=hip"
+    ],
+    "skip_compile_tests": [],
+    "skip_run_tests": [],
+    "expected_compile_failures": [],
+    "expected_run_failures": []
+}

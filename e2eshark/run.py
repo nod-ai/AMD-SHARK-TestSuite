@@ -293,7 +293,7 @@ def runTorchMLIRGeneration(
     commandslog,
     timelog,
     onnxfilename,
-    torchmlirfilename,
+    torchmlirOutputfilename,
     resultdict,
     uploadtestsList,
     cleanup,
@@ -379,7 +379,7 @@ def runTorchMLIRGeneration(
             + commandstring
             + torchonnxfilename
             + " > "
-            + torchmlirfilename
+            + torchmlirOutputfilename
             + " 2>"
             + logfilename
         )
@@ -409,7 +409,7 @@ def runCodeGeneration(
     testName,
     args,
     phases,
-    torchmlirfilename,
+    torchmlirOutputfilename,
     vmfbfilename,
     logfilename,
     commandslog,
@@ -425,10 +425,10 @@ def runCodeGeneration(
     # Compile torch MLIR using IREE to binary to target backend
     curphase = phases[3]
     if (
-        not os.path.exists(torchmlirfilename)
-        or not os.path.getsize(torchmlirfilename) > 0
+        not os.path.exists(torchmlirOutputfilename)
+        or not os.path.getsize(torchmlirOutputfilename) > 0
     ):
-        print(f"The torch MLIR {torchmlirfilename} does not exist or is empty.")
+        print(f"The torch MLIR {torchmlirOutputfilename} does not exist or is empty.")
         print(f"Test {testName} failed [{curphase}]")
         return 1
     logfilename = curphase + ".log"
@@ -448,7 +448,7 @@ def runCodeGeneration(
     scriptcommand = (
         commandname
         + " "
-        + torchmlirfilename
+        + torchmlirOutputfilename
         + " > "
         + vmfbfilename
         + " 2>"
@@ -746,7 +746,8 @@ def runTestUsingClassicalFlow(args_tuple):
     stubrunmodelpy = toolsDirAbsPath + "/stubs/pytorchmodel.py"
     mode = args.mode
     testargs = ""
-    torchmlirfilename = ""
+    torchmlirOutputfilename = ""
+    linalgmlirfilename = ""
     onnxfilename = ""
     if args.verbose:
         print(f"Running classical flow for test {testName}")
@@ -759,22 +760,27 @@ def runTestUsingClassicalFlow(args_tuple):
     if not os.path.exists(symUtilspy):
         os.symlink(utilspy, symUtilspy)
 
+    if args.torchtolinalg:
+        torchmlirsuffix = ".linalg.mlir"
+    else:
+        torchmlirsuffix = ".torch.mlir"
+
     # If turbine, uses turbine's aot export into mlir module, but rest of flow is same
     if frameworkname == "pytorch":
         if mode == "turbine":
             stubrunmodelpy = toolsDirAbsPath + "/stubs/turbinemodel.py"
-            torchmlirfilename = modelname + "." + args.todtype + ".pytorch.torch.mlir"
+            torchmlirOutputfilename = modelname + "." + args.todtype + ".pytorch" + torchmlirsuffix
         else:
             stubrunmodelpy = toolsDirAbsPath + "/stubs/pytorchmodel.py"
             onnxfilename = modelname + "." + args.todtype + ".onnx"
-            torchmlirfilename = modelname + "." + args.todtype + ".pytorch.torch.mlir"
+            torchmlirOutputfilename = modelname + "." + args.todtype + ".pytorch" + torchmlirsuffix
             testargs += " --torchmlirimport " + args.torchmlirimport
     elif frameworkname == "onnx":
         # For onnx, dierct and onnx means same as direct generates/has onnx itself
         if mode == "direct" or mode == "turbine":
             mode = "onnx"
         stubrunmodelpy = toolsDirAbsPath + "/stubs/onnxmodel.py"
-        torchmlirfilename = modelname + "." + args.todtype + ".onnx.torch.mlir"
+        torchmlirOutputfilename = modelname + "." + args.todtype + ".onnx" + torchmlirsuffix
         onnxfilename = "model.onnx"
         if getTestKind(testName) == "models":
             onnxfilename = testAbsPath + "/model.onnx"
@@ -819,7 +825,7 @@ def runTestUsingClassicalFlow(args_tuple):
             commandslog,
             timelog,
             onnxfilename,
-            torchmlirfilename,
+            torchmlirOutputfilename,
             resultdict,
             uploadtestsList,
             args.cleanup,
@@ -847,7 +853,7 @@ def runTestUsingClassicalFlow(args_tuple):
             testName,
             args,
             phases,
-            torchmlirfilename,
+            torchmlirOutputfilename,
             vmfbfilename,
             logfilename,
             commandslog,

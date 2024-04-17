@@ -3,7 +3,9 @@
     "iree_compile_flags" : [
       "--iree-hal-target-backends=rocm",
       "--iree-rocm-target-chip=gfx90a",
-      "--verify=false"
+      "--verify=false",
+      "--iree-opt-const-eval=false",
+      "--iree-codegen-transform-dialect-library=/mnt/share/amdsharks/sai/specs/attention_and_matmul_spec.mlir"
     ],
     "iree_run_module_flags": [
       "--device=hip"

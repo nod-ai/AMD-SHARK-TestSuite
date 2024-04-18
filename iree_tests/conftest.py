@@ -266,6 +266,10 @@ class MlirFile(pytest.File):
             #   try pytest-dependency or pytest-depends
             for test_case in test_cases:
                 test_name = config_name + "_" + test_case.name
+                # use config specific runtime flagfile if it exists
+                config_specific_flagfile = test_directory + "/" + test_case.runtime_flagfile + "_" + config_name
+                if os.path.exists(config_specific_flagfile):
+                    test_case.runtime_flagfile = config_specific_flagfile
                 spec = IreeCompileAndRunTestSpec(
                     test_directory=test_directory,
                     input_mlir_name=self.path.name,

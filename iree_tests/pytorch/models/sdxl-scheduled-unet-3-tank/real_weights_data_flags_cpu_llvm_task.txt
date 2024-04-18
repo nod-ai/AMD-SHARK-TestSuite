@@ -1,5 +1,5 @@
 --parameters=model=real_weights.irpa
---module=../sdxl-scheduled-unet-3-bench/model_rocm_llvm_task_real_weights.vmfb
+--module=sdxl_scheduled_unet_pipeline_fp16_cpu.vmfb
 --input=1x4x128x128xf16=@inference_input.0.bin
 --input=2x64x2048xf16=@inference_input.1.bin
 --input=2x1280xf16=@inference_input.2.bin

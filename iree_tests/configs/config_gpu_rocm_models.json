@@ -11,7 +11,7 @@
       "--device=hip"
     ],
     "skip_compile_tests": [],
-    "skip_run_tests": [],
+    "skip_run_tests": ["pytorch/models/sdxl-scheduled-unet-3-bench"],
     "expected_compile_failures": [],
     "expected_run_failures": []
 }

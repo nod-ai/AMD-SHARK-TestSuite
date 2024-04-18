@@ -26,11 +26,11 @@ E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
 
 # condition has to be a float tensor
 condition = make_tensor_value_info('condition', TensorProto.BOOL, [1])
-input1 = make_tensor_value_info('input1', TensorProto.FLOAT, [1])
-input2 = make_tensor_value_info('input2', TensorProto.FLOAT, [1])
-output = make_tensor_value_info('output', TensorProto.FLOAT, [1])
-output_then = make_tensor_value_info('output_then', TensorProto.FLOAT, [1])
-output_else = make_tensor_value_info('output_else', TensorProto.FLOAT, [1])
+input1 = make_tensor_value_info('input1', TensorProto.FLOAT, [2,3])
+input2 = make_tensor_value_info('input2', TensorProto.FLOAT, [2,3])
+output = make_tensor_value_info('output', TensorProto.FLOAT, [2,3])
+output_then = make_tensor_value_info('output_then', TensorProto.FLOAT, [2,3])
+output_else = make_tensor_value_info('output_else', TensorProto.FLOAT, [2,3])
 
 then_branch = make_graph(
     nodes=[

@@ -269,13 +269,14 @@ class MlirFile(pytest.File):
                 # use config specific runtime flagfile if it exists
                 config_specific_flagfile = test_directory / (test_case.runtime_flagfile.split(".")[0] + "_" + config_name + ".txt")
                 print("FLAGFILE: " + str(config_specific_flagfile))
+                runtime_flagfile = test_case.runtime_flagfile
                 if os.path.exists(config_specific_flagfile):
-                    test_case.runtime_flagfile = config_specific_flagfile
+                    runtime_flagfile = config_specific_flagfile
                 spec = IreeCompileAndRunTestSpec(
                     test_directory=test_directory,
                     input_mlir_name=self.path.name,
                     input_mlir_stem=self.path.stem,
-                    data_flagfile_name=test_case.runtime_flagfile,
+                    data_flagfile_name=runtime_flagfile,
                     test_name=test_name,
                     iree_compile_flags=config["iree_compile_flags"],
                     iree_run_module_flags=config["iree_run_module_flags"],

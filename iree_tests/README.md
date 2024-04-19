@@ -48,6 +48,18 @@ with these files please ensure that you have Git LFS installed:
 $ git lfs install
 ```
 
+Files that are too large for Git LFS (e.g. model weights) are stored on cloud
+providers. Download these files with
+[`download_remote_files.py`](./download_remote_files.py):
+
+```bash
+# All files
+$ python download_remote_files.py
+
+# Just files for one subdirectory
+$ python download_remote_files.py --root-dir pytorch/models/resnet50
+```
+
 ## Running tests
 
 Tests are run using the [pytest](https://docs.pytest.org/en/stable/) framework.
@@ -70,7 +82,6 @@ To use `iree-compile` and `iree-run-module` from Python packages:
 ```bash
 $ python -m pip install --find-links https://iree.dev/pip-release-links.html \
   iree-compiler iree-runtime --upgrade
-
 ```
 
 To use local versions of `iree-compile` and `iree-run-module`, put them on your
@@ -108,16 +119,14 @@ $ pytest iree_tests
 Run ONNX tests on CPU and print all errors:
 
 ```bash
-$ pytest iree_tests/onnx -n auto \
-    --ignore-xfails \
+$ pytest iree_tests/onnx -n auto --ignore-xfails \
     --config-files ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
 ```
 
 Run ONNX compilation tests only and print all errors:
 
 ```bash
-$ pytest iree_tests/onnx -n auto \
-    --ignore-xfails --skip-all-runs \
+$ pytest iree_tests/onnx -n auto --ignore-xfails --skip-all-runs \
     --config-files ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
 ```
 
@@ -220,6 +229,34 @@ PASSED iree_tests/onnx/node/generated/test_clip_example/model.mlir::cpu
 ====================== 238 passed, 809 xfailed in 35.79s ======================
 ```
 
+Fail test collection if files (such as downloaded weights) are missing:
+
+```bash
+$ pytest -k resnet50 --no-skip-tests-missing-files
+======================================= test session starts =======================================
+platform win32 -- Python 3.11.2, pytest-8.0.2, pluggy-1.4.0
+rootdir: D:\dev\projects\SHARK-TestSuite\iree_tests
+configfile: pytest.ini
+plugins: dependency-0.6.0, retry-1.6.2, timeout-2.2.0, xdist-3.5.0
+collected 1248 items / 1 error / 1248 deselected / 0 selected
+
+============================================= ERRORS ==============================================
+____________________ ERROR collecting pytorch/models/resnet50/resnet50.mlirbc _____________________
+conftest.py:260: in collect
+    test_cases = self.discover_test_cases()
+conftest.py:236: in discover_test_cases
+    raise FileNotFoundError(
+E   FileNotFoundError: Missing files for test resnet50::real_weights
+----------------------------------------- Captured stdout -----------------------------------------
+Missing file 'inference_input.0.bin' for test resnet50::real_weights
+Missing file 'inference_output.0.bin' for test resnet50::real_weights
+Missing file 'real_weights.irpa' for test resnet50::real_weights
+===================================== short test summary info =====================================
+ERROR pytorch/models/resnet50/resnet50.mlirbc - FileNotFoundError: Missing files for test resnet50::real_weights
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+================================ 1248 deselected, 1 error in 2.95s ================================
+```
+
 ## Available test suites
 
 ### Simple tests
@@ -310,14 +347,14 @@ python ./iree_tests/onnx/import_tests.py
 
 As seen in iree_tests/pytorch/models, there are some models with the "-tank" suffix.
 This refers to tests that were generated using the normal turbine flow.
-For custom models, such as sd, sdxl, or stateless_llama, you can clone the turbine repo 
+For custom models, such as sd, sdxl, or stateless_llama, you can clone the turbine repo
 and follow the setup instructions there (https://github.com/nod-ai/SHARK-Turbine).
 Then, simply run the respective model with the appropriate command line args (for sd, sdxl edit this: https://github.com/nod-ai/SHARK-Turbine/blob/ean-sd-fp16/models/turbine_models/custom_models/sdxl_inference/sdxl_cmd_opts.py. otherwise, just direct command line args for llama. make sure to --compile_to vmfb).
 Just as a side note, the unet_scheduler model requires diffusers dep changes, so make sure to use changes
 in this branch: https://github.com/aviator19941/diffusers/tree/pndm_fx_v2.
 Example run command (`python models/turbine_models/custom_models/sdxl_inference/sdxl_prompt_encoder.py`).
 There is no easy way to get `.bin` or `.npy` files for your inputs and outputs.
-You will have to edit the model runner files to convert the input and output tensors into `.bin` files, 
+You will have to edit the model runner files to convert the input and output tensors into `.bin` files,
 so those are saved when running the flow. (example runner:
 `models/turbine_models/custom_models/sdxl_inference/sdxl_prompt_encoder_runner.py`).
 Then, run the runner with the appropriate command line args (vmfb path, device flags).

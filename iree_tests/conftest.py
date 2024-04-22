@@ -7,6 +7,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
+import argparse
 import pyjson5
 import os
 import pytest
@@ -77,6 +78,13 @@ def pytest_addoption(parser):
         action="store_true",
         default=False,
         help="Skips all 'run' tests, overriding 'skip_run_tests' in configs",
+    )
+
+    parser.addoption(
+        "--skip-tests-missing-files",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Skips any tests that are missing required files",
     )
 
 
@@ -194,13 +202,13 @@ class MlirFile(pytest.File):
                     f"Missing file '{remote_file}' for test {self.path.parent.name}::{test_case_name}"
                 )
                 have_all_files = False
-                break
         return have_all_files
 
     def discover_test_cases(self):
         """Discovers test cases in either test_data_flags.txt or *.json files."""
         test_cases = []
 
+        skip_missing = self.config.getoption("skip_tests_missing_files")
         have_lfs_files = self.check_for_lfs_files()
 
         test_data_flagfile_name = "test_data_flags.txt"
@@ -220,12 +228,18 @@ class MlirFile(pytest.File):
                     continue
                 for test_case_json in test_cases_json["test_cases"]:
                     test_case_name = test_case_json["name"]
-                    have_all_files = self.check_for_remote_files(test_case_json)
+                    have_remote_files = self.check_for_remote_files(test_case_json)
+                    have_all_files = have_lfs_files and have_remote_files
+
+                    if not skip_missing and not have_all_files:
+                        raise FileNotFoundError(
+                            f"Missing files for test {self.path.parent.name}::{test_case_name}"
+                        )
                     test_cases.append(
                         MlirFile.TestCase(
                             name=test_case_name,
                             runtime_flagfile=test_case_json["runtime_flagfile"],
-                            enabled=have_lfs_files and have_all_files,
+                            enabled=have_all_files,
                         )
                     )
 
@@ -297,6 +311,12 @@ class IreeCompileRunItem(pytest.Item):
         super().__init__(**kwargs)
         self.spec = spec
 
+        if self.spec.skip_test:
+            self.add_marker(
+                pytest.mark.skip(f"{self.spec.test_name} missing required files")
+            )
+            return
+
         # TODO(scotttodd): swap cwd for a temp path?
         self.test_cwd = self.spec.test_directory
         vmfb_name = f"{self.spec.input_mlir_stem}_{self.spec.test_name}.vmfb"
@@ -310,9 +330,6 @@ class IreeCompileRunItem(pytest.Item):
         self.run_args.append(f"--flagfile={self.spec.data_flagfile_name}")
 
     def runtest(self):
-        if self.spec.skip_test:
-            pytest.skip()
-
         # We want to test two phases: 'compile', and 'run'.
         # A test can be marked as expected to fail at either stage, with these
         # possible outcomes:

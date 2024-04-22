@@ -83,6 +83,16 @@ a directory where tools/iree-compile and tools/iree-run-module can be found.
 
 In all the exmaples in this README doc the -i option to pass an IREE build location is optional.
 
+**Prerequisites**: Before proceeding with build, make sure you have following installed on your machine
+
+1. **_Git_**       : [GitInstallation](https://github.com/git-guides/install-git)
+2. **_Python_**    : [PythonInstallation](https://www.python.org/downloads/)
+3. **_cmake_**     : [cmakeInstallation](https://cmake.org/download/)
+4. **_Ninja_**     : [NinjaInstallation](https://ninja-build.org/)
+5. **_GCC(>=7.4)_**: [gccInstallation](https://gcc.gnu.org/install/)
+6. **_CUDAToolkit(>=12)_** : [CUDAToolkitInstallation](https://developer.nvidia.com/cuda-downloads)
+
+
 To get a local build of torch MLIR, follow:
 https://github.com/llvm/torch-mlir/blob/main/docs/development.md
 
@@ -103,6 +113,8 @@ CMAKE_GENERATOR=Ninja python setup.py bdist_wheel --dist-dir ./torch-mlir-wheel 
 pip uninstall torch-mlir
 pip install torch-mlir-wheel/torch_mlir-0.0.1-cp310-cp310-linux_x86_64.whl
 ```
+**Note**: torch_mlir wheel version may change so you appropriate version in above command
+
 To get a local build of IREE, follow (prefer the clang building option over gnu):
 https://iree.dev/building-from-source/getting-started 
 
@@ -112,7 +124,7 @@ https://github.com/nod-ai/iree-amd-aie
 To get this test repo:
 ```
 git clone https://github.com/nod-ai/SHARK-TestSuite.git
-cd e2eshark 
+cd SHARK-TestSuite/e2eshark 
 ```
 Set up python envonment, you can use venv or conda. 
 Example to create a brand new conda env using python 3.10 is: 

@@ -104,10 +104,8 @@ jobs:
         env:
             IREE_TEST_CONFIG_FILES: iree_tests/configs/config_gpu_rocm_models.json
         run: |
-          conda deactivate
           source ${VENV_DIR}/bin/activate
           pytest iree_tests/pytorch/models \
-            -n 2 \
             -rpfE \
             -k real_weights \
             --no-skip-tests-missing-files \

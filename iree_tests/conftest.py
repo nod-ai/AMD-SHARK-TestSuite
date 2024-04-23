@@ -286,18 +286,20 @@ class MlirFile(pytest.File):
                 if os.path.exists(config_specific_flagfile):
                     runtime_flagfile = config_specific_flagfile
                 # add backend specific iree compile flags if it exists (order doesn't matter)
-                extra_compile_flags = []
+                iree_compile_flags = config["iree_compile_flags"]
                 config_specific_compile = test_directory / ("compile_flags" + "_" + config_name + ".txt")
                 if os.path.exists(config_specific_compile):
                     with open(config_specific_flagfile) as f:
                         extra_compile_flags = [line.rstrip() for line in f]
+                        iree_compile_flags = iree_compile_flags.extend(extra_compile_flags)
+                        print(iree_compile_flags)
                 spec = IreeCompileAndRunTestSpec(
                     test_directory=test_directory,
                     input_mlir_name=self.path.name,
                     input_mlir_stem=self.path.stem,
                     data_flagfile_name=runtime_flagfile,
                     test_name=test_name,
-                    iree_compile_flags=config["iree_compile_flags"].extend(extra_compile_flags),
+                    iree_compile_flags=iree_compile_flags,
                     iree_run_module_flags=config["iree_run_module_flags"],
                     expect_compile_success=expect_compile_success,
                     expect_run_success=expect_run_success,

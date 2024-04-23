@@ -152,6 +152,9 @@ class IreeCompileAndRunTestSpec:
     # Flags to pass to `iree-compile`, e.g. ["--iree-hal-target-backends=llvm-cpu"].
     iree_compile_flags: List[str]
 
+    # Flags to pass to `iree-compile` based on the test name + backend, e.g. sdxl-models.
+    iree_compile_extra_flags: List[str]
+
     # Flags to pass to `iree-run-module`, e.g. ["--device=local-task"].
     # These will be passed in addition to `--flagfile={data_flagfile_name}`.
     iree_run_module_flags: List[str]
@@ -286,19 +289,19 @@ class MlirFile(pytest.File):
                 if os.path.exists(config_specific_flagfile):
                     runtime_flagfile = config_specific_flagfile
                 # add backend specific iree compile flags if it exists (order doesn't matter)
-                iree_compile_flags = config["iree_compile_flags"]
+                extra_compile_flags = []
                 config_specific_compile = test_directory / ("compile_flags" + "_" + config_name + ".txt")
                 if os.path.exists(config_specific_compile):
                     with open(config_specific_compile) as f:
                         extra_compile_flags = [line.rstrip() for line in f]
-                        iree_compile_flags.extend(extra_compile_flags)
                 spec = IreeCompileAndRunTestSpec(
                     test_directory=test_directory,
                     input_mlir_name=self.path.name,
                     input_mlir_stem=self.path.stem,
                     data_flagfile_name=runtime_flagfile,
                     test_name=test_name,
-                    iree_compile_flags=iree_compile_flags,
+                    iree_compile_flags=config["iree_compile_flags"],
+                    iree_compile_extra_flags=extra_compile_flags,
                     iree_run_module_flags=config["iree_run_module_flags"],
                     expect_compile_success=expect_compile_success,
                     expect_run_success=expect_run_success,
@@ -329,6 +332,7 @@ class IreeCompileRunItem(pytest.Item):
 
         self.compile_args = ["iree-compile", self.spec.input_mlir_name]
         self.compile_args.extend(self.spec.iree_compile_flags)
+        self.compile_args.extend(self.spec.iree_compile_extra_flags)
         self.compile_args.extend(["-o", str(vmfb_name)])
 
         self.run_args = ["iree-run-module", f"--module={vmfb_name}"]

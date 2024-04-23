@@ -289,10 +289,9 @@ class MlirFile(pytest.File):
                 iree_compile_flags = config["iree_compile_flags"]
                 config_specific_compile = test_directory / ("compile_flags" + "_" + config_name + ".txt")
                 if os.path.exists(config_specific_compile):
-                    with open(config_specific_flagfile) as f:
+                    with open(config_specific_compile) as f:
                         extra_compile_flags = [line.rstrip() for line in f]
-                        iree_compile_flags = iree_compile_flags.extend(extra_compile_flags)
-                        print(iree_compile_flags)
+                        iree_compile_flags.extend(extra_compile_flags)
                 spec = IreeCompileAndRunTestSpec(
                     test_directory=test_directory,
                     input_mlir_name=self.path.name,

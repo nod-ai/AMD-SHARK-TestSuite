@@ -106,7 +106,7 @@ jobs:
         run: |
           source ${VENV_DIR}/bin/activate
           pytest iree_tests/pytorch/models \
-            -n 4 \
+            -n 2 \
             -rpfE \
             -k real_weights \
             --no-skip-tests-missing-files \

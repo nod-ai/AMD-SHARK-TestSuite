@@ -109,7 +109,8 @@ def pytest_sessionstart(session):
 
 
 def pytest_collect_file(parent, file_path):
-    if file_path.name.endswith(".mlir") or file_path.name.endswith(".mlirbc"):
+    if (not file_path.name.endswith("_spec.mlir") 
+        and (file_path.name.endswith(".mlir") or file_path.name.endswith(".mlirbc"))):
         return MlirFile.from_parent(parent, path=file_path)
 
 

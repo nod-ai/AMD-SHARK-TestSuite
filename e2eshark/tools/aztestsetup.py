@@ -44,7 +44,7 @@ def cleanup_e2eshark_test(testList, e2eshark_test_dir):
 def download_azure_blob(account_url, container_name, blob_name, dest_file):
     if container_name == priv_container_name:
         if PRIVATE_CONN_STRING == "":
-            print("Please set PRIVATE_CONN_STRING environment variable with connection string for private azure storage account")
+            print("Please set AZ_PRIVATE_CONNECTION environment variable with connection string for private azure storage account")
         with ContainerClient.from_connection_string(
                 conn_str=PRIVATE_CONN_STRING,
                 container_name=container_name,

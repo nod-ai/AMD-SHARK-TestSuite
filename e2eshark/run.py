@@ -287,7 +287,7 @@ def writeInferenceInputBinFile(modelinput, modelinputbinfilename):
         f.close()
 
 
-def runTorchMLIRGeneration(
+def runOnnxToTorchMLIRGeneration(
     testName,
     modelname,
     mode,
@@ -303,39 +303,18 @@ def runTorchMLIRGeneration(
     cleanup,
     uploadDict,
     dateAndTime,
+    torch_mlir_pythonpath,
 ):
-    if args.verbose:
-        print("Running torch MLIR generation for", testName)
-    start = time.time()
-    curphase = phases[0]
-    if launchCommand(args, scriptcommand, commandslog):
-        print("Test", testName, "failed [" + curphase + "]")
-        end = time.time()
-        resultdict[curphase] = ["failed", end - start]
-        return logAndReturn(
-            commandslog,
-            timelog,
-            resultdict,
-            1,
-            uploadtestsList,
-            cleanup,
-            testName,
-            uploadDict,
-            dateAndTime,
-        )
-    end = time.time()
-    resultdict[curphase] = ["passed", end - start]
-    if mode == "onnx" or mode == "ort":
-        torch_mlir_pythonpath = (
-            SHARED_TORCH_MLIR_BUILD + "/tools/torch-mlir/python_packages/torch_mlir"
-        )
+
+    # If a torch mlit build is provided, use that else use iree-import-onnx
+    if SHARED_TORCH_MLIR_BUILD:
         # start phases[1]
         curphase = phases[1]
         # Import ONNX into torch MLIR as torch.operator custom OP
         torchonnxfilename = modelname + "." + args.todtype + ".torch-onnx.mlir"
         logfilename = curphase + ".log"
         scriptcommand = (
-            f"PYTHONPATH={torch_mlir_pythonpath} python -m torch_mlir.tools.import_onnx "
+            f"{torch_mlir_pythonpath} python -m torch_mlir.tools.import_onnx "
             + onnxfilename
             + " -o "
             + torchonnxfilename
@@ -406,6 +385,111 @@ def runTorchMLIRGeneration(
             )
         end = time.time()
         resultdict[curphase] = ["passed", end - start]
+    else:
+        iree_import_onnx = "iree-import-onnx"
+        curphase = phases[1]
+        logfilename = curphase + ".log"
+        # if SHARED_IREE_BUILD:
+        # If local iree build provided use that instead of using the one installed
+        # in user's env
+        # TBD, pick from user's env later, for now use the env installed one
+        # iree_import_onnx = SHARED_IREE_BUILD + "/tools/" + iree_import_onnx
+        scriptcommand = (
+            iree_import_onnx
+            + " "
+            + onnxfilename
+            + " -o "
+            + torchmlirOutputfilename
+            + " 1> "
+            + logfilename
+            + " 2>&1"
+        )
+        start = time.time()
+        if launchCommand(args, scriptcommand, commandslog):
+            print("Test", testName, "failed [" + curphase + "]")
+            end = time.time()
+            resultdict[curphase] = ["failed", end - start]
+            return logAndReturn(
+                commandslog,
+                timelog,
+                resultdict,
+                1,
+                uploadtestsList,
+                cleanup,
+                testName,
+                uploadDict,
+                dateAndTime,
+            )
+        end = time.time()
+        resultdict[curphase] = ["passed", end - start]
+
+    return 0
+
+
+def runTorchMLIRGeneration(
+    testName,
+    modelname,
+    mode,
+    args,
+    phases,
+    scriptcommand,
+    commandslog,
+    timelog,
+    onnxfilename,
+    torchmlirOutputfilename,
+    resultdict,
+    uploadtestsList,
+    cleanup,
+    uploadDict,
+    dateAndTime,
+):
+    if args.verbose:
+        print("Running torch MLIR generation for", testName)
+
+    torch_mlir_pythonpath = ""
+    if SHARED_TORCH_MLIR_BUILD:
+        torch_mlir_pythonpath = f"PYHONPATH={SHARED_TORCH_MLIR_BUILD}/tools/torch-mlir/python_packages/torch_mlir"
+        scriptcommand = f"{torch_mlir_pythonpath} {scriptcommand}"
+
+    # Phase = 0, Run the model.py first
+    start = time.time()
+    curphase = phases[0]
+    if launchCommand(args, scriptcommand, commandslog):
+        print("Test", testName, "failed [" + curphase + "]")
+        end = time.time()
+        resultdict[curphase] = ["failed", end - start]
+        return logAndReturn(
+            commandslog,
+            timelog,
+            resultdict,
+            1,
+            uploadtestsList,
+            cleanup,
+            testName,
+            uploadDict,
+            dateAndTime,
+        )
+    end = time.time()
+    resultdict[curphase] = ["passed", end - start]
+    if mode == "onnx" or mode == "ort":
+        return runOnnxToTorchMLIRGeneration(
+            testName,
+            modelname,
+            mode,
+            args,
+            phases,
+            scriptcommand,
+            commandslog,
+            timelog,
+            onnxfilename,
+            torchmlirOutputfilename,
+            resultdict,
+            uploadtestsList,
+            cleanup,
+            uploadDict,
+            dateAndTime,
+            torch_mlir_pythonpath,
+        )
     return 0
 
 
@@ -423,6 +507,7 @@ def runCodeGeneration(
     cleanup,
     uploadDict,
     dateAndTime,
+    ireeInputType,
 ):
     if args.verbose:
         print("Running code generation for", testName)
@@ -448,7 +533,7 @@ def runCodeGeneration(
     if args.mode == "onnx" and args.torchtolinalg:
         commandname += " --iree-input-type=tm_tensor"
     else:
-        commandname += " --iree-input-type=torch"
+        commandname += " --iree-input-type=" + ireeInputType
     scriptcommand = (
         commandname
         + " "
@@ -673,7 +758,9 @@ def runInference(
             print(f"Gold reference[output[{i}]]:\n{goldoutput}\n", file=failedinflog)
             print(f"Inference Output[output[{i}]]:\n{infoutput}:\n", file=failedinflog)
             atol, rtol = getTolerances(args, infoutput.dtype)
-            diff = torch.abs(infoutput - goldoutput) <= (atol + rtol * torch.abs(goldoutput))
+            diff = torch.abs(infoutput - goldoutput) <= (
+                atol + rtol * torch.abs(goldoutput)
+            )
             print(f"Element-wise difference[output[{i}]]:\n{diff}\n", file=failedinflog)
             percentdiff = torch.sum(diff).item() / diff.nelement() * 100
             print(
@@ -755,7 +842,9 @@ def runTestUsingClassicalFlow(args_tuple):
     onnxfilename = ""
     if args.verbose:
         print(f"Running classical flow for test {testName}")
-
+    ireeInputType = "onnx"
+    if SHARED_TORCH_MLIR_BUILD:
+        ireeInputType = "torch"
     # create a symlink to the utils file inside the test dir
     if not os.path.exists(utilspy):
         print(f"ERROR: {utilspy} file missing")
@@ -773,18 +862,24 @@ def runTestUsingClassicalFlow(args_tuple):
     if frameworkname == "pytorch":
         if mode == "turbine":
             stubrunmodelpy = toolsDirAbsPath + "/stubs/turbinemodel.py"
-            torchmlirOutputfilename = modelname + "." + args.todtype + ".pytorch" + torchmlirsuffix
+            torchmlirOutputfilename = (
+                modelname + "." + args.todtype + ".pytorch" + torchmlirsuffix
+            )
         else:
             stubrunmodelpy = toolsDirAbsPath + "/stubs/pytorchmodel.py"
             onnxfilename = modelname + "." + args.todtype + ".onnx"
-            torchmlirOutputfilename = modelname + "." + args.todtype + ".pytorch" + torchmlirsuffix
+            torchmlirOutputfilename = (
+                modelname + "." + args.todtype + ".pytorch" + torchmlirsuffix
+            )
             testargs += " --torchmlirimport " + args.torchmlirimport
     elif frameworkname == "onnx":
         # For onnx, dierct and onnx means same as direct generates/has onnx itself
         if mode == "direct" or mode == "turbine":
             mode = "onnx"
         stubrunmodelpy = toolsDirAbsPath + "/stubs/onnxmodel.py"
-        torchmlirOutputfilename = modelname + "." + args.todtype + ".onnx" + torchmlirsuffix
+        torchmlirOutputfilename = (
+            modelname + "." + args.todtype + ".onnx" + torchmlirsuffix
+        )
         onnxfilename = "model.onnx"
         if getTestKind(testName) == "models":
             onnxfilename = testAbsPath + "/model.onnx"
@@ -867,6 +962,7 @@ def runTestUsingClassicalFlow(args_tuple):
             args.cleanup,
             uploadDict,
             dateAndTime,
+            ireeInputType,
         ):
             return 1
     if args.runupto == "iree-compile":
@@ -1288,7 +1384,6 @@ def main():
     parser.add_argument(
         "-c",
         "--torchmlirbuild",
-        required=True,
         help="Path to the torch-mlir build directory",
     )
     parser.add_argument(
@@ -1448,11 +1543,6 @@ def main():
     frameworks = args.frameworks
     TORCH_MLIR_BUILD, IREE_BUILD = checkBuild(run_dir, args)
     # assert
-    if TORCH_MLIR_BUILD == "":
-        print(
-            "ERROR: Torch MLIR build path is required to be set using --torchmlirbuild"
-        )
-        sys.exit(1)
 
     print("Starting e2eshark tests. Using", args.jobs, "processes")
     print("Cache Directory: " + cache_path)
@@ -1463,7 +1553,14 @@ def main():
 
     if args.verbose:
         print("Test run with arguments: ", vars(args))
-    print("Torch MLIR build:", TORCH_MLIR_BUILD)
+
+    if TORCH_MLIR_BUILD:
+        print("Torch MLIR build:", TORCH_MLIR_BUILD)
+    else:
+        print(
+            "Note: No Torch MLIR build provided using --torchmlirbuild. iree-import-onnx will be used to convert onnx to torch onnx mlir"
+        )
+
     if IREE_BUILD:
         print("IREE build:", IREE_BUILD)
     else:

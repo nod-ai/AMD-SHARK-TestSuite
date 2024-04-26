@@ -1,14 +1,20 @@
-transformers
+tabulate
+simplejson
 ml_dtypes
-huggingface-cli
 onnxruntime
+transformers
+huggingface-cli
 sentencepiece
 accelerate
 auto-gptq
 optimum
-tabulate
+azure-storage-blob
+# install nightly build of torch_mlir 
+torch_mlir -f  https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
 # install nightly build of iree-compiler and iree-runtime
 iree-compiler -f https://iree.dev/pip-release-links.html
 iree-runtime -f https://iree.dev/pip-release-links.html
-azure-storage-blob
-simplejson
+
+
+
+

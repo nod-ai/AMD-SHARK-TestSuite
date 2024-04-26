@@ -7,7 +7,6 @@
 import sys, argparse
 import torch
 import torch.nn as nn
-import torch_mlir
 
 
 # import from e2eshark/tools to allow running in current dir, for run through

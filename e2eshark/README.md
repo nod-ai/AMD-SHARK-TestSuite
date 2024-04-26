@@ -32,7 +32,8 @@
  - requirements.txt : 'pip install -r requirements.txt' to install needed additional 
                        packages not already in your venv or conda. If you have a venv or conda 
                        environment for building torch mlir or iree, you can install 
-                       this on top of that
+                       this on top of that. Also, peridically, run this step to keep packages current. 
+                       Sometimes you may need to force installation: 'pip install --force -r requirements.txt'
  - run.py : Run 'python run.py --help' to learn about the script. This is the script to 
             run a specific test, all tests in a framework, all frameworks as per choice of a user
  - Framework/operators: This has operator level tests. Example: pytorch/operators/conv2d
@@ -41,8 +42,9 @@
                            has torch.linear followed by torch.relu and optionally repeated a few times
  - Framework/models: This has full model test. Since this is full model test, you may need 
                      necesary permsisions to download a model such as for llama2 you will 
-                     need hugging face token. You should run 'huggingface-cli login' and 
-                     enter the HF token before launching the run.py.
+                     need hugging face token. You can either run 'huggingface-cli login' and 
+                     enter the HF token before launching the run.py or set an environment variable 
+                     named HF_TOKEN or provide it as "HF_TOKEN='token' python run.py 'options'"
  - gold/passed.txt : This has list of tests that are passing as of today. If your check-in increases
                      passing tests, please update this. After your changes in torch MLIR or IREE, 
                      run all the tests upto inference and make sure that your are passing at least 
@@ -59,6 +61,7 @@
  - tools/reportutil.py: Given two or more run directories, diff or merge any of status, time or 
                       summary reports. For time and summary reports, it tell how many new 
                       passes (improvements) were seen
+ - tools/aztestsetup.py: Setup, upload and download large models to/from Azure storage
 
  
  The logs are created as .log files in the test-run sub directory. Examine the logs to find and fix 
@@ -72,16 +75,24 @@
 
 ## Setting up
 
-You will need to have a local build of torch MLIR and pass using --torchmlirbuild (-c) option. 
-By default, a nightly build of IREE is installed when you run 'pip install -r ./requirements.txt'
-and that will be used to run tests. But, if you made changed in IREE or you want to pull 
-the latest fix in IREE, then create a local build and pass that using --ireebuild (-i). 
+By default, a nightly build of torch_mlir and IREE is installed when you run 'pip install -r ./requirements.txt'
+and that will be used to run tests. So, you are not required to have a local build of either torch mlir or iree.
+
+But, if you want to test a local change in either torch mlir or iree, you can pass the build using switches.
+
+If you have a local build of torch MLIR pass it using --torchmlirbuild (-c) option. Else, it will use
+torch_mlir package from last nightly build and use iree tools directly such as iree-import-onnx to import
+onnx into torch onnx mlir as opposed to running torch_mlir.tools.import_onnx.
+
+If you made changed in IREE or you want to pull the latest fix in IREE, then create a local build and pass 
+that using --ireebuild (-i). 
 
 The arg value passed to --torchmlirbuild (-c) should point to a directory where 
 bin/torch-mlir-opt can be found and the option passed to --ireebuild (-i) should point to 
 a directory where tools/iree-compile and tools/iree-run-module can be found.
 
-In all the exmaples in this README doc the -i option to pass an IREE build location is optional.
+In all the exmaples in this README doc the -c option to pass a torch mlir build location 
+or -i option to pass an IREE build location are optional.
 
 **Prerequisites**: Before proceeding with build, make sure you have following installed on your machine
 
@@ -96,8 +107,12 @@ In all the exmaples in this README doc the -i option to pass an IREE build locat
 To get a local build of torch MLIR, follow:
 https://github.com/llvm/torch-mlir/blob/main/docs/development.md
 
-For torch MLIR build, build the torch_mlir python wheel and install it in your python env in addition
-(preferrred to ensure that you have the latest and greatest changes):
+If you have a local build of torch MLIR build, you can build the torch_mlir python wheel and install it in your 
+python env in addition, that will remove need to use PYTHONPATH when you are running model.py manually. Use any of
+following options for allowing torch_mlir package to be available when running manually the model.py or runmodel.py.
+If you run using run.py then this step is taken care of for you.
+
+Option 1:
 
 https://github.com/llvm/torch-mlir/blob/main/docs/development.md#build-python-packages 
 
@@ -113,7 +128,22 @@ CMAKE_GENERATOR=Ninja python setup.py bdist_wheel --dist-dir ./torch-mlir-wheel 
 pip uninstall torch-mlir
 pip install torch-mlir-wheel/torch_mlir-0.0.1-cp310-cp310-linux_x86_64.whl
 ```
-**Note**: torch_mlir wheel version may change so you appropriate version in above command
+**Note**: torch_mlir wheel version may change so you should choose appropriate file name in the above command
+
+
+An easier way than creating the above torch_mlir wheel is to simply set PYTHONPATH while running model.py or set and export
+PYTHONPATH. 
+
+Option 2:
+```
+PYHONPATH="Your torch mlir build dir"/tools/torch-mlir/python_packages/torch_mlir python model.py
+```
+Option 3: 
+```
+cd to "Your torch mlir root dir"
+./build_tools/write_env_file.sh
+source build/.env && export PYTHONPATH
+```
 
 To get a local build of IREE, follow (prefer the clang building option over gnu):
 https://iree.dev/building-from-source/getting-started 
@@ -127,9 +157,9 @@ git clone https://github.com/nod-ai/SHARK-TestSuite.git
 cd SHARK-TestSuite/e2eshark 
 ```
 Set up python envonment, you can use venv or conda. 
-Example to create a brand new conda env using python 3.10 is: 
+Example to create a brand new conda env using python 3.11 is: 
 ```
-conda create -n e2e python=3.10
+conda create -n e2e python=3.11
 conda activate e2e
 pip install --upgrade pip
 
@@ -139,8 +169,11 @@ Then install needed packages as below:
 ```
 pip install -r 'your local torch MLIR repo'/requirements.txt
 pip install -r 'your local torch MLIR repo'/torchvision-requirements.txt
-pip install 'your local torch MLIR repo'/torch-mlir-wheel/torch_mlir-0.0.1-cp310-cp310-linux_x86_64.whl
 pip install -r ./requirements.txt
+```
+Optionally, as explained above, if you have built a local wheel of torch_mlir, then do (your whl file name may differ):
+```
+pip install 'your local torch MLIR repo'/torch-mlir-wheel/torch_mlir-0.0.1-cp310-cp310-linux_x86_64.whl
 ```
 
 ## Turbine Mode
@@ -317,7 +350,9 @@ The -1 under inference indicates, one test regressed in inference
 
 If you are interested in running tests, but want to upload the mlir files generated to Azure 
 to share with others or for yourself, first you will have to set the AZURE_CONNECTION_STRING environment
-variable. You can find this connection string here: https://portal.azure.com/#@amdcloud.onmicrosoft.com/resource/subscriptions/8c190d1b-eb91-48d5-bec5-3e7cb7412e6c/resourceGroups/pdue-nod-ai-rg/providers/Microsoft.Storage/storageAccounts/e2esharkuserartifacts/keys. If you don't have access to link above, you can ask Sai Enduri for the connection string.
+variable. You can find this connection string here: 
+https://portal.azure.com/#@amdcloud.onmicrosoft.com/resource/subscriptions/8c190d1b-eb91-48d5-bec5-3e7cb7412e6c/resourceGroups/pdue-nod-ai-rg/providers/Microsoft.Storage/storageAccounts/e2esharkuserartifacts/keys. 
+If you don't have access to link above, you can ask Sai Enduri for the connection string.
 
 Then, setup an upload_list.txt file with the names of the models you want to upload on. There is already one
 setup at e2eshark/gold/upload_list.txt. You can just modify that one.

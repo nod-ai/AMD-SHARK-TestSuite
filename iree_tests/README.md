@@ -130,6 +130,44 @@ $ pytest iree_tests/onnx -n auto --ignore-xfails --skip-all-runs \
     --config-files ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
 ```
 
+### Updating expected failure lists
+
+Each config file uses with pytest includes a list of expected compile and run
+failures like this:
+
+```json
+  "expected_compile_failures": [
+    "test_acos",
+  ],
+  "expected_run_failures": [
+    "test_add_uint8",
+  ],
+```
+
+To update these lists using the results of a test run:
+
+1. Run pytest with the `--report-log` option:
+
+    ```bash
+    $ pytest iree_tests/onnx \
+      --report-log=/tmp/onnx_cpu_logs.json \
+      --config-files=config_onnx_cpu.json \
+      ...
+    ```
+
+2. Run the `update_config_xfails.py` script:
+
+    ```bash
+    $ python iree_tests/update_config_xfails.py \
+      --log-file=/tmp/onnx_cpu_logs.json \
+      --config-file=config_onnx_cpu.json
+    ```
+
+You can also update the config JSON files manually. The log output on its own
+should give enough information for each test case (e.g.
+"remove from 'expected_run_failures'" for newly passing tests), but there can be
+1000+ test cases, so the automation can save time.
+
 ### Advanced pytest usage tips
 
 Collect tests (but do not run them):

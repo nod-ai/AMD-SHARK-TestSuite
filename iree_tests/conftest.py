@@ -113,17 +113,6 @@ def pytest_collect_file(parent, file_path):
         and (file_path.name.endswith(".mlir") or file_path.name.endswith(".mlirbc"))):
         return MlirFile.from_parent(parent, path=file_path)
 
-
-# TODO(scotttodd): other hooks hook may help with updating XFAIL sets
-#
-#   * load config file(s) and lists of tests requested
-#     `pytest_collection_finish`
-#   * after each test finishes, record result
-#     `pytest_runtest_logfinish`
-#   * after all tests finish, join results back into a config file
-#     `pytest_sessionfinish`
-#   * let the user accept the new config file in place of their original
-
 # --------------------------------------------------------------------------- #
 
 
@@ -255,26 +244,26 @@ class MlirFile(pytest.File):
         #     ...
 
         test_directory = self.path.parent
-        test_name = test_directory.name
+        test_directory_name = test_directory.name
 
         test_cases = self.discover_test_cases()
         if len(test_cases) == 0:
-            print(f"No test cases for '{test_name}'")
+            print(f"No test cases for '{test_directory_name}'")
             return []
 
         for config in self.config.iree_test_configs:
-            if test_name in config.get("skip_compile_tests", []):
+            if test_directory_name in config.get("skip_compile_tests", []):
                 continue
 
             expect_compile_success = self.config.getoption(
                 "ignore_xfails"
-            ) or test_name not in config.get("expected_compile_failures", [])
+            ) or test_directory_name not in config.get("expected_compile_failures", [])
             expect_run_success = self.config.getoption(
                 "ignore_xfails"
-            ) or test_name not in config.get("expected_run_failures", [])
+            ) or test_directory_name not in config.get("expected_run_failures", [])
             skip_run = self.config.getoption(
                 "skip_all_runs"
-            ) or test_name in config.get("skip_run_tests", [])
+            ) or test_directory_name in config.get("skip_run_tests", [])
             config_name = config["config_name"]
 
             # TODO(scotttodd): don't compile once per test case?
@@ -305,6 +294,12 @@ class IreeCompileRunItem(pytest.Item):
     def __init__(self, spec, **kwargs):
         super().__init__(**kwargs)
         self.spec = spec
+
+        self.user_properties.append(
+            ("test_directory_name", self.spec.test_directory.name)
+        )
+        self.user_properties.append(("input_mlir_name", self.spec.input_mlir_name))
+        self.user_properties.append(("test_name", self.spec.test_name))
 
         if self.spec.skip_test:
             self.add_marker(
@@ -398,7 +393,6 @@ class IreeCompileRunItem(pytest.Item):
                 "Expected compile failure but run failed (move to 'expected_run_failures'):\n"
                 + "\n".join(excinfo.value.__cause__.args)
             )
-        # TODO(scotttodd): XFAIL tests spew a ton of logs here when run with `pytest -rA`. Fix?
         return super().repr_failure(excinfo)
 
     def reportinfo(self):

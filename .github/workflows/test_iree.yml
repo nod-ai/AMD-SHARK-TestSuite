@@ -65,7 +65,30 @@ jobs:
       - name: "Running the generated ONNX test suite"
         run: |
           source ${VENV_DIR}/bin/activate
-          pytest iree_tests/onnx/node/generated -n auto -rpfE --timeout=30 --retries 2 --retry-delay 5 --durations=10
+          pytest iree_tests/onnx/node/generated \
+            -n auto \
+            -rpfE \
+            --timeout=30 \
+            --retries=2 \
+            --retry-delay=5 \
+            --durations=10 \
+            --report-log=/tmp/iree_tests_onnx_cpu_logs.json \
+            --config-files=./iree_tests/configs/config_onnx_cpu_llvm_sync.json
+
+      - name: "Updating config file with latest XFAIL lists"
+        if: failure()
+        run: |
+          source ${VENV_DIR}/bin/activate
+          python iree_tests/update_config_xfails.py \
+            --log-file=/tmp/iree_tests_onnx_cpu_logs.json \
+            --config-file=./iree_tests/configs/config_onnx_cpu_llvm_sync.json
+          cat ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
+      - name: "Uploading new config file"
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "config_onnx_cpu_llvm_sync.json"
+          path: "./iree_tests/configs/config_onnx_cpu_llvm_sync.json"
 
   linux_x86_64_w7900_cpu_models:
     name: Linux (x86_64 w7900) Models CPU
@@ -116,7 +139,7 @@ jobs:
             --retry-delay 5 \
             --durations=0 \
             --config-files=iree_tests/configs/config_pytorch_models_cpu_llvm_task.json
-      
+
       - name: "Running real weight model tests scheduled unet cpu"
         run: |
           source ${VENV_DIR}/bin/activate
@@ -179,7 +202,7 @@ jobs:
             --retry-delay 5 \
             --durations=0 \
             --config-files=iree_tests/configs/config_gpu_rocm_models.json
-    
+
       - name: "Running real weight model tests scheduled unet ROCm AMDGPU"
         run: |
           source ${VENV_DIR}/bin/activate
@@ -193,7 +216,7 @@ jobs:
             --retry-delay 5 \
             --durations=0 \
             --config-files=iree_tests/configs/config_sdxl_scheduled_unet_gpu_rocm.json
-      
+
       - name: "Running SDXL rocm pipeline benchmark"
         run: |
           source ${VENV_DIR}/bin/activate

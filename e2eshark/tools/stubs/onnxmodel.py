@@ -9,7 +9,7 @@
 
 import numpy
 import onnxruntime
-import sys, argparse
+import sys, argparse, warnings
 import torch, pickle
 from commonutils import getOutputTensorList, E2ESHARK_CHECK_DEF, postProcess
 
@@ -36,18 +36,37 @@ parser.add_argument(
     default="model",
     help="Prefix of output files written by this model",
 )
+parser.add_argument(
+    "--run_as_static",
+    action="store_true",
+    default=False,
+    help="makes the dim_params for model.onnx static with param/value dict given in model.py",
+)
+parser.add_argument(
+    "-v",
+    "--verbose",
+    action="store_true",
+    default=False,
+    help="Print aditional messsages to show progress",
+)
 args = parser.parse_args()
 if args.todtype != "default":
     print(
         "Onnx does not support model.to(dtype). Default dtype of the model will be used."
     )
-
 runmode = args.mode
 outfileprefix = args.outfileprefix
 outfileprefix += "." + args.todtype
 inputsavefilename = outfileprefix + ".input.pt"
 outputsavefilename = outfileprefix + ".goldoutput.pt"
 
+try:
+    run(args.run_as_static, "model-run-verbose.log", args.verbose)
+except NameError as e:
+    if args.run_as_static:
+        warnings.warn(
+            f"Caught exception: {e}\nmodel.py does not support run_as_static option."
+        )
 
 E2ESHARK_CHECK["postprocessed_output"] = postProcess(E2ESHARK_CHECK)
 # TBD, remobe torch.save and use the .pkl instead

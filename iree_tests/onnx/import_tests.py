@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import numpy as np
 import sys
+from import_tests_utils import get_shape_string, write_io_bin
 
 THIS_DIR = Path(__file__).parent
 REPO_ROOT = THIS_DIR.parent.parent
@@ -129,10 +130,12 @@ def import_onnx_files(test_dir_path, imported_dir_path):
         print("WARNING: unhandled 'len(test_data_dirs) != 1'")
         return False
 
-    # Convert input_*.pb and output_*.pb to .npy files.
+    # Convert input_*.pb and output_*.pb -> .npy -> .bin (little endian)
+    # systems with big endian byteordering may have problems with provided bins
+    # Check using `sys.byteorder` and import tests locally if required.
     test_data_dir = test_data_dirs[0]
-    test_inputs = list(test_data_dir.glob("input_*.pb"))
-    test_outputs = list(test_data_dir.glob("output_*.pb"))
+    test_inputs = sorted(list(test_data_dir.glob("input_*.pb")))
+    test_outputs = sorted(list(test_data_dir.glob("output_*.pb")))
     model = onnx.load(converted_model_path)
     for i in range(len(test_inputs)):
         test_input = test_inputs[i]
@@ -140,16 +143,30 @@ def import_onnx_files(test_dir_path, imported_dir_path):
         if t is None:
             return False
         input_path = (imported_dir_path / test_input.stem).with_suffix(".npy")
-        np.save(input_path, t)
-        test_data_flagfile_lines.append(f"--input=@{input_path.name}\n")
+        np.save(input_path, t)  # Only for ref, actual comparison with .bin
+        ss = get_shape_string(t)
+        input_path_bin = (imported_dir_path / test_input.stem).with_suffix(".bin")
+        write_io_bin(t, input_path_bin)
+        test_data_flagfile_lines.append(
+            f"--input={ss}=@{input_path_bin.name}\n"
+        )
     for i in range(len(test_outputs)):
         test_output = test_outputs[i]
         t = convert_io_proto(test_output, model.graph.output[i].type)
         if t is None:
             return False
         output_path = (imported_dir_path / test_output.stem).with_suffix(".npy")
-        np.save(output_path, t)
-        test_data_flagfile_lines.append(f"--expected_output=@{output_path.name}\n")
+        np.save(output_path, t)  # Only for ref, actual comparison with .bin
+        ss = get_shape_string(t)
+        # required for signless output comparision
+        if "xsi" in ss or "xui" in ss:
+            ss = ss.replace("xsi", "xi")
+            ss = ss.replace("xui", "xi")
+        output_path_bin = (imported_dir_path / test_output.stem).with_suffix(".bin")
+        write_io_bin(t, output_path_bin)
+        test_data_flagfile_lines.append(
+            f"--expected_output={ss}=@{output_path_bin.name}\n"
+        )
 
     with open(test_data_flagfile_path, "wt") as f:
         f.writelines(test_data_flagfile_lines)
@@ -180,7 +197,9 @@ if __name__ == "__main__":
     passed_imports = []
     failed_imports = []
     with Pool(args.jobs) as pool:
-        results = pool.imap_unordered(import_onnx_files_with_cleanup, test_dir_paths)
+        results = pool.imap_unordered(
+            import_onnx_files_with_cleanup, test_dir_paths
+        )
         for result in results:
             if result[1]:
                 passed_imports.append(result[0])

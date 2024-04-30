@@ -1,2 +1,2 @@
---input=@input_0.npy
---expected_output=@output_0.npy
+--input=12xsi32=@input_0.bin
+--expected_output=7xf32=@output_0.bin

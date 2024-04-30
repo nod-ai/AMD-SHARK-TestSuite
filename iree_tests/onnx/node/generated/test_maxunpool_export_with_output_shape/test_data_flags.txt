@@ -1,4 +1,4 @@
---input=@input_0.npy
---input=@input_1.npy
---input=@input_2.npy
---expected_output=@output_0.npy
+--input=1x1x2x2xf32=@input_0.bin
+--input=1x1x2x2xsi64=@input_1.bin
+--input=4xsi64=@input_2.bin
+--expected_output=1x1x5x5xf32=@output_0.bin

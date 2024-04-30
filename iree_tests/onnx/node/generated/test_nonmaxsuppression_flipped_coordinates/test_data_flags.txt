@@ -1,6 +1,6 @@
---input=@input_0.npy
---input=@input_1.npy
---input=@input_2.npy
---input=@input_3.npy
---input=@input_4.npy
---expected_output=@output_0.npy
+--input=1x6x4xf32=@input_0.bin
+--input=1x1x6xf32=@input_1.bin
+--input=1xsi64=@input_2.bin
+--input=1xf32=@input_3.bin
+--input=1xf32=@input_4.bin
+--expected_output=3x3xi64=@output_0.bin

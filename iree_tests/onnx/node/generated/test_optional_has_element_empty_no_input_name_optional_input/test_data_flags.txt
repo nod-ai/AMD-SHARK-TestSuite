@@ -1,1 +1,1 @@
---expected_output=@output_0.npy
+--expected_output=xi1=@output_0.bin

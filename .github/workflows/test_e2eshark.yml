@@ -8,8 +8,8 @@ name: E2ESHARK Test Suite
 on:
   workflow_dispatch:
   schedule:
-  # Runs at 1:00 PM UTC, which is 5:00 AM PST (UTC-8)
-   - cron: '0 13 * * *'
+  # Runs at 12:00 PM UTC, which is 5:00 AM PST
+   - cron: '0 12 * * *'
 
 jobs:
   turbine:

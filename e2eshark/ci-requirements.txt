@@ -1,0 +1,8 @@
+tabulate
+simplejson
+ml_dtypes
+sentencepiece
+accelerate
+auto-gptq
+optimum
+azure-storage-blob

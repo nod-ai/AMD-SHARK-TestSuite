@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: nod-ai/SHARK-Turbine
-          ref: torch_2.1_support
+          ref: torch_2.1
           path: turbine
 
   e2eshark:

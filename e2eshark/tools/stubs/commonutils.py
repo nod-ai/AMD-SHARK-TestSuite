@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 import torch
+from PIL import Image
+import torchvision.transforms as transforms
+import requests
 
 # These are pickle-saved and used by tools/stubs python and run.pl.
 # If adding new fields, make sure the field has default value and have updated
@@ -80,3 +83,24 @@ def postProcess(e2esharkDict):
     else:
         postprocess_output = test_output
     return postprocess_output
+
+# used for image inputs for onnx vision models
+def to_numpy(tensor):
+    return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
+
+def setup_test_image():
+    url = "http://images.cocodataset.org/val2017/000000039769.jpg"
+    img = Image.open(requests.get(url, stream=True).raw)
+
+    resize = transforms.Resize([224, 224])
+    img = resize(img)
+    
+    # Define a transform to convert 
+    # the image to torch tensor 
+    img_ycbcr = img.convert('YCbCr')
+    
+    # Convert the image to Torch tensor 
+    to_tensor = transforms.ToTensor()
+    img_ycbcr = to_tensor(img_ycbcr)
+    img_ycbcr.unsqueeze_(0)
+    return img_ycbcr

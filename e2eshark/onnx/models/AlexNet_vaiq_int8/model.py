@@ -4,7 +4,7 @@ import onnxruntime
 # import from e2eshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
 sys.path.insert(0, "../../../tools/stubs")
-from commonutils import E2ESHARK_CHECK_DEF
+from commonutils import E2ESHARK_CHECK_DEF, to_numpy, setup_test_image
 
 # Create an instance of it for this test
 E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
@@ -21,7 +21,10 @@ session = onnxruntime.InferenceSession("model.onnx", None)
 
 # Even if model is quantized, the inputs and outputs are
 # not, so apply float32
-model_input_X = numpy.random.rand(1, 3, 224, 224).astype(numpy.float32)
+# Get and process the image
+img_ycbcr = setup_test_image()
+
+model_input_X = to_numpy(img_ycbcr)
 
 # gets X in inputs[0] and Y in inputs[1]
 inputs = session.get_inputs()
@@ -40,10 +43,7 @@ print("Input:", E2ESHARK_CHECK["input"])
 print("Output:", E2ESHARK_CHECK["output"])
 
 # Post process output to do:
-# sort(topk(torch.nn.functional.softmax(output, 0), 2)[1])[0]
-# Top most probability
-# E2ESHARK_CHECK["postprocess"] = [
-#     (torch.nn.functional.softmax, [0], False, 0),
-#     (torch.topk, [2], True, 1),
-#     (torch.sort, [], True, 0),
-# ]
+E2ESHARK_CHECK["postprocess"] = [
+    (torch.nn.functional.softmax, [0], False, 0),
+    (torch.topk, [3], True, 1),
+]

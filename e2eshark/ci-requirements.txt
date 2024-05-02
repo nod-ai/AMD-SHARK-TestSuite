@@ -6,3 +6,4 @@ accelerate
 auto-gptq
 optimum
 azure-storage-blob
+pillow

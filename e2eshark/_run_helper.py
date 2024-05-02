@@ -5,6 +5,7 @@ from azure.storage.blob import BlobServiceClient
 import zipfile
 import struct
 import torch
+import io
 
 
 def concatenateFiles(inpfile1, inpfile2, outfile):

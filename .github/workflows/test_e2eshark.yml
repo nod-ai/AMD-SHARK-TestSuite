@@ -41,6 +41,8 @@ jobs:
           source ${E2E_VENV_DIR}/bin/activate
           pip install --upgrade pip
           pip install -r ./e2eshark/requirements.txt
+          pip uninstall -y numpy
+          pip install numpy
         working-directory: ./test-suite
 
       - name: Run Onnx Mode

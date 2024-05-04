@@ -375,12 +375,19 @@ class IreeCompileRunItem(pytest.Item):
             raise e
 
     def test_compile(self):
-        proc = subprocess.run(self.compile_args, capture_output=True, cwd=self.test_cwd)
+        compile_env = os.environ.copy()
+        compile_env["IREE_TEST_PATH_EXTENSION"] = os.getenv("IREE_TEST_PATH_EXTENSION", default=self.test_cwd)
+        path_extension = compile_env["IREE_TEST_PATH_EXTENSION"]
+        cmd = subprocess.list2cmdline(self.compile_args)
+        cmd = cmd.replace("${IREE_TEST_PATH_EXTENSION}", f"{path_extension}")
+        proc = subprocess.run(cmd, env=compile_env, shell=True, capture_output=True, cwd=self.test_cwd)
         if proc.returncode != 0:
             raise IreeCompileException(proc, self.test_cwd)
 
     def test_run(self):
-        proc = subprocess.run(self.run_args, capture_output=True, cwd=self.test_cwd)
+        run_env = os.environ.copy()
+        cmd = subprocess.list2cmdline(self.run_args)
+        proc = subprocess.run(cmd, env=run_env, shell=True, capture_output=True, cwd=self.test_cwd)
         if proc.returncode != 0:
             raise IreeRunException(proc, self.test_cwd, self.compile_args)
 
@@ -418,7 +425,7 @@ class IreeCompileException(Exception):
             f"Error code: {process.returncode}\n"
             f"Stderr diagnostics:\n{errs}\n\n"
             f"Invoked with:\n"
-            f"  cd {cwd} && {' '.join(process.args)}\n\n"
+            f"  cd {cwd} && {process.args}\n\n"
         )
 
 
@@ -437,6 +444,10 @@ class IreeRunException(Exception):
             outs = process.stdout.decode("utf-8")
         except:
             outs = str(process.stdout)  # Decode error or other: best we can do.
+        
+        compile_cmd = subprocess.list2cmdline(compile_args)
+        common_files_path = os.getenv("IREE_TEST_PATH_EXTENSION", default=cwd)
+        compile_cmd = compile_cmd.replace("${IREE_TEST_PATH_EXTENSION}", f"{common_files_path}")
 
         super().__init__(
             f"Error invoking iree-run-module\n"
@@ -444,9 +455,9 @@ class IreeRunException(Exception):
             f"Stderr diagnostics:\n{errs}\n"
             f"Stdout diagnostics:\n{outs}\n"
             f"Compiled with:\n"
-            f"  cd {cwd} && {' '.join(compile_args)}\n\n"
+            f"  cd {cwd} && {compile_cmd}\n\n"
             f"Run with:\n"
-            f"  cd {cwd} && {' '.join(process.args)}\n\n"
+            f"  cd {cwd} && {process.args}\n\n"
         )
 
 

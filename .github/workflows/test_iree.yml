@@ -125,7 +125,7 @@ jobs:
           source ${VENV_DIR}/bin/activate
           python3 iree_tests/download_remote_files.py --root-dir pytorch/models
 
-      - name: "Running real weight model tests cpu"
+      - name: "Running real weight model tests - CPU"
         run: |
           source ${VENV_DIR}/bin/activate
           pytest iree_tests/pytorch/models \
@@ -134,13 +134,14 @@ jobs:
             -k real_weights \
             --no-skip-tests-missing-files \
             --capture=no \
+            --log-cli-level=info \
             --timeout=1200 \
             --retries 2 \
             --retry-delay 5 \
             --durations=0 \
             --config-files=iree_tests/configs/config_pytorch_models_cpu_llvm_task.json
 
-      - name: "Running real weight model tests scheduled unet cpu"
+      - name: "Running real weight model tests - Scheduled UNet CPU"
         run: |
           source ${VENV_DIR}/bin/activate
           pytest iree_tests/pytorch/models/sdxl-scheduled-unet-3-tank \
@@ -148,6 +149,7 @@ jobs:
             -k real_weights \
             --no-skip-tests-missing-files \
             --capture=no \
+            --log-cli-level=info \
             --timeout=1200 \
             --retries 2 \
             --retry-delay 5 \
@@ -190,7 +192,7 @@ jobs:
           source ${VENV_DIR}/bin/activate
           python3.11 iree_tests/download_remote_files.py --root-dir pytorch/models
 
-      - name: "Running real weight model tests ROCm AMDGPU"
+      - name: "Running real weight model tests - ROCm AMDGPU"
         run: |
           source ${VENV_DIR}/bin/activate
           pytest iree_tests/pytorch/models \
@@ -198,13 +200,14 @@ jobs:
             -k real_weights \
             --no-skip-tests-missing-files \
             --capture=no \
+            --log-cli-level=info \
             --timeout=1200 \
             --retries 2 \
             --retry-delay 5 \
             --durations=0 \
             --config-files=iree_tests/configs/config_gpu_rocm_models.json
 
-      - name: "Running real weight model tests scheduled unet ROCm AMDGPU"
+      - name: "Running real weight model tests - Scheduled UNet ROCm AMDGPU"
         run: |
           source ${VENV_DIR}/bin/activate
           pytest iree_tests/pytorch/models/sdxl-scheduled-unet-3-tank \
@@ -212,6 +215,7 @@ jobs:
             -k real_weights \
             --no-skip-tests-missing-files \
             --capture=no \
+            --log-cli-level=info \
             --timeout=1200 \
             --retries 2 \
             --retry-delay 5 \

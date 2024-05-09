@@ -158,8 +158,10 @@ def runOnnxToTorchMLIRGeneration(
             )
             commandstring += "torch-backend-to-linalg-on-tensors-backend-pipeline)' "
         else:
-            commandstring += " -convert-torch-onnx-to-torch "
-
+            commandstring += " -pass-pipeline='builtin.module(func.func(convert-torch-onnx-to-torch),"
+            commandstring += (
+                "torch-lower-to-backend-contract,func.func(cse,canonicalize))' "
+            )
         # TORCH_MLIR_BUILD = path_config["TORCH_MLIR_BUILD"]
         # print(f"In RunTest - torch mlir build - {SHARED_TORCH_MLIR_BUILD}")
         scriptcommand = (

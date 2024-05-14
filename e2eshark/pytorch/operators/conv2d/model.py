@@ -4,10 +4,9 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-import sys, argparse
+import sys
 import torch
 import torch.nn as nn
-import torch_mlir
 
 # import from e2eshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work

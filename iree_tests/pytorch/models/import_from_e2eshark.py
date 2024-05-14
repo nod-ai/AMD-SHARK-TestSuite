@@ -38,8 +38,8 @@ def extract_parameters(
     exec_args = [
         "iree-compile",
         str(input_mlir_path),
-        f"--iree-opt-parameter-archive-export-file={str(real_weights_output_path)}",
-        f"--iree-opt-splat-parameter-archive-export-file={str(splats_output_path)}",
+        f"--iree-opt-export-parameters={str(real_weights_output_path)}",
+        f"--iree-opt-splat-parameters={str(splats_output_path)}",
         "--compile-to=global-optimization",
         "-o",
         str(output_mlir_path),

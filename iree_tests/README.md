@@ -333,15 +333,31 @@ python ./iree_tests/onnx/import_tests.py
 > [!WARNING]
 > UNDER CONSTRUCTION - this will change!
 
-1. Setup venv for the [e2eshark/](/e2eshark/) directory by following that README
+1. Setup venv for the [e2eshark/](/e2eshark/) directory by following that README:
+
+    ```bash
+    e2eshark$ python -m venv .venv
+    e2eshark$ source .venv/bin/activate
+    e2eshark$ python -m pip install -r requirements.txt
+    e2eshark$ python -m pip install -e [PATH TO SHARK-Turbine REPO]/models
+    ```
+
+    Notes:
+
+    * You may need to comment out the torch-mlir install from `requirements.txt`
+      on non-Linux.
+    * You may need to downgrade numpy:
+
+        ```bash
+        pip uninstall numpy
+        pip install numpy<2.0
+        ```
 
 2. Run a test from e2eshark to generate artifact files:
 
     ```bash
     e2eshark$ python run.py \
       --cachedir ${CACHE_DIR} \
-      -c ${TORCH_MLIR_BUILD_DIR} \
-      -i ${IREE_BUILD_DIR} \
       --tests pytorch/models/resnet50 \
       --mode turbine
 
@@ -361,7 +377,7 @@ python ./iree_tests/onnx/import_tests.py
    into `iree_tests/`:
 
    ```bash
-   iree_tests$ python ./pytorch/models/export_from_e2eshark.py resnet50
+   iree_tests$ python ./pytorch/models/import_from_e2eshark.py --model=resnet50
    iree_tests$ ls ./pytorch/models/resnet50
 
    opt-125M.mlirbc  splats.irpa
@@ -383,7 +399,7 @@ python ./iree_tests/onnx/import_tests.py
 
 #### Generating model test cases from turbine/tank
 
-As seen in iree_tests/pytorch/models, there are some models with the "-tank" suffix.
+As seen in [`iree_tests/pytorch/models`](./pytorch/models/), there are some models with the "-tank" suffix.
 This refers to tests that were generated using the normal turbine flow.
 For custom models, such as sd, sdxl, or stateless_llama, you can clone the turbine repo
 and follow the setup instructions there (https://github.com/nod-ai/SHARK-Turbine).

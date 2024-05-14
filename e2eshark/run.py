@@ -1307,18 +1307,16 @@ def main():
 
     args = parser.parse_args()
     cache_dir = args.cachedir
+
+
+    cache_dir = os.path.expanduser(cache_dir)
+    cache_dir = os.path.abspath(cache_dir)
+
     if not os.path.exists(cache_dir):
-        print(f"ERROR: The Cache directory {cache_dir} does not exist")
-        sys.exit(1)
-
-    cache_path = os.path.expanduser(cache_dir)
-    cache_path = os.path.abspath(cache_dir)
-
-    if not os.path.exists(cache_path):
-        print(f"ERROR: The Cache directory {cache_path} does not exist.")
+        print(f"ERROR: The Cache directory {cache_dir} does not exist.")
         sys.exit(1)
     # get the amount of GB available
-    _, _, free = shutil.disk_usage(cache_path)
+    _, _, free = shutil.disk_usage(cache_dir)
     space_available = float(free) / pow(1024, 3)
     if space_available < 20:
         warnings.warn(
@@ -1326,9 +1324,9 @@ def main():
             + "Please choose directory with more space to avoid disk storage issues when running models."
         )
 
-    os.environ["TORCH_HOME"] = cache_path
-    os.environ["HF_HOME"] = cache_path
-    os.environ["TURBINE_TANK_CACHE_DIR"] = cache_path
+    os.environ["TORCH_HOME"] = cache_dir
+    os.environ["HF_HOME"] = cache_dir
+    os.environ["TURBINE_TANK_CACHE_DIR"] = cache_dir
 
     if args.skiptestsfile and args.testsfile:
         print(f"ERROR: Only one of --skiptestsfile or --testsfile can be used")
@@ -1351,7 +1349,7 @@ def main():
     # assert
 
     print("Starting e2eshark tests. Using", args.jobs, "processes")
-    print("Cache Directory: " + cache_path)
+    print("Cache Directory: " + cache_dir)
     if args.tolerance:
         print(
             f"Tolerance for comparing floating point (atol, rtol) = {tuple(args.tolerance)}"
@@ -1418,7 +1416,7 @@ def main():
             testsList = [test for test in testsList if not test in skiptestslist]
             totalTestList += testsList
             if framework == "onnx":
-                pre_test_onnx_models_azure_download(testsList, cache_path, script_dir)
+                pre_test_onnx_models_azure_download(testsList, cache_dir, script_dir)
             if not args.norun:
                 runFrameworkTests(
                     framework,
@@ -1435,7 +1433,7 @@ def main():
             testsList = [test for test in testsList if not test in skiptestslist]
             totalTestList += testsList
             if framework == "onnx":
-                pre_test_onnx_models_azure_download(testsList, cache_path, script_dir)
+                pre_test_onnx_models_azure_download(testsList, cache_dir, script_dir)
             if not args.norun:
                 runFrameworkTests(
                     framework,

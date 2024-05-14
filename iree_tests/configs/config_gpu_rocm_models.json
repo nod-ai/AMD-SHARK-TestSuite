@@ -14,7 +14,8 @@
     ],
     "skip_run_tests": [],
     "expected_compile_failures": [
-      "resnet50"
+      "opt-125M", // TODO(#17344): need to regenerate .mlirbc
+      "resnet50",
     ],
     "expected_run_failures": []
 }

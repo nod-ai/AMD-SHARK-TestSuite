@@ -175,7 +175,7 @@ def loadRawBinaryAsTorchSensor(binaryfile, shape, dtype):
     with open(binaryfile, "rb") as f:
         binarydata = f.read()
     # Number of elements in tensor
-    num_elem = torch.prod(torch.tensor(list(shape)))
+    num_elem = torch.prod(torch.tensor(list(shape), dtype=torch.int64))
     # Total bytes
     tensor_num_bytes = (num_elem * dtype.itemsize).item()
     barray = bytearray(binarydata[0:tensor_num_bytes])

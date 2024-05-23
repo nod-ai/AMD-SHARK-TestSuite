@@ -196,11 +196,11 @@ def runOnnxToTorchMLIRGeneration(
         iree_import_onnx = "iree-import-onnx"
         curphase = phases[1]
         logfilename = curphase + ".log"
-        # if SHARED_IREE_BUILD:
         # If local iree build provided use that instead of using the one installed
         # in user's env
-        # TBD, pick from user's env later, for now use the env installed one
-        # iree_import_onnx = SHARED_IREE_BUILD + "/tools/" + iree_import_onnx
+        if SHARED_IREE_BUILD:
+            iree_python_path = f"PYHONPATH={SHARED_IREE_BUILD}/compiler/bindings/python"
+            iree_import_onnx = f"{iree_python_path} python -m iree.compiler.tools.import_onnx"
         scriptcommand = (
             iree_import_onnx
             + " "

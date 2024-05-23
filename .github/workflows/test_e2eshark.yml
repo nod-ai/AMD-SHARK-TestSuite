@@ -43,6 +43,15 @@ jobs:
           pip install -r ./e2eshark/requirements.txt
           pip uninstall -y numpy
           pip install numpy
+          pip install \
+            --find-links https://iree.dev/pip-release-links.html \
+            --upgrade \
+            iree-compiler \
+            iree-runtime
+          pip install \
+            --find-links https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels \
+            --upgrade \
+            torch-mlir
         working-directory: ./test-suite
 
       - name: Run Onnx Mode

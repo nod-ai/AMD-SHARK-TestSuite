@@ -11,7 +11,6 @@ test_cast_INT4_to_INT8
 test_cast_UINT4_to_FLOAT
 test_cast_UINT4_to_FLOAT16
 test_cast_UINT4_to_UINT8
-test_dequantizelinear_e4m3fn_float16
 test_dequantizelinear_int4
 test_dequantizelinear_uint4
 test_identity_opt
@@ -20,7 +19,6 @@ test_if_opt
 test_if_seq
 test_loop13_seq
 test_loop16_seq_none
-test_maxpool_2d_ceil_output_size_reduce_by_one
 test_optional_get_element_optional_sequence
 test_optional_get_element_optional_tensor
 test_optional_get_element_sequence

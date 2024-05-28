@@ -7,8 +7,8 @@ module {
     %3 = torch.operator "onnx.LogSoftmax"(%2) {torch.onnx.axis = 2 : si64} : (!torch.vtensor<[3,2,5],f32>) -> !torch.vtensor<[3,2,5],f32> 
     %4 = torch.operator "onnx.Transpose"(%3) {torch.onnx.perm = [0 : si64, 2 : si64, 1 : si64]} : (!torch.vtensor<[3,2,5],f32>) -> !torch.vtensor<[3,5,2],f32> 
     %5 = torch.operator "onnx.Shape"(%arg0) : (!torch.vtensor<[3,5,2],f32>) -> !torch.vtensor<[3],si64> 
-    %6 = torch.operator "onnx.Reshape"(%4, %5) : (!torch.vtensor<[3,5,2],f32>, !torch.vtensor<[3],si64>) -> !torch.vtensor<[?,?,?],f32> 
-    %7 = torch.operator "onnx.NegativeLogLikelihoodLoss"(%6, %arg1) {torch.onnx.reduction = "mean"} : (!torch.vtensor<[?,?,?],f32>, !torch.vtensor<[3,2],si64>) -> !torch.vtensor<[],f32> 
+    %6 = torch.operator "onnx.Reshape"(%4, %5) : (!torch.vtensor<[3,5,2],f32>, !torch.vtensor<[3],si64>) -> !torch.vtensor<[3,5,2],f32> 
+    %7 = torch.operator "onnx.NegativeLogLikelihoodLoss"(%6, %arg1) {torch.onnx.reduction = "mean"} : (!torch.vtensor<[3,5,2],f32>, !torch.vtensor<[3,2],si64>) -> !torch.vtensor<[],f32> 
     return %7 : !torch.vtensor<[],f32>
   }
 }

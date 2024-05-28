@@ -301,6 +301,7 @@ test_dequantizelinear
 test_dequantizelinear_axis
 test_dequantizelinear_blocked
 test_dequantizelinear_e4m3fn
+test_dequantizelinear_e4m3fn_float16
 test_dequantizelinear_e4m3fn_zero_point
 test_dequantizelinear_e5m2
 test_dequantizelinear_int16
@@ -598,6 +599,7 @@ test_max_uint64
 test_max_uint8
 test_maxpool_1d_default
 test_maxpool_2d_ceil
+test_maxpool_2d_ceil_output_size_reduce_by_one
 test_maxpool_2d_default
 test_maxpool_2d_dilations
 test_maxpool_2d_pads

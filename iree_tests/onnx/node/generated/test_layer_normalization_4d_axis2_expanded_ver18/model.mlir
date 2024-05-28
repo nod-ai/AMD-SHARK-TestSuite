@@ -9,8 +9,8 @@ module {
     %5 = torch.operator "onnx.Constant"() {torch.onnx.value = dense<2> : tensor<1xsi64>} : () -> !torch.vtensor<[1],si64> 
     %6 = torch.operator "onnx.Slice"(%2, %4, %5) : (!torch.vtensor<[4],si64>, !torch.vtensor<[1],si64>, !torch.vtensor<[1],si64>) -> !torch.vtensor<[2],si64> 
     %7 = torch.operator "onnx.Sub"(%3, %5) : (!torch.vtensor<[],si64>, !torch.vtensor<[1],si64>) -> !torch.vtensor<[1],si64> 
-    %8 = torch.operator "onnx.ConstantOfShape"(%7) {torch.onnx.value = dense<1> : tensor<1xsi64>} : (!torch.vtensor<[1],si64>) -> !torch.vtensor<[?],si64> 
-    %9 = torch.operator "onnx.Concat"(%6, %8) {torch.onnx.axis = 0 : si64} : (!torch.vtensor<[2],si64>, !torch.vtensor<[?],si64>) -> !torch.vtensor<[?],si64> 
+    %8 = torch.operator "onnx.ConstantOfShape"(%7) {torch.onnx.value = dense<1> : tensor<1xsi64>} : (!torch.vtensor<[1],si64>) -> !torch.vtensor<[2],si64> 
+    %9 = torch.operator "onnx.Concat"(%6, %8) {torch.onnx.axis = 0 : si64} : (!torch.vtensor<[2],si64>, !torch.vtensor<[2],si64>) -> !torch.vtensor<[4],si64> 
     %10 = torch.operator "onnx.Flatten"(%arg0) {torch.onnx.axis = 2 : si64} : (!torch.vtensor<[2,3,4,5],f32>) -> !torch.vtensor<[6,20],f32> 
     %11 = torch.operator "onnx.Cast"(%10) {torch.onnx.to = 1 : si64} : (!torch.vtensor<[6,20],f32>) -> !torch.vtensor<[6,20],f32> 
     %12 = torch.operator "onnx.Constant"() {torch.onnx.value = dense<1> : tensor<1xsi64>} : () -> !torch.vtensor<[1],si64> 
@@ -30,8 +30,8 @@ module {
     %26 = torch.operator "onnx.Add"(%24, %25) : (!torch.vtensor<[6,20],f32>, !torch.vtensor<[1,20],f32>) -> !torch.vtensor<[6,20],f32> 
     %27 = torch.operator "onnx.Reshape"(%26, %2) : (!torch.vtensor<[6,20],f32>, !torch.vtensor<[4],si64>) -> !torch.vtensor<[2,3,4,5],f32> 
     %28 = torch.operator "onnx.Reciprocal"(%19) : (!torch.vtensor<[6,1],f32>) -> !torch.vtensor<[6,1],f32> 
-    %29 = torch.operator "onnx.Reshape"(%13, %9) : (!torch.vtensor<[6,1],f32>, !torch.vtensor<[?],si64>) -> !torch.vtensor<[2,3,1,1],f32> 
-    %30 = torch.operator "onnx.Reshape"(%28, %9) : (!torch.vtensor<[6,1],f32>, !torch.vtensor<[?],si64>) -> !torch.vtensor<[2,3,1,1],f32> 
+    %29 = torch.operator "onnx.Reshape"(%13, %9) : (!torch.vtensor<[6,1],f32>, !torch.vtensor<[4],si64>) -> !torch.vtensor<[2,3,1,1],f32> 
+    %30 = torch.operator "onnx.Reshape"(%28, %9) : (!torch.vtensor<[6,1],f32>, !torch.vtensor<[4],si64>) -> !torch.vtensor<[2,3,1,1],f32> 
     return %27, %29, %30 : !torch.vtensor<[2,3,4,5],f32>, !torch.vtensor<[2,3,1,1],f32>, !torch.vtensor<[2,3,1,1],f32>
   }
 }

@@ -24,17 +24,17 @@ module {
     %20 = torch.operator "onnx.Sqrt"(%19) : (!torch.vtensor<[?,?,1],f32>) -> !torch.vtensor<[?,?,1],f32> 
     %21 = torch.operator "onnx.Sub"(%12, %14) : (!torch.vtensor<[?,?,?],f32>, !torch.vtensor<[?,?,1],f32>) -> !torch.vtensor<[?,?,?],f32> 
     %22 = torch.operator "onnx.Div"(%21, %20) : (!torch.vtensor<[?,?,?],f32>, !torch.vtensor<[?,?,1],f32>) -> !torch.vtensor<[?,?,?],f32> 
-    %23 = torch.operator "onnx.Reshape"(%22, %3) : (!torch.vtensor<[?,?,?],f32>, !torch.vtensor<[4],si64>) -> !torch.vtensor<[?,?,?,?],f32> 
-    %24 = torch.operator "onnx.Reshape"(%23, %11) : (!torch.vtensor<[?,?,?,?],f32>, !torch.vtensor<[3],si64>) -> !torch.vtensor<[?,?,?],f32> 
-    %25 = torch.operator "onnx.Cast"(%24) {torch.onnx.to = 1 : si64} : (!torch.vtensor<[?,?,?],f32>) -> !torch.vtensor<[?,?,?],f32> 
+    %23 = torch.operator "onnx.Reshape"(%22, %3) : (!torch.vtensor<[?,?,?],f32>, !torch.vtensor<[4],si64>) -> !torch.vtensor<[3,4,2,2],f32> 
+    %24 = torch.operator "onnx.Reshape"(%23, %11) : (!torch.vtensor<[3,4,2,2],f32>, !torch.vtensor<[3],si64>) -> !torch.vtensor<[3,4,4],f32> 
+    %25 = torch.operator "onnx.Cast"(%24) {torch.onnx.to = 1 : si64} : (!torch.vtensor<[3,4,4],f32>) -> !torch.vtensor<[3,4,4],f32> 
     %26 = torch.operator "onnx.Constant"() {torch.onnx.value_ints = [1 : si64, -1 : si64, 1 : si64]} : () -> !torch.vtensor<[3],si64> 
     %27 = torch.operator "onnx.Cast"(%arg1) {torch.onnx.to = 1 : si64} : (!torch.vtensor<[4],f32>) -> !torch.vtensor<[4],f32> 
     %28 = torch.operator "onnx.Cast"(%arg2) {torch.onnx.to = 1 : si64} : (!torch.vtensor<[4],f32>) -> !torch.vtensor<[4],f32> 
     %29 = torch.operator "onnx.Reshape"(%27, %26) : (!torch.vtensor<[4],f32>, !torch.vtensor<[3],si64>) -> !torch.vtensor<[1,4,1],f32> 
     %30 = torch.operator "onnx.Reshape"(%28, %26) : (!torch.vtensor<[4],f32>, !torch.vtensor<[3],si64>) -> !torch.vtensor<[1,4,1],f32> 
-    %31 = torch.operator "onnx.Mul"(%29, %25) : (!torch.vtensor<[1,4,1],f32>, !torch.vtensor<[?,?,?],f32>) -> !torch.vtensor<[?,4,?],f32> 
-    %32 = torch.operator "onnx.Add"(%31, %30) : (!torch.vtensor<[?,4,?],f32>, !torch.vtensor<[1,4,1],f32>) -> !torch.vtensor<[?,4,?],f32> 
-    %33 = torch.operator "onnx.Reshape"(%32, %3) : (!torch.vtensor<[?,4,?],f32>, !torch.vtensor<[4],si64>) -> !torch.vtensor<[3,4,2,2],f32> 
+    %31 = torch.operator "onnx.Mul"(%29, %25) : (!torch.vtensor<[1,4,1],f32>, !torch.vtensor<[3,4,4],f32>) -> !torch.vtensor<[3,4,4],f32> 
+    %32 = torch.operator "onnx.Add"(%31, %30) : (!torch.vtensor<[3,4,4],f32>, !torch.vtensor<[1,4,1],f32>) -> !torch.vtensor<[3,4,4],f32> 
+    %33 = torch.operator "onnx.Reshape"(%32, %3) : (!torch.vtensor<[3,4,4],f32>, !torch.vtensor<[4],si64>) -> !torch.vtensor<[3,4,2,2],f32> 
     return %33 : !torch.vtensor<[3,4,2,2],f32>
   }
 }

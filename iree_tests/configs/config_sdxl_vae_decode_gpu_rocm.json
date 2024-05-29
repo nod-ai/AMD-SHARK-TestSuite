@@ -7,17 +7,14 @@
       "--iree-codegen-transform-dialect-library=${IREE_TEST_PATH_EXTENSION}/attention_and_matmul_spec.mlir"
     ],
     "iree_run_module_flags": [
-      "--device=hip"
+      "--device=hip",
+      "--parameters=model=real_weights.irpa",
+      "--input=1x4x128x128xf16=@inference_input.0.bin",
+      "--expected_output=1x3x1024x1024xf16=@inference_output.0.bin",
+      "--expected_f16_threshold=0.015f"
     ],
-    "skip_compile_tests": [
-      "sdxl-scheduled-unet-3-tank",
-      "sdxl-vae-decode-tank",
-      "sdxl-prompt-encoder-tank"
-    ],
+    "skip_compile_tests": [],
     "skip_run_tests": [],
-    "expected_compile_failures": [
-      "opt-125M", // TODO(#17344): need to regenerate .mlirbc
-      "resnet50",
-    ],
+    "expected_compile_failures": [],
     "expected_run_failures": []
 }

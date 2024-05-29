@@ -98,20 +98,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: cpu_llvm_sync
+          - name: cpu_llvm_task
             runs-on: nodai-amdgpu-w7900-x86-64
             models-config-file: config_pytorch_models_cpu_llvm_task.json
-            sdxl-config-file: config_sdxl_scheduled_unet_cpu_llvm_task.json
+            sdxl-prompt-encoder-config-file: config_sdxl_prompt_encoder_cpu_llvm_task.json
+            sdxl-unet-config-file: config_sdxl_scheduled_unet_cpu_llvm_task.json
+            sdxl-vae-decode-config-file: config_sdxl_vae_decode_cpu_llvm_task.json
           - name: gpu_mi250_rocm
             runs-on: nodai-amdgpu-mi250-x86-64
             models-config-file: config_gpu_rocm_models.json
-            sdxl-config-file: config_sdxl_scheduled_unet_gpu_rocm.json
+            sdxl-prompt-encoder-config-file: config_sdxl_prompt_encoder_gpu_rocm.json
+            sdxl-unet-config-file: config_sdxl_scheduled_unet_gpu_rocm.json
+            sdxl-vae-decode-config-file: config_sdxl_vae_decode_gpu_rocm.json
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
       IREE_TEST_FILES: ~/iree_tests_cache
       IREE_TEST_PATH_EXTENSION: ${{ github.workspace }}/iree_tests/specs
       MODELS_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.models-config-file }}
-      SDXL_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.sdxl-config-file }}
+      SDXL_PROMPT_ENCODER_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.sdxl-prompt-encoder-config-file }}
+      SDXL_UNET_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.sdxl-unet-config-file }}
+      SDXL_VAE_DECODE_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.sdxl-vae-decode-config-file }}
     steps:
       - name: "Checking out repository"
         uses: actions/checkout@v4
@@ -157,7 +163,23 @@ jobs:
             --durations=0 \
             --config-files=${MODELS_CONFIG_FILE_PATH}
 
-      - name: "Running real weights SDXL tests"
+      - name: "Running real weights SDXL prompt encoder tests"
+        id: prompt_encoder
+        if: ${{ !cancelled() }}
+        run: |
+          source ${VENV_DIR}/bin/activate
+          pytest iree_tests/pytorch/models/sdxl-prompt-encoder-tank \
+            -rpfE \
+            -k real_weights \
+            --no-skip-tests-missing-files \
+            --capture=no \
+            --log-cli-level=info \
+            --timeout=1200 \
+            --durations=0 \
+            --config-files=${SDXL_PROMPT_ENCODER_CONFIG_FILE_PATH}
+
+      - name: "Running real weights SDXL scheduled unet tests"
+        id: unet
         if: ${{ !cancelled() }}
         run: |
           source ${VENV_DIR}/bin/activate
@@ -169,10 +191,28 @@ jobs:
             --log-cli-level=info \
             --timeout=1200 \
             --durations=0 \
-            --config-files=${SDXL_CONFIG_FILE_PATH}
+            --config-files=${SDXL_UNET_CONFIG_FILE_PATH}
+      
+      - name: "Running real weights SDXL vae decode tests"
+        id: vae
+        if: ${{ !cancelled() }}
+        run: |
+          source ${VENV_DIR}/bin/activate
+          pytest iree_tests/pytorch/models/sdxl-vae-decode-tank \
+            -rpfE \
+            -k real_weights \
+            --no-skip-tests-missing-files \
+            --capture=no \
+            --log-cli-level=info \
+            --timeout=1200 \
+            --durations=0 \
+            --config-files=${SDXL_VAE_DECODE_CONFIG_FILE_PATH}
 
       - name: "Running SDXL ROCm pipeline benchmark"
-        if: contains(matrix.name, 'rocm')
+        if: |
+          contains(matrix.name, 'rocm') &&
+          steps.prompt_encoder.outcome == 'success' && 
+          steps.unet.outcome == 'success' && steps.vae.outcome == 'success'
         run: |
           source ${VENV_DIR}/bin/activate
           bash iree_tests/benchmarks/benchmark_sdxl_rocm.sh

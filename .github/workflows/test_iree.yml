@@ -9,6 +9,9 @@ on:
   # TODO(scotttodd): run on schedule (nightly), and/or on pushes to `main`
   pull_request:
     paths:
+      # This file itself.
+      - ".github/workflows/test_iree.yml"
+      # The iree_tests subproject.
       - "iree_tests/**"
   workflow_dispatch:
 
@@ -20,29 +23,35 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
   cancel-in-progress: true
 
+
 jobs:
-  linux_x86_64_onnx:
-    name: Linux (x86_64) Onnx
-    runs-on: ubuntu-latest
+  onnx:
+    name: "ONNX :: ${{ matrix.name }} :: ${{ matrix.runs-on }}"
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: cpu_llvm_sync
+            runs-on: ubuntu-24.04
+            config-file: config_onnx_cpu_llvm_sync.json
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
+      CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.config-file }}
     steps:
       - name: "Checking out repository"
         uses: actions/checkout@v4
         with:
           submodules: false
           lfs: true
+
+      # Install Python packages.
       - name: "Setting up Python"
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: "Setup Python venv"
         run: python3 -m venv ${VENV_DIR}
-
-      # TODO(scotttodd): swap this with workflow artifact downloads
-      # TODO(scotttodd): make this configurable with workflow inputs
-      # TODO(scotttodd): pin to a version? in this repo we could just test latest
       - name: "Installing IREE nightly release Python packages"
         run: |
           source ${VENV_DIR}/bin/activate
@@ -51,49 +60,58 @@ jobs:
             --upgrade \
             iree-compiler \
             iree-runtime
-
-      - name: "Installing other Python requirements"
+      - name: "Installing Python test requirements"
         run: |
           source ${VENV_DIR}/bin/activate
           python3 -m pip install -r iree_tests/requirements.txt
 
-      - name: "Running simple tests"
-        run: |
-          source ${VENV_DIR}/bin/activate
-          pytest iree_tests/simple --durations=0
-
+      # Run tests and output new config files as needed.
       - name: "Running the generated ONNX test suite"
         run: |
           source ${VENV_DIR}/bin/activate
-          pytest iree_tests/onnx/node/generated \
+          pytest iree_tests/onnx/ \
             -n auto \
             -rpfE \
             --timeout=30 \
             --durations=10 \
-            --report-log=/tmp/iree_tests_onnx_cpu_logs.json \
-            --config-files=./iree_tests/configs/config_onnx_cpu_llvm_sync.json
-
+            --report-log=/tmp/iree_tests_onnx_${{ matrix.name }}_logs.json \
+            --config-files=${CONFIG_FILE_PATH}
       - name: "Updating config file with latest XFAIL lists"
         if: failure()
         run: |
           source ${VENV_DIR}/bin/activate
           python iree_tests/update_config_xfails.py \
-            --log-file=/tmp/iree_tests_onnx_cpu_logs.json \
-            --config-file=./iree_tests/configs/config_onnx_cpu_llvm_sync.json
-          cat ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
+            --log-file=/tmp/iree_tests_onnx_${{ matrix.name }}_logs.json \
+            --config-file=${CONFIG_FILE_PATH}
+          cat ${CONFIG_FILE_PATH}
       - name: "Uploading new config file"
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: "config_onnx_cpu_llvm_sync.json"
-          path: "./iree_tests/configs/config_onnx_cpu_llvm_sync.json"
+          name: "${{ matrix.config-file }}"
+          path: "${CONFIG_FILE_PATH}"
 
-  linux_x86_64_w7900_cpu_models:
-    name: Linux (x86_64 w7900) Models CPU
-    runs-on: nodai-amdgpu-w7900-x86-64
+  models:
+    name: "Models :: ${{ matrix.name }} :: ${{ matrix.runs-on }}"
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: cpu_llvm_sync
+            runs-on: nodai-amdgpu-w7900-x86-64
+            models-config-file: config_pytorch_models_cpu_llvm_task.json
+            sdxl-config-file: config_sdxl_scheduled_unet_cpu_llvm_task.json
+          - name: gpu_mi250_rocm
+            runs-on: nodai-amdgpu-mi250-x86-64
+            models-config-file: config_gpu_rocm_models.json
+            sdxl-config-file: config_sdxl_scheduled_unet_gpu_rocm.json
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
       IREE_TEST_FILES: ~/iree_tests_cache
+      IREE_TEST_PATH_EXTENSION: ${{ github.workspace }}/iree_tests/specs
+      MODELS_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.models-config-file }}
+      SDXL_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.sdxl-config-file }}
     steps:
       - name: "Checking out repository"
         uses: actions/checkout@v4
@@ -101,9 +119,10 @@ jobs:
           submodules: false
           lfs: true
 
+      # Install Python packages.
+      # Note: skipping actions/setup-python since these self-hosted runners already have Python.
       - name: "Setup Python venv"
         run: python3 -m venv ${VENV_DIR}
-
       - name: "Installing IREE nightly release Python packages"
         run: |
           source ${VENV_DIR}/bin/activate
@@ -112,18 +131,19 @@ jobs:
             --upgrade \
             iree-compiler \
             iree-runtime
-
-      - name: "Installing other Python requirements"
+      - name: "Installing Python test requirements"
         run: |
           source ${VENV_DIR}/bin/activate
           python3 -m pip install -r iree_tests/requirements.txt
 
+      # Download remote files.
       - name: "Downloading remote files for real weight model tests"
         run: |
           source ${VENV_DIR}/bin/activate
           python3 iree_tests/download_remote_files.py --root-dir pytorch/models
 
-      - name: "Running real weight model tests - CPU"
+      - name: "Running real weights model tests"
+        if: ${{ !cancelled() }}
         run: |
           source ${VENV_DIR}/bin/activate
           pytest iree_tests/pytorch/models \
@@ -135,9 +155,10 @@ jobs:
             --log-cli-level=info \
             --timeout=1200 \
             --durations=0 \
-            --config-files=iree_tests/configs/config_pytorch_models_cpu_llvm_task.json
+            --config-files=${MODELS_CONFIG_FILE_PATH}
 
-      - name: "Running real weight model tests - Scheduled UNet CPU"
+      - name: "Running real weights SDXL tests"
+        if: ${{ !cancelled() }}
         run: |
           source ${VENV_DIR}/bin/activate
           pytest iree_tests/pytorch/models/sdxl-scheduled-unet-3-tank \
@@ -148,71 +169,10 @@ jobs:
             --log-cli-level=info \
             --timeout=1200 \
             --durations=0 \
-            --config-files=iree_tests/configs/config_sdxl_scheduled_unet_cpu_llvm_task.json
+            --config-files=${SDXL_CONFIG_FILE_PATH}
 
-  linux_x86_64_mi250_gpu_models:
-    name: Linux (x86_64 mi250) Models GPU
-    runs-on: nodai-amdgpu-mi250-x86-64
-    env:
-      VENV_DIR: ${{ github.workspace }}/.venv
-      IREE_TEST_FILES: ~/iree_tests_cache
-      IREE_TEST_PATH_EXTENSION: ${{ github.workspace }}/iree_tests/specs
-    steps:
-      - name: "Checking out repository"
-        uses: actions/checkout@v4
-        with:
-          submodules: false
-          lfs: true
-
-      - name: "Setup Python venv"
-        run: python3.11 -m venv ${VENV_DIR}
-
-      - name: "Installing IREE nightly release Python packages"
-        run: |
-          source ${VENV_DIR}/bin/activate
-          python3.11 -m pip install \
-            --find-links https://iree.dev/pip-release-links.html \
-            --upgrade \
-            iree-compiler \
-            iree-runtime
-
-      - name: "Installing other Python requirements"
-        run: |
-          source ${VENV_DIR}/bin/activate
-          python3.11 -m pip install -r iree_tests/requirements.txt
-
-      - name: "Downloading remote files for real weight model tests"
-        run: |
-          source ${VENV_DIR}/bin/activate
-          python3.11 iree_tests/download_remote_files.py --root-dir pytorch/models
-
-      - name: "Running real weight model tests - ROCm AMDGPU"
-        run: |
-          source ${VENV_DIR}/bin/activate
-          pytest iree_tests/pytorch/models \
-            -rpfE \
-            -k real_weights \
-            --no-skip-tests-missing-files \
-            --capture=no \
-            --log-cli-level=info \
-            --timeout=1200 \
-            --durations=0 \
-            --config-files=iree_tests/configs/config_gpu_rocm_models.json
-
-      - name: "Running real weight model tests - Scheduled UNet ROCm AMDGPU"
-        run: |
-          source ${VENV_DIR}/bin/activate
-          pytest iree_tests/pytorch/models/sdxl-scheduled-unet-3-tank \
-            -rpfE \
-            -k real_weights \
-            --no-skip-tests-missing-files \
-            --capture=no \
-            --log-cli-level=info \
-            --timeout=1200 \
-            --durations=0 \
-            --config-files=iree_tests/configs/config_sdxl_scheduled_unet_gpu_rocm.json
-
-      - name: "Running SDXL rocm pipeline benchmark"
+      - name: "Running SDXL ROCm pipeline benchmark"
+        if: contains(matrix.name, 'rocm')
         run: |
           source ${VENV_DIR}/bin/activate
           bash iree_tests/benchmarks/benchmark_sdxl_rocm.sh

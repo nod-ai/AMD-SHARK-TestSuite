@@ -9,6 +9,7 @@
 
 import argparse
 import pickle
+import torch
 
 from turbine_models.model_builder import HFTransformerBuilder
 import shark_turbine.aot as aot

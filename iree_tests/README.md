@@ -344,8 +344,6 @@ python ./iree_tests/onnx/import_tests.py
 
     Notes:
 
-    * You may need to comment out the torch-mlir install from `requirements.txt`
-      on non-Linux.
     * You may need to downgrade numpy:
 
         ```bash

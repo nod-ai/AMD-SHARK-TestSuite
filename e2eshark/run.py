@@ -199,7 +199,7 @@ def runOnnxToTorchMLIRGeneration(
         # If local iree build provided use that instead of using the one installed
         # in user's env
         if SHARED_IREE_BUILD:
-            iree_python_path = f"PYHONPATH={SHARED_IREE_BUILD}/compiler/bindings/python"
+            iree_python_path = f"PYTHONPATH={SHARED_IREE_BUILD}/compiler/bindings/python"
             iree_import_onnx = f"{iree_python_path} python -m iree.compiler.tools.import_onnx"
         scriptcommand = (
             iree_import_onnx
@@ -255,7 +255,7 @@ def runTorchMLIRGeneration(
 
     torch_mlir_pythonpath = ""
     if SHARED_TORCH_MLIR_BUILD:
-        torch_mlir_pythonpath = f"PYHONPATH={SHARED_TORCH_MLIR_BUILD}/tools/torch-mlir/python_packages/torch_mlir"
+        torch_mlir_pythonpath = f"PYTHONPATH={SHARED_TORCH_MLIR_BUILD}/tools/torch-mlir/python_packages/torch_mlir"
         scriptcommand = f"{torch_mlir_pythonpath} {scriptcommand}"
 
     # Phase = 0, Run the model.py first

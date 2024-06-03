@@ -88,8 +88,8 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.config-file }}"
-          path: "${CONFIG_FILE_PATH}"
+          name: ${{ matrix.config-file }}
+          path: ${{ env.CONFIG_FILE_PATH }}
 
   models:
     name: "Models :: ${{ matrix.name }} :: ${{ matrix.runs-on }}"
@@ -192,7 +192,7 @@ jobs:
             --timeout=1200 \
             --durations=0 \
             --config-files=${SDXL_UNET_CONFIG_FILE_PATH}
-      
+
       - name: "Running real weights SDXL vae decode tests"
         id: vae
         if: ${{ !cancelled() }}
@@ -211,7 +211,7 @@ jobs:
       - name: "Running SDXL ROCm pipeline benchmark"
         if: |
           contains(matrix.name, 'rocm') &&
-          steps.prompt_encoder.outcome == 'success' && 
+          steps.prompt_encoder.outcome == 'success' &&
           steps.unet.outcome == 'success' && steps.vae.outcome == 'success'
         run: |
           source ${VENV_DIR}/bin/activate

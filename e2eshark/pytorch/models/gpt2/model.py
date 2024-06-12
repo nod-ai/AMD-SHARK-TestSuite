@@ -6,6 +6,7 @@
 
 import sys
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
+import torch
 
 # import from e2eshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
@@ -46,3 +47,14 @@ print("Output:", E2ESHARK_CHECK["output"])
 # For geneartive AI models, input is int and should be kept that way for
 # casted models as well
 E2ESHARK_CHECK["inputtodtype"] = False
+
+# Post process output to do:
+# torch.nn.functional.softmax(output, -1)
+# The output logits is the shape of (B, S, V).
+# (batch size, sequence length, unormalized scores for each possible token in vocabulary)
+# This way we create a probability distribution for each possible token (vocabulary)
+# for each position in the sequence by doing softmax over the last dimension.
+E2ESHARK_CHECK["postprocess"] = [
+    (torch.nn.functional.softmax, [-1], False, 0),
+    (torch.topk, [1, -1], True, 1),
+]

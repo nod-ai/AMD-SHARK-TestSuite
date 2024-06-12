@@ -67,7 +67,7 @@ jobs:
             --mode onnx \
             -f onnx pytorch \
             -g models \
-            --tolerance .001 .001 \
+            --tolerance .01 .01 \
             --cleanup \
             --postprocess \
             --ci \

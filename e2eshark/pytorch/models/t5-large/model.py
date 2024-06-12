@@ -53,3 +53,6 @@ print("Output:", E2ESHARK_CHECK["output"])
 # For geneartive AI models, input is int and should be kept that way for
 # casted models as well
 E2ESHARK_CHECK["inputtodtype"] = False
+
+# not possible to postprocess output here (model outputs text, not probability distribution/logits)
+# example use of this model input: "translate this sentence to spanish: Hi" -> output: "Hola"

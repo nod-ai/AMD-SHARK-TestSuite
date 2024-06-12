@@ -40,10 +40,11 @@ print("Input:", E2ESHARK_CHECK["input"])
 print("Output:", E2ESHARK_CHECK["output"])
 
 # Post process output to do:
-# sort(topk(torch.nn.functional.softmax(output, 0), 2)[1])[0]
+# Shape of model_output: (batch_size, num_classes, height, width) (1, 64, 128, 128)
+# squeeze(topk(torch.nn.functional.softmax(output, dim=1), k=1, dim=1)[1], dim=1)
 # Top most probability
-# E2ESHARK_CHECK["postprocess"] = [
-#     (torch.nn.functional.softmax, [0], False, 0),
-#     (torch.topk, [2], True, 1),
-#     (torch.sort, [], True, 0),
-# ]
+E2ESHARK_CHECK["postprocess"] = [
+    (torch.nn.functional.softmax, [1], False, 0),
+    (torch.topk, [1, 1], True, 1),
+    (torch.squeeze, [1], False, 0),
+]

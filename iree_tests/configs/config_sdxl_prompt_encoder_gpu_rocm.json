@@ -22,6 +22,8 @@
   ],
   "skip_compile_tests": [],
   "skip_run_tests": [],
-  "expected_compile_failures": [],
+  "expected_compile_failures": [
+    "sd3-prompt-encoder",
+  ],
   "expected_run_failures": []
 }

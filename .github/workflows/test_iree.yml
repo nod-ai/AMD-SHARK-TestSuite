@@ -104,12 +104,14 @@ jobs:
             sdxl-prompt-encoder-config-file: config_sdxl_prompt_encoder_cpu_llvm_task.json
             sdxl-unet-config-file: config_sdxl_scheduled_unet_cpu_llvm_task.json
             sdxl-vae-decode-config-file: config_sdxl_vae_decode_cpu_llvm_task.json
+            backend: cpu
           - name: gpu_mi250_rocm
             runs-on: nodai-amdgpu-mi250-x86-64
             models-config-file: config_gpu_rocm_models.json
             sdxl-prompt-encoder-config-file: config_sdxl_prompt_encoder_gpu_rocm.json
             sdxl-unet-config-file: config_sdxl_scheduled_unet_gpu_rocm.json
             sdxl-vae-decode-config-file: config_sdxl_vae_decode_gpu_rocm.json
+            backend: rocm
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
       IREE_TEST_FILES: ~/iree_tests_cache
@@ -192,6 +194,8 @@ jobs:
             --timeout=1200 \
             --durations=0 \
             --config-files=${SDXL_UNET_CONFIG_FILE_PATH}
+        env:
+          IREE_TEST_BACKEND: ${{ matrix.backend }}
 
       - name: "Running real weights SDXL vae decode tests"
         id: vae

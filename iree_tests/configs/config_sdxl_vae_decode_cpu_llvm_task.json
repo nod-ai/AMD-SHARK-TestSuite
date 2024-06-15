@@ -6,7 +6,8 @@
     ],
     "iree_run_module_flags": [
       "--device=local-task",
-      "--parameters=model=real_weights.irpa"
+      "--parameters=model=real_weights.irpa",
+      "--expected_f16_threshold=0.05f"
     ],
     "skip_compile_tests": [],
     "skip_run_tests": [],

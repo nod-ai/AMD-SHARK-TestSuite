@@ -12,7 +12,8 @@
     "iree_run_module_flags": [
       "--device=local-task",
       "--parameters=model=real_weights.irpa",
-      "--expected_f32_threshold=0.01f"
+      "--expected_f32_threshold=0.01f",
+      "--expected_f16_threshold=0.02f"
     ],
     "skip_compile_tests": [],
     "skip_run_tests": [],

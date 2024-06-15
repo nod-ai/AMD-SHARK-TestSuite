@@ -320,7 +320,7 @@ class IreeCompileRunItem(pytest.Item):
         self.run_args = ["iree-run-module", f"--module={vmfb_name}"]
         self.run_args.extend(self.spec.iree_run_module_flags)
 
-        # expand data flag file, so beter for logging and can use environmnet variables
+        # expand data flag file, so beter for logging and can use environment variables
         flag_file_path = f"{self.test_cwd}/{self.spec.data_flagfile_name}"
         file = open(flag_file_path)
         for line in file:

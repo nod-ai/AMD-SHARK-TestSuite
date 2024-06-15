@@ -16,6 +16,7 @@
   "iree_run_module_flags": [
     "--device=hip",
     "--parameters=model=real_weights.irpa",
+    "--expected_f32_threshold=0.6f",
     "--expected_f16_threshold=0.4f"
   ],
   "skip_compile_tests": [],

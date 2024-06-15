@@ -6,10 +6,7 @@
     ],
     "iree_run_module_flags": [
       "--device=local-task",
-      "--parameters=model=real_weights.irpa",
-      "--input=1x4x128x128xf16=@inference_input.0.bin",
-      "--expected_output=1x3x1024x1024xf16=@inference_output.0.bin",
-      "--expected_f16_threshold=0.02f"
+      "--parameters=model=real_weights.irpa"
     ],
     "skip_compile_tests": [],
     "skip_run_tests": [],

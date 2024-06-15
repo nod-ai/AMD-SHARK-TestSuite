@@ -1,0 +1,5 @@
+--input="2x16x128x128xf16"
+--input="2x154x4096xf16"
+--input="2x2048xf16"
+--input="1xf16"
+--parameters=splats.irpa

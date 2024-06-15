@@ -1,0 +1,22 @@
+{
+  "file_format": "test_cases_v0",
+  "test_cases": [
+    {
+      "name": "splats",
+      "runtime_flagfile": "splat_data_flags.txt",
+      "remote_files": []
+    },
+    {
+      "name": "real_weights",
+      "runtime_flagfile": "real_weights_data_flags.txt",
+      "remote_files": [
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/sai/sd3-mmdit/inference_input.0.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/sai/sd3-mmdit/inference_input.1.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/sai/sd3-mmdit/inference_input.2.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/sai/sd3-mmdit/inference_input.3.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/sai/sd3-mmdit/inference_output.0.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/sai/sd3-mmdit/real_weights.irpa"
+      ]
+    }
+  ]
+}

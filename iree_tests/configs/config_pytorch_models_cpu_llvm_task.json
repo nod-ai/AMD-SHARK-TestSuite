@@ -10,7 +10,10 @@
     "skip_compile_tests": [
       "sdxl-scheduled-unet-3-tank",
       "sdxl-vae-decode-tank",
-      "sdxl-prompt-encoder-tank"
+      "sdxl-prompt-encoder-tank",
+      "sd3-mmdit",
+      "sd3-vae-decode",
+      "sd3-prompt-encoder"
     ],
     "skip_run_tests": [],
     "expected_compile_failures": [

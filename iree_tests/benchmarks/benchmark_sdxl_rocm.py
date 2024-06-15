@@ -12,9 +12,9 @@ import subprocess
 
 benchmark_dir = os.path.dirname(os.path.realpath(__file__))
 iree_root = os.path.dirname(benchmark_dir)
-prompt_encoder_dir = f"{iree_root}/pytorch/models/sdxl-prompt-encoder-tank"
-scheduled_unet_dir = f"{iree_root}/pytorch/models/sdxl-scheduled-unet-3-tank"
-vae_decode_dir = f"{iree_root}/pytorch/models/sdxl-vae-decode-tank"
+prompt_encoder_dir = f"{iree_root}/pytorch/models/sd-clip/sdxl-prompt-encoder-tank"
+scheduled_unet_dir = f"{iree_root}/pytorch/models/sd-unet/sdxl-scheduled-unet-3-tank"
+vae_decode_dir = f"{iree_root}/pytorch/models/sd-vae/sdxl-vae-decode-tank"
 
 def run_iree_command(args: Sequence[str] = ()):
     command = "Exec:", " ".join(args)

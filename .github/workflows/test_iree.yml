@@ -101,16 +101,16 @@ jobs:
           - name: cpu_llvm_task
             runs-on: nodai-amdgpu-w7900-x86-64
             models-config-file: config_pytorch_models_cpu_llvm_task.json
-            sdxl-prompt-encoder-config-file: config_sdxl_prompt_encoder_cpu_llvm_task.json
-            sdxl-unet-config-file: config_sdxl_scheduled_unet_cpu_llvm_task.json
-            sdxl-vae-decode-config-file: config_sdxl_vae_decode_cpu_llvm_task.json
+            sdxl-prompt-encoder-config-file: config_sd_prompt_encoder_cpu_llvm_task.json
+            sdxl-unet-config-file: config_sd_scheduled_unet_cpu_llvm_task.json
+            sdxl-vae-decode-config-file: config_sd_vae_decode_cpu_llvm_task.json
             backend: cpu
           - name: gpu_mi250_rocm
             runs-on: nodai-amdgpu-mi250-x86-64
             models-config-file: config_gpu_rocm_models.json
-            sdxl-prompt-encoder-config-file: config_sdxl_prompt_encoder_gpu_rocm.json
-            sdxl-unet-config-file: config_sdxl_scheduled_unet_gpu_rocm.json
-            sdxl-vae-decode-config-file: config_sdxl_vae_decode_gpu_rocm.json
+            sdxl-prompt-encoder-config-file: config_sd_prompt_encoder_gpu_rocm.json
+            sdxl-unet-config-file: config_sd_scheduled_unet_gpu_rocm.json
+            sdxl-vae-decode-config-file: config_sd_vae_decode_gpu_rocm.json
             backend: rocm
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
@@ -165,12 +165,12 @@ jobs:
             --durations=0 \
             --config-files=${MODELS_CONFIG_FILE_PATH}
 
-      - name: "Running real weights SDXL prompt encoder tests"
+      - name: "Running real weights SDXL + SD3 prompt encoder tests"
         id: prompt_encoder
         if: ${{ !cancelled() }}
         run: |
           source ${VENV_DIR}/bin/activate
-          pytest iree_tests/pytorch/models/sdxl-prompt-encoder-tank \
+          pytest iree_tests/pytorch/models/sd-clip \
             -rpfE \
             -k real_weights \
             --no-skip-tests-missing-files \
@@ -180,12 +180,12 @@ jobs:
             --durations=0 \
             --config-files=${SDXL_PROMPT_ENCODER_CONFIG_FILE_PATH}
 
-      - name: "Running real weights SDXL scheduled unet tests"
+      - name: "Running real weights SDXL + SD3 scheduled unet/mmdit tests"
         id: unet
         if: ${{ !cancelled() }}
         run: |
           source ${VENV_DIR}/bin/activate
-          pytest iree_tests/pytorch/models/sdxl-scheduled-unet-3-tank \
+          pytest iree_tests/pytorch/models/sd-unet \
             -rpfE \
             -k real_weights \
             --no-skip-tests-missing-files \
@@ -197,12 +197,12 @@ jobs:
         env:
           IREE_TEST_BACKEND: ${{ matrix.backend }}
 
-      - name: "Running real weights SDXL vae decode tests"
+      - name: "Running real weights SDXL + SD3 vae decode tests"
         id: vae
         if: ${{ !cancelled() }}
         run: |
           source ${VENV_DIR}/bin/activate
-          pytest iree_tests/pytorch/models/sdxl-vae-decode-tank \
+          pytest iree_tests/pytorch/models/sd-vae \
             -rpfE \
             -k real_weights \
             --no-skip-tests-missing-files \

@@ -325,7 +325,6 @@ class IreeCompileRunItem(pytest.Item):
         file = open(flag_file_path)
         for line in file:
             self.run_args.append(line.rstrip())
-        logging.getLogger().info(self.run_args)
 
     def runtest(self):
         # TODO(scotttodd): log files needed by the test (remote files / git LFS)

@@ -63,7 +63,7 @@ jobs:
           HF_TOKEN=${{ secrets.HF_TOKEN }} AZ_PRIVATE_CONNECTION=${{ secrets.AZ_PRIVATE_CONNECTION }} python3.11 ./run.py \
             -r ./test-onnx \
             --report \
-            --cachedir ~/sai/huggingface_cache \
+            --cachedir ~/sai/test-suite-ci-cache \
             --mode onnx \
             -f onnx pytorch \
             -g models \
@@ -91,7 +91,7 @@ jobs:
           HF_TOKEN=${{ secrets.HF_TOKEN }} python3.11 ./run.py \
           -r ./test-turbine \
           --report \
-          --cachedir ~/sai/huggingface_cache \
+          --cachedir ~/sai/test-suite-ci-cache \
           --mode turbine \
           -g models \
           --cleanup \

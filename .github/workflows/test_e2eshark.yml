@@ -91,7 +91,7 @@ jobs:
           HF_TOKEN=${{ secrets.HF_TOKEN }} python3.11 ./run.py \
           -r ./test-turbine \
           --report \
-          --cachedir ~/huggingface_cache \
+          --cachedir ~/sai/huggingface_cache \
           --mode turbine \
           -g models \
           --cleanup \

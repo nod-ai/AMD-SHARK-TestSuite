@@ -63,7 +63,7 @@ jobs:
           HF_TOKEN=${{ secrets.HF_TOKEN }} AZ_PRIVATE_CONNECTION=${{ secrets.AZ_PRIVATE_CONNECTION }} python3.11 ./run.py \
             -r ./test-onnx \
             --report \
-            --cachedir ~/huggingface_cache \
+            --cachedir ~/sai/huggingface_cache \
             --mode onnx \
             -f onnx pytorch \
             -g models \

@@ -82,11 +82,19 @@ if args.todtype != "default":
 
 if runmode == "onnx" or runmode == "ort":
     onnx_name = outfileprefix + ".onnx"
-    if not isinstance(E2ESHARK_CHECK["input"], list):
-        onnx_program = torch.onnx.export(model, E2ESHARK_CHECK["input"], onnx_name, opset_version=18)
+    if args.outfileprefix == "llama2-7b-GPTQ" or args.outfileprefix == "opt-125m-gptq":
+        if not isinstance(E2ESHARK_CHECK["input"], list):
+            onnx_program = torch.onnx.export(model, E2ESHARK_CHECK["input"], onnx_name, opset_version=18)
+        else:
+            onnx_program = torch.onnx.export(
+                model, tuple(E2ESHARK_CHECK["input"]), onnx_name, opset_version=18
+        )
     else:
-        onnx_program = torch.onnx.export(
-            model, tuple(E2ESHARK_CHECK["input"]), onnx_name, opset_version=18
+        if not isinstance(E2ESHARK_CHECK["input"], list):
+            onnx_program = torch.onnx.export(model, E2ESHARK_CHECK["input"], onnx_name)
+        else:
+            onnx_program = torch.onnx.export(
+                model, tuple(E2ESHARK_CHECK["input"]), onnx_name
         )
 elif runmode == "direct":
     torch_mlir_name = outfileprefix + ".pytorch.torch.mlir"

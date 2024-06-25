@@ -215,15 +215,18 @@ jobs:
           steps.unet.outcome == 'success' && steps.vae.outcome == 'success'
         run: |
           source ${VENV_DIR}/bin/activate
-          pytest iree_tests/benchmarks/benchmark_sdxl_rocm.py \
+          pytest iree_tests/benchmarks/sdxl/benchmark_sdxl_rocm.py \
             --goldentime-rocm-e2e-ms 1661.5 \
             --goldentime-rocm-unet-ms 450.5 \
             --goldentime-rocm-clip-ms 19 \
             --goldentime-rocm-vae-ms 288.5 \
+            --goldendispatch-rocm-unet 1718 \
+            --goldendispatch-rocm-clip 1571 \
+            --goldendispatch-rocm-vae 250 \
+            --goldensize-rocm-unet-bytes 2088217 \
+            --goldensize-rocm-clip-bytes 785493 \
+            --goldensize-rocm-vae-bytes 762067 \
             --gpu-number 6 \
             --rocm-chip gfx90a \
-            --log-cli-level=info \
-            --retries 3
-          echo "### SDXL Benchmark Summary:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
-          echo "$(<job_summary.txt )" >> $GITHUB_STEP_SUMMARY
+            --log-cli-level=info
+          echo "$(<job_summary.md )" >> $GITHUB_STEP_SUMMARY

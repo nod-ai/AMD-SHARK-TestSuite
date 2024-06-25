@@ -48,12 +48,12 @@ model_output = session.run(
         inputs[0].name: model_input_X,
         inputs[1].name: model_input_Y
     },
-)[0]
-E2ESHARK_CHECK["inputs"] = [torch.from_numpy(model_input_X), torch.from_numpy(model_input_Y)]
-E2ESHARK_CHECK["outputs"] = [torch.from_numpy(arr) for arr in model_output]
+)
+E2ESHARK_CHECK["input"] = [torch.from_numpy(model_input_X), torch.from_numpy(model_input_Y)]
+E2ESHARK_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
 
-print("Input:", E2ESHARK_CHECK["inputs"])
-print("Output:", E2ESHARK_CHECK["outputs"])
+print("Input:", E2ESHARK_CHECK["input"])
+print("Output:", E2ESHARK_CHECK["output"])
 
 # Post process output to do:
 # sort(topk(torch.nn.functional.softmax(output, 0), 2)[1])[0]

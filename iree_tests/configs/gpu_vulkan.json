@@ -8,8 +8,8 @@
   ],
   "skip_compile_tests": [
     // TODO(#16666): Fix these tests hanging at runtime (miscompiles?)
-    "test_dequantizelinear",
-    "test_slice_default_axes",
+    "onnx/node/generated/test_dequantizelinear",
+    "onnx/node/generated/test_slice_default_axes",
   ],
   "skip_run_tests": [],
   "expected_compile_failures": [

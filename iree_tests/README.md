@@ -67,7 +67,7 @@ Tests are run using the [pytest](https://docs.pytest.org/en/stable/) framework.
 A [`conftest.py`](conftest.py) file collects test cases from subdirectories,
 wrapping each directory matching the format described above to one test case
 per test configuration. Test configurations are defined in JSON config files
-like [`configs/config_onnx_cpu_llvm_sync.json`](./configs/config_onnx_cpu_llvm_sync.json).
+like [`configs/onnx_cpu_llvm_sync.json`](./configs/onnx_cpu_llvm_sync.json).
 
 ### Common venv setup with deps
 
@@ -109,10 +109,10 @@ $ pytest iree_tests -n auto
 Run tests using custom config files:
 
 ```bash
-$ pytest iree_tests --config-files ./iree_tests/configs/config_gpu_vulkan.json
+$ pytest iree_tests --config-files ./iree_tests/configs/gpu_vulkan.json
 
 # OR set an environment variable
-$ export IREE_TEST_CONFIG_FILES=/iree/config_cpu_llvm_sync.json;/iree/config_gpu_vulkan.json
+$ export IREE_TEST_CONFIG_FILES=/iree/cpu_llvm_sync.json;/iree/gpu_vulkan.json
 $ pytest iree_tests
 ```
 
@@ -120,14 +120,14 @@ Run ONNX tests on CPU and print all errors:
 
 ```bash
 $ pytest iree_tests/onnx -n auto --ignore-xfails \
-    --config-files ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
+    --config-files ./iree_tests/configs/onnx_cpu_llvm_sync.json
 ```
 
 Run ONNX compilation tests only and print all errors:
 
 ```bash
 $ pytest iree_tests/onnx -n auto --ignore-xfails --skip-all-runs \
-    --config-files ./iree_tests/configs/config_onnx_cpu_llvm_sync.json
+    --config-files ./iree_tests/configs/onnx_cpu_llvm_sync.json
 ```
 
 ### Updating expected failure lists
@@ -151,7 +151,7 @@ To update these lists using the results of a test run:
     ```bash
     $ pytest iree_tests/onnx \
       --report-log=/tmp/onnx_cpu_logs.json \
-      --config-files=config_onnx_cpu.json \
+      --config-files=onnx_cpu.json \
       ...
     ```
 
@@ -160,7 +160,7 @@ To update these lists using the results of a test run:
     ```bash
     $ python iree_tests/update_config_xfails.py \
       --log-file=/tmp/onnx_cpu_logs.json \
-      --config-file=config_onnx_cpu.json
+      --config-file=onnx_cpu.json
     ```
 
 You can also update the config JSON files manually. The log output on its own

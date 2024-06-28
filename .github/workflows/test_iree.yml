@@ -23,7 +23,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
   cancel-in-progress: true
 
-
 jobs:
   onnx:
     name: "ONNX :: ${{ matrix.name }} :: ${{ matrix.runs-on }}"
@@ -34,7 +33,7 @@ jobs:
         include:
           - name: cpu_llvm_sync
             runs-on: ubuntu-24.04
-            config-file: config_onnx_cpu_llvm_sync.json
+            config-file: onnx_cpu_llvm_sync.json
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
       CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.config-file }}
@@ -49,7 +48,7 @@ jobs:
       - name: "Setting up Python"
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
       - name: "Setup Python venv"
         run: python3 -m venv ${VENV_DIR}
       - name: "Installing IREE nightly release Python packages"
@@ -99,17 +98,17 @@ jobs:
       matrix:
         include:
           - name: cpu_llvm_task
-            runs-on: nodai-amdgpu-w7900-x86-64
-            models-config-file: config_pytorch_models_cpu_llvm_task.json
-            sdxl-prompt-encoder-config-file: config_sdxl_prompt_encoder_cpu_llvm_task.json
-            sdxl-unet-config-file: config_sdxl_scheduled_unet_cpu_llvm_task.json
-            sdxl-vae-decode-config-file: config_sdxl_vae_decode_cpu_llvm_task.json
+            runs-on: nodai-amdgpu-mi250-x86-64
+            models-config-file: models_cpu_llvm_task.json
+            sdxl-prompt-encoder-config-file: sdxl_prompt_encoder_cpu_llvm_task.json
+            sdxl-unet-config-file: sdxl_scheduled_unet_cpu_llvm_task.json
+            sdxl-vae-decode-config-file: sdxl_vae_decode_cpu_llvm_task.json
           - name: gpu_mi250_rocm
             runs-on: nodai-amdgpu-mi250-x86-64
-            models-config-file: config_gpu_rocm_models.json
-            sdxl-prompt-encoder-config-file: config_sdxl_prompt_encoder_gpu_rocm.json
-            sdxl-unet-config-file: config_sdxl_scheduled_unet_gpu_rocm.json
-            sdxl-vae-decode-config-file: config_sdxl_vae_decode_gpu_rocm.json
+            models-config-file: models_gpu_rocm_gfx90a.json
+            sdxl-prompt-encoder-config-file: sdxl_prompt_encoder_gpu_rocm.json
+            sdxl-unet-config-file: sdxl_scheduled_unet_gpu_rocm.json
+            sdxl-vae-decode-config-file: sdxl_vae_decode_gpu_rocm.json
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
       IREE_TEST_FILES: ~/iree_tests_cache
@@ -220,9 +219,9 @@ jobs:
             --goldentime-rocm-unet-ms 450.5 \
             --goldentime-rocm-clip-ms 19 \
             --goldentime-rocm-vae-ms 288.5 \
-            --goldendispatch-rocm-unet 1718 \
-            --goldendispatch-rocm-clip 1571 \
-            --goldendispatch-rocm-vae 250 \
+            --goldendispatch-rocm-unet 1714 \
+            --goldendispatch-rocm-clip 1569 \
+            --goldendispatch-rocm-vae 248 \
             --goldensize-rocm-unet-bytes 2088217 \
             --goldensize-rocm-clip-bytes 785493 \
             --goldensize-rocm-vae-bytes 762067 \

@@ -10,14 +10,14 @@
       "--device=hip"
     ],
     "skip_compile_tests": [
-      "sdxl-scheduled-unet-3-tank",
-      "sdxl-vae-decode-tank",
-      "sdxl-prompt-encoder-tank"
+      "pytorch/models/sdxl-scheduled-unet-3-tank",
+      "pytorch/models/sdxl-vae-decode-tank",
+      "pytorch/models/sdxl-prompt-encoder-tank"
     ],
     "skip_run_tests": [],
     "expected_compile_failures": [
-      "opt-125M", // TODO(#17344): need to regenerate .mlirbc
-      "resnet50",
+      "pytorch/models/opt-125M", // TODO(#17344): need to regenerate .mlirbc
+      "pytorch/models/resnet50",
     ],
     "expected_run_failures": []
 }

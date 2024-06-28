@@ -1,0 +1,13 @@
+{
+  "file_format": "test_cases_v0",
+  "test_cases": [
+    {
+      "name": "real_weights_prefill",
+      "runtime_flagfile": "real_weights_prefill_data_flags.txt",
+      "remote_files": [
+        "https://huggingface.co/SlyEcho/open_llama_3b_v2_gguf/resolve/main/open-llama-3b-v2-f16.gguf",
+        // TODO: files for real inputs and real expected outputs
+      ]
+    }
+  ]
+}

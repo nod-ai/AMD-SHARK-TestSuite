@@ -18,6 +18,9 @@
     "expected_compile_failures": [
       "pytorch/models/opt-125M", // TODO(#17344): need to regenerate .mlirbc
       "pytorch/models/resnet50",
+      // error: 'builtin.module' op failed to run transform dialect passes
+      // (might need to drop the iree-codegen-transform-dialect-library flag)
+      "sharktank/llama/open-llama-3b-v2-f16"
     ],
     "expected_run_failures": []
 }

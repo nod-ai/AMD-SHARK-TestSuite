@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 from azure.storage.blob import BlobClient, BlobProperties
+from huggingface_hub import hf_hub_download
 from pathlib import Path
 from typing import Optional
 import argparse
@@ -145,6 +146,56 @@ def download_azure_remote_file(
         setup_cache_symlink_if_needed(cache_dir, test_dir, remote_file_name)
 
 
+def download_huggingface_remote_file(
+    remote_file: str, test_dir: Path, override_cache_dir: Optional[Path]
+):
+    """
+    Downloads a file from Hugging Face into test_dir.
+
+    A symlink will be created from a cache directory to the test directory.
+    The cache directory follows the structure described at
+    https://huggingface.co/docs/huggingface_hub/en/guides/manage-cache.
+
+    * If cache_dir is set, the cache will be rooted in that location
+    * If cache_dir is *not* set, the default from Hugging Face Hub will be used
+      This is typically your user home directory, or the HF_HOME / HF_HUB_CACHE
+      environment variable.
+    """
+    remote_file_name = remote_file.rsplit("/", 1)[-1]
+    relative_dir = test_dir.relative_to(THIS_DIR)
+
+    # Extract path components from Hugging Face URL to use with huggingface_hub.
+    # (https://pypi.org/project/huggingface-hub/).
+    #
+    # For example:
+    #   https://huggingface.co/SlyEcho/open_llama_3b_v2_gguf/resolve/main/open-llama-3b-v2-q4_0.gguf
+    #                          ^---------------------------^         ^    ^
+    #   repo_id:  SlyEcho/open_llama_3b_v2_gguf
+    #   revision: main
+    #   filename: open-llama-3b-v2-q4_0.gguf
+    result = re.search(r"https://huggingface.co/(.+)/resolve/(.+)/(.+)", remote_file)
+    repo_id = result.groups()[0]
+    revision = result.groups()[1]
+    filename = result.groups()[2]
+
+    logger.info(
+        f"  Downloading '{remote_file_name}' from '{repo_id}' to '{relative_dir}'"
+    )
+
+    # TODO(scotttodd): provide authentication token? (can also inherit from env)
+    downloaded_file_path = hf_hub_download(
+        repo_id=repo_id,
+        filename=filename,
+        revision=revision,
+        cache_dir=override_cache_dir,
+    )
+    setup_cache_symlink_if_needed(
+        cache_dir=Path(downloaded_file_path).parent,
+        local_dir=test_dir,
+        file_name=remote_file_name,
+    )
+
+
 def download_generic_remote_file(
     remote_file: str, test_dir: Path, cache_dir: Optional[Path]
 ):
@@ -178,6 +229,8 @@ def download_files_for_test_case(
     for remote_file in test_case_json["remote_files"]:
         if "blob.core.windows.net" in remote_file:
             download_azure_remote_file(remote_file, test_dir, cache_dir)
+        elif "huggingface" in remote_file:
+            download_huggingface_remote_file(remote_file, test_dir, cache_dir)
         else:
             download_generic_remote_file(remote_file, test_dir, cache_dir)
 

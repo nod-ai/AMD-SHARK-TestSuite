@@ -9,6 +9,7 @@ pytest-check
 
 # Remote file downloading
 azure-storage-blob
+huggingface-hub
 
 # Markdown table generator
 tabulate

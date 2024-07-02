@@ -16,7 +16,6 @@ import os
 import pyjson5
 import re
 
-THIS_DIR = Path(__file__).parent
 REPO_ROOT = Path(__file__).parent.parent
 logger = logging.getLogger(__name__)
 
@@ -88,7 +87,7 @@ def download_azure_remote_file(
     test_dir/file_name to cache_dir/file_name.
     """
     remote_file_name = remote_file.rsplit("/", 1)[-1]
-    relative_dir = test_dir.relative_to(THIS_DIR)
+    relative_dir = test_dir.relative_to(REPO_ROOT)
 
     # Extract path components from Azure URL to use with the Azure Storage Blobs
     # client library for Python (https://pypi.org/project/azure-storage-blob/).
@@ -162,7 +161,7 @@ def download_huggingface_remote_file(
       environment variable.
     """
     remote_file_name = remote_file.rsplit("/", 1)[-1]
-    relative_dir = test_dir.relative_to(THIS_DIR)
+    relative_dir = test_dir.relative_to(REPO_ROOT)
 
     # Extract path components from Hugging Face URL to use with huggingface_hub.
     # (https://pypi.org/project/huggingface-hub/).
@@ -263,20 +262,20 @@ if __name__ == "__main__":
     # TODO(scotttodd): build list of files _then_ download
     # TODO(scotttodd): report size needed for requested files and size available on disk
 
-    for test_cases_path in (THIS_DIR / args.root_dir).rglob("*.json"):
+    for test_cases_path in (REPO_ROOT / args.root_dir).rglob("*.json"):
         with open(test_cases_path) as f:
             test_cases_json = pyjson5.load(f)
             if test_cases_json.get("file_format", "") != "test_cases_v0":
                 continue
 
-            logger.info(f"Processing {test_cases_path.relative_to(THIS_DIR)}")
+            logger.info(f"Processing {test_cases_path.relative_to(REPO_ROOT)}")
 
             test_dir = test_cases_path.parent
-            relative_dir = test_dir.relative_to(THIS_DIR)
+            relative_dir = test_dir.relative_to(REPO_ROOT)
 
             # Expand directory structure in the cache matching the test tree.
             if args.cache_dir:
-                cache_dir_for_test = args.cache_dir / "iree_tests" / relative_dir
+                cache_dir_for_test = args.cache_dir / relative_dir
                 if not os.path.isdir(cache_dir_for_test):
                     os.makedirs(cache_dir_for_test)
             else:

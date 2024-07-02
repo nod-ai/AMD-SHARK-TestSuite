@@ -15,10 +15,10 @@ import tabulate
 from pytest_check import check
 
 benchmark_dir = os.path.dirname(os.path.realpath(__file__))
-iree_root = os.path.dirname(os.path.dirname(benchmark_dir))
-prompt_encoder_dir = f"{iree_root}/pytorch/models/sdxl-prompt-encoder-tank"
-scheduled_unet_dir = f"{iree_root}/pytorch/models/sdxl-scheduled-unet-3-tank"
-vae_decode_dir = f"{iree_root}/pytorch/models/sdxl-vae-decode-tank"
+iree_root = os.path.dirname(os.path.dirname(os.path.dirname(benchmark_dir)))
+prompt_encoder_dir = f"{iree_root}/iree_special_models/sdxl/prompt-encoder"
+scheduled_unet_dir = f"{iree_root}/iree_special_models/sdxl/scheduled-unet"
+vae_decode_dir = f"{iree_root}/iree_special_models/sdxl/vae-decode"
 
 def run_iree_command(args: Sequence[str] = ()):
     command = "Exec:", " ".join(args)
@@ -54,11 +54,11 @@ def run_sdxl_rocm_benchmark(rocm_chip, gpu_number):
         "iree-benchmark-module",
         f"--device=hip://{gpu_number}",
         "--device_allocator=caching",
-        f"--module={prompt_encoder_dir}/model_gpu_rocm_real_weights.vmfb",
+        f"--module={prompt_encoder_dir}/model_rocm.vmfb",
         f"--parameters=model={prompt_encoder_dir}/real_weights.irpa",
-        f"--module={scheduled_unet_dir}/model_gpu_rocm_real_weights.vmfb",
+        f"--module={scheduled_unet_dir}/model_rocm.vmfb",
         f"--parameters=model={scheduled_unet_dir}/real_weights.irpa",
-        f"--module={vae_decode_dir}/model_gpu_rocm_real_weights.vmfb",
+        f"--module={vae_decode_dir}/model_rocm.vmfb",
         f"--parameters=model={vae_decode_dir}/real_weights.irpa",
         f"--module={benchmark_dir}/sdxl_full_pipeline_fp16_rocm.vmfb",
         "--function=tokens_to_image",
@@ -79,7 +79,7 @@ def run_sdxl_unet_rocm_benchmark(gpu_number):
         "iree-benchmark-module",
         f"--device=hip://{gpu_number}",
         "--device_allocator=caching",
-        f"--module={scheduled_unet_dir}/model_gpu_rocm_real_weights.vmfb",
+        f"--module={scheduled_unet_dir}/model_rocm.vmfb",
         f"--parameters=model={scheduled_unet_dir}/real_weights.irpa",
         "--function=run_forward",
         "--input=1x4x128x128xf16",
@@ -99,7 +99,7 @@ def run_sdxl_prompt_encoder_rocm_benchmark(gpu_number):
         "iree-benchmark-module",
         f"--device=hip://{gpu_number}",
         "--device_allocator=caching",
-        f"--module={prompt_encoder_dir}/model_gpu_rocm_real_weights.vmfb",
+        f"--module={prompt_encoder_dir}/model_rocm.vmfb",
         f"--parameters=model={prompt_encoder_dir}/real_weights.irpa",
         "--function=encode_prompts",
         "--input=1x64xi64",
@@ -117,7 +117,7 @@ def run_sdxl_vae_decode_rocm_benchmark(gpu_number):
         "iree-benchmark-module",
         f"--device=hip://{gpu_number}",
         "--device_allocator=caching",
-        f"--module={vae_decode_dir}/model_gpu_rocm_real_weights.vmfb",
+        f"--module={vae_decode_dir}/model_rocm.vmfb",
         f"--parameters=model={vae_decode_dir}/real_weights.irpa",
         "--function=main",
         "--input=1x4x128x128xf16",
@@ -193,7 +193,7 @@ def test_sdxl_rocm_benchmark(goldentime_rocm_e2e, goldentime_rocm_unet,
                         f" (golden dispatch count {goldendispatch_rocm_unet})")
     logging.getLogger().info(compilation_line)
 
-    module_path = f"{scheduled_unet_dir}/model_gpu_rocm_real_weights.vmfb"
+    module_path = f"{scheduled_unet_dir}/model_rocm.vmfb"
     unet_binary_size = Path(module_path).stat().st_size
     compilation_line = (f"Scheduled Unet Binary Size: {unet_binary_size} bytes"
                         f" (golden binary size {goldensize_rocm_unet} bytes)")
@@ -214,7 +214,7 @@ def test_sdxl_rocm_benchmark(goldentime_rocm_e2e, goldentime_rocm_unet,
                         f" (golden dispatch count {goldendispatch_rocm_clip})")
     logging.getLogger().info(compilation_line)
 
-    module_path = f"{prompt_encoder_dir}/model_gpu_rocm_real_weights.vmfb"
+    module_path = f"{prompt_encoder_dir}/model_rocm.vmfb"
     clip_binary_size = Path(module_path).stat().st_size
     compilation_line = (f"Prompt Encoder Binary Size: {clip_binary_size} bytes"
                         f" (golden binary size {goldensize_rocm_clip} bytes)")
@@ -235,7 +235,7 @@ def test_sdxl_rocm_benchmark(goldentime_rocm_e2e, goldentime_rocm_unet,
                         f" (golden dispatch count {goldendispatch_rocm_vae})")
     logging.getLogger().info(compilation_line)
 
-    module_path = f"{vae_decode_dir}/model_gpu_rocm_real_weights.vmfb"
+    module_path = f"{vae_decode_dir}/model_rocm.vmfb"
     vae_binary_size = Path(module_path).stat().st_size
     compilation_line = (f"VAE Decode Binary Size: {vae_binary_size} bytes"
                         f" (golden binary size {goldensize_rocm_vae} bytes)")

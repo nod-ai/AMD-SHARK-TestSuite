@@ -13,6 +13,7 @@ import pyjson5
 import os
 import pytest
 import subprocess
+from ireers import *
 
 IREE_TESTS_ROOT = Path(__file__).parent
 
@@ -316,13 +317,8 @@ class IreeCompileRunItem(pytest.Item):
 
         # TODO(scotttodd): swap cwd for a temp path?
         self.test_cwd = self.spec.test_directory
-        vmfb_name = f"{self.spec.input_mlir_stem}_{self.spec.test_name}.vmfb"
 
-        self.compile_args = ["iree-compile", self.spec.input_mlir_name]
-        self.compile_args.extend(self.spec.iree_compile_flags)
-        self.compile_args.extend(["-o", str(vmfb_name)])
-
-        self.run_args = ["iree-run-module", f"--module={vmfb_name}"]
+        self.run_args = []
         self.run_args.extend(self.spec.iree_run_module_flags)
         self.run_args.append(f"--flagfile={self.spec.data_flagfile_name}")
 
@@ -386,41 +382,15 @@ class IreeCompileRunItem(pytest.Item):
             raise e
 
     def test_compile(self):
-        compile_env = os.environ.copy()
-        compile_env["IREE_TEST_PATH_EXTENSION"] = os.getenv(
-            "IREE_TEST_PATH_EXTENSION", default=str(self.test_cwd)
-        )
-        path_extension = compile_env["IREE_TEST_PATH_EXTENSION"]
-        cmd = subprocess.list2cmdline(self.compile_args)
-        cmd = cmd.replace("${IREE_TEST_PATH_EXTENSION}", f"{path_extension}")
-
-        # TODO(scotttodd): expand flagfile(s)
-        logging.getLogger().info(
-            f"Launching compile command:\n"  #
-            f"cd {self.test_cwd} && {cmd}"
-        )
-
-        proc = subprocess.run(
-            cmd, env=compile_env, shell=True, capture_output=True, cwd=self.test_cwd
-        )
-        if proc.returncode != 0:
-            raise IreeCompileException(proc, self.test_cwd)
+        mlir_name = self.spec.input_mlir_name
+        vmfb_name = f"{self.spec.input_mlir_stem}_{self.spec.test_name}.vmfb"
+        iree_compile(mlir_name, vmfb_name, self.spec.iree_compile_flags, self.test_cwd)
 
     def test_run(self):
-        run_env = os.environ.copy()
-        cmd = subprocess.list2cmdline(self.run_args)
-
-        # TODO(scotttodd): expand flagfile(s)
-        logging.getLogger().info(
-            f"Launching run command:\n"  #
-            f"cd {self.test_cwd} && {cmd}"
-        )
-
-        proc = subprocess.run(
-            cmd, env=run_env, shell=True, capture_output=True, cwd=self.test_cwd
-        )
-        if proc.returncode != 0:
-            raise IreeRunException(proc, self.test_cwd, self.compile_args)
+        mlir_name = self.spec.input_mlir_name
+        vmfb_name = f"{self.spec.input_mlir_stem}_{self.spec.test_name}.vmfb"
+        compile_cmd = get_compile_cmd(mlir_name, vmfb_name, self.spec.iree_compile_flags)
+        iree_run_module(vmfb_name, self.run_args, self.test_cwd, compile_cmd)
 
     def repr_failure(self, excinfo):
         """Called when self.runtest() raises an exception."""
@@ -440,59 +410,6 @@ class IreeCompileRunItem(pytest.Item):
     # Defining this for pytest-retry to avoid an AttributeError.
     def _initrequest(self):
         pass
-
-
-class IreeCompileException(Exception):
-    """Compiler exception that preserves the command line and error output."""
-
-    def __init__(self, process: subprocess.CompletedProcess, cwd: str):
-        try:
-            errs = process.stderr.decode("utf-8")
-        except:
-            errs = str(process.stderr)  # Decode error or other: best we can do.
-
-        super().__init__(
-            f"Error invoking iree-compile\n"
-            f"Error code: {process.returncode}\n"
-            f"Stderr diagnostics:\n{errs}\n\n"
-            f"Invoked with:\n"
-            f"  cd {cwd} && {process.args}\n\n"
-        )
-
-
-class IreeRunException(Exception):
-    """Runtime exception that preserves the command line and error output."""
-
-    def __init__(
-        self, process: subprocess.CompletedProcess, cwd: str, compile_args: List[str]
-    ):
-        # iree-run-module sends output to both stdout and stderr
-        try:
-            errs = process.stderr.decode("utf-8")
-        except:
-            errs = str(process.stderr)  # Decode error or other: best we can do.
-        try:
-            outs = process.stdout.decode("utf-8")
-        except:
-            outs = str(process.stdout)  # Decode error or other: best we can do.
-
-        compile_cmd = subprocess.list2cmdline(compile_args)
-        common_files_path = os.getenv("IREE_TEST_PATH_EXTENSION", default=cwd)
-        compile_cmd = compile_cmd.replace(
-            "${IREE_TEST_PATH_EXTENSION}", f"{common_files_path}"
-        )
-
-        super().__init__(
-            f"Error invoking iree-run-module\n"
-            f"Error code: {process.returncode}\n"
-            f"Stderr diagnostics:\n{errs}\n"
-            f"Stdout diagnostics:\n{outs}\n"
-            f"Compiled with:\n"
-            f"  cd {cwd} && {compile_cmd}\n\n"
-            f"Run with:\n"
-            f"  cd {cwd} && {process.args}\n\n"
-        )
-
 
 class IreeXFailCompileRunException(Exception):
     pass

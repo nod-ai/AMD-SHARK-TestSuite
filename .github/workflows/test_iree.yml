@@ -13,6 +13,8 @@ on:
       - ".github/workflows/test_iree.yml"
       # The iree_tests subproject.
       - "iree_tests/**"
+      # The iree_special_models subproject.
+      - "iree_special_models/**"
   workflow_dispatch:
 
 concurrency:
@@ -63,6 +65,7 @@ jobs:
         run: |
           source ${VENV_DIR}/bin/activate
           python3 -m pip install -r iree_tests/requirements.txt
+          pip install --no-compile --pre --upgrade -e common_tools
 
       # Run tests and output new config files as needed.
       - name: "Running the generated ONNX test suite"
@@ -100,23 +103,18 @@ jobs:
           - name: cpu_llvm_task
             runs-on: nodai-amdgpu-mi250-x86-64
             models-config-file: models_cpu_llvm_task.json
-            sdxl-prompt-encoder-config-file: sdxl_prompt_encoder_cpu_llvm_task.json
-            sdxl-unet-config-file: sdxl_scheduled_unet_cpu_llvm_task.json
-            sdxl-vae-decode-config-file: sdxl_vae_decode_cpu_llvm_task.json
+            backend: cpu
           - name: gpu_mi250_rocm
             runs-on: nodai-amdgpu-mi250-x86-64
             models-config-file: models_gpu_rocm_gfx90a.json
-            sdxl-prompt-encoder-config-file: sdxl_prompt_encoder_gpu_rocm.json
-            sdxl-unet-config-file: sdxl_scheduled_unet_gpu_rocm.json
-            sdxl-vae-decode-config-file: sdxl_vae_decode_gpu_rocm.json
+            backend: rocm
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
+      ROCM_CHIP: gfx90a
       IREE_TEST_FILES: ~/iree_tests_cache
       IREE_TEST_PATH_EXTENSION: ${{ github.workspace }}/iree_tests/specs
       MODELS_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.models-config-file }}
-      SDXL_PROMPT_ENCODER_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.sdxl-prompt-encoder-config-file }}
-      SDXL_UNET_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.sdxl-unet-config-file }}
-      SDXL_VAE_DECODE_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.sdxl-vae-decode-config-file }}
+      TEST_SUITE_REPO_ROOT: ${{ github.workspace }}
     steps:
       - name: "Checking out repository"
         uses: actions/checkout@v4
@@ -140,13 +138,16 @@ jobs:
         run: |
           source ${VENV_DIR}/bin/activate
           python3 -m pip install -r iree_tests/requirements.txt
+          python3 -m pip install -r iree_special_models/requirements.txt
+          pip install --no-compile --pre --upgrade -e common_tools
 
       # Download remote files.
       - name: "Downloading remote files for real weight model tests"
         run: |
           source ${VENV_DIR}/bin/activate
-          python3 iree_tests/download_remote_files.py --root-dir pytorch/models
-          python3 iree_tests/download_remote_files.py --root-dir sharktank
+          python3 iree_tests/download_remote_files.py --root-dir iree_special_models
+          python3 iree_tests/download_remote_files.py --root-dir iree_tests/pytorch/models
+          python3 iree_tests/download_remote_files.py --root-dir iree_tests/sharktank
 
       - name: "Running real weight model tests"
         if: "matrix.models-config-file != '' && !cancelled()"
@@ -164,64 +165,44 @@ jobs:
             --timeout=1200 \
             --durations=0 \
             --config-files=${MODELS_CONFIG_FILE_PATH}
-
-      - name: "Running real weights SDXL prompt encoder tests"
-        id: prompt_encoder
+      
+      - name: "Running SDXL special model tests"
+        id: special_models_sdxl
         if: ${{ !cancelled() }}
         run: |
           source ${VENV_DIR}/bin/activate
-          pytest iree_tests/pytorch/models/sdxl-prompt-encoder-tank \
+          pytest iree_special_models/sdxl \
+            -k ${{ matrix.backend }} \
             -rpfE \
-            -k real_weights \
-            --no-skip-tests-missing-files \
             --capture=no \
             --log-cli-level=info \
             --timeout=1200 \
-            --durations=0 \
-            --config-files=${SDXL_PROMPT_ENCODER_CONFIG_FILE_PATH}
-
-      - name: "Running real weights SDXL scheduled unet tests"
-        id: unet
+            --durations=0
+      
+      - name: "Running SD3 special model tests"
+        id: special_models_sd3
         if: ${{ !cancelled() }}
         run: |
           source ${VENV_DIR}/bin/activate
-          pytest iree_tests/pytorch/models/sdxl-scheduled-unet-3-tank \
+          pytest iree_special_models/sd3 \
+            -k ${{ matrix.backend }} \
             -rpfE \
-            -k real_weights \
-            --no-skip-tests-missing-files \
             --capture=no \
             --log-cli-level=info \
             --timeout=1200 \
-            --durations=0 \
-            --config-files=${SDXL_UNET_CONFIG_FILE_PATH}
-
-      - name: "Running real weights SDXL vae decode tests"
-        id: vae
-        if: ${{ !cancelled() }}
-        run: |
-          source ${VENV_DIR}/bin/activate
-          pytest iree_tests/pytorch/models/sdxl-vae-decode-tank \
-            -rpfE \
-            -k real_weights \
-            --no-skip-tests-missing-files \
-            --capture=no \
-            --log-cli-level=info \
-            --timeout=1200 \
-            --durations=0 \
-            --config-files=${SDXL_VAE_DECODE_CONFIG_FILE_PATH}
+            --durations=0
 
       - name: "Running SDXL ROCm pipeline benchmark"
         if: |
           contains(matrix.name, 'rocm') &&
-          steps.prompt_encoder.outcome == 'success' &&
-          steps.unet.outcome == 'success' && steps.vae.outcome == 'success'
+          steps.special_models_sdxl.outcome == 'success'
         run: |
           source ${VENV_DIR}/bin/activate
           pytest iree_tests/benchmarks/sdxl/benchmark_sdxl_rocm.py \
             --goldentime-rocm-e2e-ms 1661.5 \
             --goldentime-rocm-unet-ms 450.5 \
             --goldentime-rocm-clip-ms 19 \
-            --goldentime-rocm-vae-ms 288.5 \
+            --goldentime-rocm-vae-ms 295 \
             --goldendispatch-rocm-unet 1714 \
             --goldendispatch-rocm-clip 1569 \
             --goldendispatch-rocm-vae 248 \

@@ -15,8 +15,6 @@
       "pytorch/models/direct/resnet50", // TODO(#17344): need to regenerate .mlirbc
     ],
     "expected_run_failures": [
-      "pytorch/models/direct/mobilebert-uncased",
-      "pytorch/models/direct/t5-base",
-      "pytorch/models/direct/t5-large"
+      "pytorch/models/onnx-export/mobilebert-uncased",
     ]
   }

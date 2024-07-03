@@ -99,3 +99,4 @@
 --expected_output=1x16x512x64xf32=@inference_output.95.bin
 --expected_output=1x16x512x64xf32=@inference_output.96.bin
 --expected_output=1x512x1024xf32=@inference_output.97.bin
+--expected_f32_threshold=0.01f

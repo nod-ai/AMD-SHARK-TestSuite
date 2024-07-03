@@ -105,7 +105,8 @@
         "https://sharkpublic.blob.core.windows.net/sharkpublic/shark-test-suite/iree-tests/pytorch/models/onnx-export/t5-large/inference_output.94.bin",
         "https://sharkpublic.blob.core.windows.net/sharkpublic/shark-test-suite/iree-tests/pytorch/models/onnx-export/t5-large/inference_output.95.bin",
         "https://sharkpublic.blob.core.windows.net/sharkpublic/shark-test-suite/iree-tests/pytorch/models/onnx-export/t5-large/inference_output.96.bin",
-        "https://sharkpublic.blob.core.windows.net/sharkpublic/shark-test-suite/iree-tests/pytorch/models/onnx-export/t5-large/inference_output.97.bin"
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/shark-test-suite/iree-tests/pytorch/models/onnx-export/t5-large/inference_output.97.bin",
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/shark-test-suite/iree-tests/pytorch/models/onnx-export/t5-large/model.mlirbc"
       ]
     }
   ]

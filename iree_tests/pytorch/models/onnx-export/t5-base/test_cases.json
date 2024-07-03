@@ -58,7 +58,7 @@
         "https://sharkpublic.blob.core.windows.net/sharkpublic/shark-test-suite/iree-tests/pytorch/models/onnx-export/t5-base/inference_output.47.bin",
         "https://sharkpublic.blob.core.windows.net/sharkpublic/shark-test-suite/iree-tests/pytorch/models/onnx-export/t5-base/inference_output.48.bin",
         "https://sharkpublic.blob.core.windows.net/sharkpublic/shark-test-suite/iree-tests/pytorch/models/onnx-export/t5-base/inference_output.49.bin",
-        "https://sharkpublic.blob.core.windows.net/sharkpublic/shark-test-suite/iree-tests/pytorch/models/onnx-export/mobilebert-uncased/model.mlirbc"
+        "https://sharkpublic.blob.core.windows.net/sharkpublic/shark-test-suite/iree-tests/pytorch/models/onnx-export/t5-base/model.mlirbc"
       ]
     }
   ]

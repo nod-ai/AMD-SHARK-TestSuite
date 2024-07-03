@@ -7,15 +7,16 @@
     "iree_run_module_flags": [
       "--device=local-task"
     ],
-    "skip_compile_tests": [
-      "pytorch/models/sdxl-scheduled-unet-3-tank",
-      "pytorch/models/sdxl-vae-decode-tank",
-      "pytorch/models/sdxl-prompt-encoder-tank"
-    ],
+    "skip_compile_tests": [],
     "skip_run_tests": [],
     "expected_compile_failures": [
-      "pytorch/models/opt-125M", // TODO(#17344): need to regenerate .mlirbc
-      "pytorch/models/resnet50", // TODO(#17344): need to regenerate .mlirbc
+      "pytorch/models/direct/opt-125M", // TODO(#17344): need to regenerate .mlirbc
+      "pytorch/models/direct/resnet50", // TODO(#17344): need to regenerate .mlirbc
     ],
-    "expected_run_failures": []
+    "expected_run_failures": [
+      "pytorch/models/onnx-export/mit-b0",
+      "pytorch/models/direct/mobilebert-uncased",
+      "pytorch/models/direct/t5-base",
+      "pytorch/models/direct/t5-large"
+    ]
   }

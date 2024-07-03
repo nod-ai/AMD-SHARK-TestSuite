@@ -2,25 +2,23 @@
     "config_name": "gpu_rocm",
     "iree_compile_flags" : [
       "--iree-hal-target-backends=rocm",
-      "--iree-rocm-target-chip=gfx90a",
-      "--iree-opt-const-eval=false",
-      "--iree-codegen-transform-dialect-library=${IREE_TEST_PATH_EXTENSION}/attention_and_matmul_spec.mlir"
+      "--iree-rocm-target-chip=gfx90a"
     ],
     "iree_run_module_flags": [
       "--device=hip"
     ],
-    "skip_compile_tests": [
-      "pytorch/models/sdxl-scheduled-unet-3-tank",
-      "pytorch/models/sdxl-vae-decode-tank",
-      "pytorch/models/sdxl-prompt-encoder-tank"
-    ],
+    "skip_compile_tests": [],
     "skip_run_tests": [],
     "expected_compile_failures": [
-      "pytorch/models/opt-125M", // TODO(#17344): need to regenerate .mlirbc
-      "pytorch/models/resnet50",
+      "pytorch/models/direct/opt-125M", // TODO(#17344): need to regenerate .mlirbc
+      "pytorch/models/direct/resnet50",
       // error: 'builtin.module' op failed to run transform dialect passes
       // (might need to drop the iree-codegen-transform-dialect-library flag)
-      "sharktank/llama/open-llama-3b-v2-f16"
+      "sharktank/llama/open-llama-3b-v2-f16",
+      "pytorch/models/onnx-export/mit-b0",
+      "pytorch/models/onnx-export/mobilebert-uncased",
+      "pytorch/models/onnx-export/t5-base",
+      "pytorch/models/onnx-export/t5-large"
     ],
     "expected_run_failures": []
 }

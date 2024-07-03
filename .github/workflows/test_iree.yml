@@ -166,50 +166,50 @@ jobs:
             --durations=0 \
             --config-files=${MODELS_CONFIG_FILE_PATH}
       
-      # - name: "Running SDXL special model tests"
-      #   id: special_models_sdxl
-      #   if: ${{ !cancelled() }}
-      #   run: |
-      #     source ${VENV_DIR}/bin/activate
-      #     pytest iree_special_models/sdxl \
-      #       -k ${{ matrix.backend }} \
-      #       -rpfE \
-      #       --capture=no \
-      #       --log-cli-level=info \
-      #       --timeout=1200 \
-      #       --durations=0
+      - name: "Running SDXL special model tests"
+        id: special_models_sdxl
+        if: ${{ !cancelled() }}
+        run: |
+          source ${VENV_DIR}/bin/activate
+          pytest iree_special_models/sdxl \
+            -k ${{ matrix.backend }} \
+            -rpfE \
+            --capture=no \
+            --log-cli-level=info \
+            --timeout=1200 \
+            --durations=0
       
-      # - name: "Running SD3 special model tests"
-      #   id: special_models_sd3
-      #   if: ${{ !cancelled() }}
-      #   run: |
-      #     source ${VENV_DIR}/bin/activate
-      #     pytest iree_special_models/sd3 \
-      #       -k ${{ matrix.backend }} \
-      #       -rpfE \
-      #       --capture=no \
-      #       --log-cli-level=info \
-      #       --timeout=1200 \
-      #       --durations=0
+      - name: "Running SD3 special model tests"
+        id: special_models_sd3
+        if: ${{ !cancelled() }}
+        run: |
+          source ${VENV_DIR}/bin/activate
+          pytest iree_special_models/sd3 \
+            -k ${{ matrix.backend }} \
+            -rpfE \
+            --capture=no \
+            --log-cli-level=info \
+            --timeout=1200 \
+            --durations=0
 
-      # - name: "Running SDXL ROCm pipeline benchmark"
-      #   if: |
-      #     contains(matrix.name, 'rocm') &&
-      #     steps.special_models_sdxl.outcome == 'success'
-      #   run: |
-      #     source ${VENV_DIR}/bin/activate
-      #     pytest iree_tests/benchmarks/sdxl/benchmark_sdxl_rocm.py \
-      #       --goldentime-rocm-e2e-ms 1661.5 \
-      #       --goldentime-rocm-unet-ms 450.5 \
-      #       --goldentime-rocm-clip-ms 19 \
-      #       --goldentime-rocm-vae-ms 295 \
-      #       --goldendispatch-rocm-unet 1714 \
-      #       --goldendispatch-rocm-clip 1569 \
-      #       --goldendispatch-rocm-vae 248 \
-      #       --goldensize-rocm-unet-bytes 2088217 \
-      #       --goldensize-rocm-clip-bytes 785493 \
-      #       --goldensize-rocm-vae-bytes 762067 \
-      #       --gpu-number 6 \
-      #       --rocm-chip gfx90a \
-      #       --log-cli-level=info
-      #     echo "$(<job_summary.md )" >> $GITHUB_STEP_SUMMARY
+      - name: "Running SDXL ROCm pipeline benchmark"
+        if: |
+          contains(matrix.name, 'rocm') &&
+          steps.special_models_sdxl.outcome == 'success'
+        run: |
+          source ${VENV_DIR}/bin/activate
+          pytest iree_tests/benchmarks/sdxl/benchmark_sdxl_rocm.py \
+            --goldentime-rocm-e2e-ms 1661.5 \
+            --goldentime-rocm-unet-ms 450.5 \
+            --goldentime-rocm-clip-ms 19 \
+            --goldentime-rocm-vae-ms 295 \
+            --goldendispatch-rocm-unet 1714 \
+            --goldendispatch-rocm-clip 1569 \
+            --goldendispatch-rocm-vae 248 \
+            --goldensize-rocm-unet-bytes 2088217 \
+            --goldensize-rocm-clip-bytes 785493 \
+            --goldensize-rocm-vae-bytes 762067 \
+            --gpu-number 6 \
+            --rocm-chip gfx90a \
+            --log-cli-level=info
+          echo "$(<job_summary.md )" >> $GITHUB_STEP_SUMMARY

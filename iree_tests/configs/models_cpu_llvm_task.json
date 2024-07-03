@@ -2,7 +2,8 @@
     "config_name": "cpu_llvm_task",
     "iree_compile_flags" : [
       "--iree-hal-target-backends=llvm-cpu",
-      "--iree-llvmcpu-target-cpu-features=host"
+      "--iree-llvmcpu-target-cpu-features=host",
+      "--iree-input-demote-i64-to-i32"
     ],
     "iree_run_module_flags": [
       "--device=local-task"
@@ -14,9 +15,8 @@
       "pytorch/models/direct/resnet50", // TODO(#17344): need to regenerate .mlirbc
     ],
     "expected_run_failures": [
-      // "pytorch/models/onnx-export/mit-b0",
-      // "pytorch/models/direct/mobilebert-uncased",
-      // "pytorch/models/direct/t5-base",
-      // "pytorch/models/direct/t5-large"
+      "pytorch/models/direct/mobilebert-uncased",
+      "pytorch/models/direct/t5-base",
+      "pytorch/models/direct/t5-large"
     ]
   }

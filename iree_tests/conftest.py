@@ -303,8 +303,11 @@ class IreeCompileRunItem(pytest.Item):
         super().__init__(**kwargs)
         self.spec = spec
 
+        relative_test_directory = self.spec.test_directory.relative_to(
+            IREE_TESTS_ROOT
+        ).as_posix()
         self.user_properties.append(
-            ("test_directory_name", self.spec.test_directory.name)
+            ("relative_test_directory_name", relative_test_directory)
         )
         self.user_properties.append(("input_mlir_name", self.spec.input_mlir_name))
         self.user_properties.append(("test_name", self.spec.test_name))
@@ -389,7 +392,9 @@ class IreeCompileRunItem(pytest.Item):
     def test_run(self):
         mlir_name = self.spec.input_mlir_name
         vmfb_name = f"{self.spec.input_mlir_stem}_{self.spec.test_name}.vmfb"
-        compile_cmd = get_compile_cmd(mlir_name, vmfb_name, self.spec.iree_compile_flags)
+        compile_cmd = get_compile_cmd(
+            mlir_name, vmfb_name, self.spec.iree_compile_flags
+        )
         iree_run_module(vmfb_name, self.run_args, self.test_cwd, compile_cmd)
 
     def repr_failure(self, excinfo):
@@ -410,6 +415,7 @@ class IreeCompileRunItem(pytest.Item):
     # Defining this for pytest-retry to avoid an AttributeError.
     def _initrequest(self):
         pass
+
 
 class IreeXFailCompileRunException(Exception):
     pass

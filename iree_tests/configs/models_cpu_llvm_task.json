@@ -14,8 +14,8 @@
     ],
     "skip_run_tests": [],
     "expected_compile_failures": [
-      "pytorch/models/opt-125M", // TODO(#17344): need to regenerate .mlirbc
-      "pytorch/models/resnet50", // TODO(#17344): need to regenerate .mlirbc
+      "pytorch/models/opt-125M",
+      "pytorch/models/resnet50",
     ],
     "expected_run_failures": []
-  }
+}

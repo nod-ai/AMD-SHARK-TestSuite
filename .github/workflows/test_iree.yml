@@ -159,7 +159,7 @@ jobs:
             iree_tests/pytorch/models \
             iree_tests/sharktank \
             -n 4 \
-            -rpfE \
+            -rA \
             -k real_weights \
             --no-skip-tests-missing-files \
             --capture=no \

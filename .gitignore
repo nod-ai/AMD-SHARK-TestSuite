@@ -10,6 +10,10 @@
 *.venv
 .venv
 
+# Python deployment artifacts
+*.whl
+*.egg-info
+
 # Visual Studio files
 .vs/
 .vscode/

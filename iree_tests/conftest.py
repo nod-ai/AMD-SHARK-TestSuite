@@ -360,7 +360,7 @@ class IreeCompileRunItem(pytest.Item):
                 pytest.mark.xfail(
                     raises=IreeCompileException,
                     strict=True,
-                    reason="Expected compilation to fail (remove from 'expected_compile_failures')",
+                    reason="Expected compilation to fail (included in 'expected_compile_failures')",
                 )
             )
         if not self.spec.expect_run_success:
@@ -368,7 +368,7 @@ class IreeCompileRunItem(pytest.Item):
                 pytest.mark.xfail(
                     raises=IreeRunException,
                     strict=True,
-                    reason="Expected run to fail (remove from 'expected_run_failures')",
+                    reason="Expected run to fail (included in 'expected_run_failures')",
                 )
             )
 

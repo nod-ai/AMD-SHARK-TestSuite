@@ -1,10 +1,10 @@
 {
-  "config_name": "gpu_vulkan",
+  "config_name": "gpu_cuda",
   "iree_compile_flags" : [
-    "--iree-hal-target-backends=vulkan-spirv"
+    "--iree-hal-target-backends=cuda"
   ],
   "iree_run_module_flags": [
-    "--device=vulkan"
+    "--device=cuda"
   ],
   "skip_compile_tests": [],
   "skip_run_tests": [],

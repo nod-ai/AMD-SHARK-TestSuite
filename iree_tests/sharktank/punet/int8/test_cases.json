@@ -5,7 +5,8 @@
       "name": "real_weights",
       "runtime_flagfile": "real_weights_data_flags.txt",
       "remote_files": [
-        "https://sharkpublic.blob.core.windows.net/sharkpublic/scotttodd/iree_tests/2024_07_02/sdxl_int8_dataset.irpa",
+        "https://huggingface.co/amd-shark/sdxl-quant-models/resolve/fe57fe12eeb6eac83f469793984f6ad4c06a478c/unet/int8/export/sdxl_unet_int8_dataset.irpa",
+        "https://huggingface.co/amd-shark/sdxl-quant-models/resolve/fe57fe12eeb6eac83f469793984f6ad4c06a478c/unet/int8/export/sdxl_unet_int8_export.mlir"
         // TODO: files for real inputs and real expected outputs
       ]
     }

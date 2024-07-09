@@ -172,7 +172,9 @@ def download_huggingface_remote_file(
     #   repo_id:  SlyEcho/open_llama_3b_v2_gguf
     #   revision: main
     #   filename: open-llama-3b-v2-q4_0.gguf
-    result = re.search(r"https://huggingface.co/(.+)/resolve/(.+)/(.+)", remote_file)
+    result = re.search(
+        r"https://huggingface.co/(.+)/resolve/([^\/]+)/(.+)", remote_file
+    )
     repo_id = result.groups()[0]
     revision = result.groups()[1]
     filename = result.groups()[2]

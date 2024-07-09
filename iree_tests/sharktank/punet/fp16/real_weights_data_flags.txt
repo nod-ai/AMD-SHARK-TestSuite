@@ -1,4 +1,4 @@
---parameters=model=sdxl_fp16_dataset.irpa
+--parameters=model=sdxl_unet_fp16_dataset.irpa
 --input=1x4x128x128xf16
 --input=1xi32
 --input=2x64x2048xf16

@@ -19,36 +19,41 @@ from commonutils import E2ESHARK_CHECK_DEF
 # Create an instance of it for this test
 E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
 
+# Define dimensions
+seq_length = 10
+batch_size = 1
+input_size = 5
+hidden_size = 20
+num_directions = 1
 
 # Create an input (ValueInfoProto)
-X = make_tensor_value_info("X", TensorProto.FLOAT, [10, 1, 5])
-initial_h = make_tensor_value_info("initial_h", TensorProto.FLOAT, [1, 1, 20])
+X = make_tensor_value_info("X", TensorProto.FLOAT, [seq_length, batch_size, input_size])
+initial_h = make_tensor_value_info("initial_h", TensorProto.FLOAT, [num_directions, batch_size, hidden_size])
 
 # Create tensor value info for W, R, B, sequence_lens
-W = make_tensor_value_info("W", TensorProto.FLOAT, [1, 60, 5])  # [num_directions, 3*hidden_size, input_size]
-R = make_tensor_value_info("R", TensorProto.FLOAT, [1, 60, 20])  # [num_directions, 3*hidden_size, hidden_size]
-B = make_tensor_value_info("B", TensorProto.FLOAT, [1, 120])  # [num_directions, 6*hidden_size]
-sequence_lens = make_tensor_value_info("sequence_lens", TensorProto.INT32, [1])  # [batch_size]
+W = make_tensor_value_info("W", TensorProto.FLOAT, [num_directions, 3*hidden_size, input_size])
+R = make_tensor_value_info("R", TensorProto.FLOAT, [num_directions, 3*hidden_size, hidden_size])
+B = make_tensor_value_info("B", TensorProto.FLOAT, [num_directions, 6*hidden_size])
+sequence_lens = make_tensor_value_info("sequence_lens", TensorProto.INT32, [batch_size])
 
-Y = make_tensor_value_info("Y", TensorProto.FLOAT, [10, 1, 1, 20])
-Y_h = make_tensor_value_info("Y_h", TensorProto.FLOAT, [1, 1, 20])
-
+Y = make_tensor_value_info("Y", TensorProto.FLOAT, [seq_length, num_directions, batch_size, hidden_size])
+Y_h = make_tensor_value_info("Y_h", TensorProto.FLOAT, [num_directions, batch_size, hidden_size])
 
 grunode = make_node(
     op_type="GRU",
     inputs=[
-        "X",  # input tensor
-        "W",  # weight tensor for gates
-        "R",  # recurrence weight tensor
-        "B",  # optional bias tensor
-        "sequence_lens",  # optional tensor specifying lengths of the sequences
-        "initial_h",  # optional initial value of the hidden
+        "X",
+        "W",
+        "R",
+        "B",
+        "sequence_lens",
+        "initial_h",
     ],
     outputs=[
-        "Y",  # output tensor
-        "Y_h",  # the last output value of the hidden
+        "Y",
+        "Y_h",
     ],
-    hidden_size=20,
+    hidden_size=hidden_size,
 )
 
 graph = make_graph(
@@ -63,35 +68,27 @@ onnx_model = make_model(graph)
 onnx_model.opset_import[0].version = 20
 
 # Save the model
-# save_model(onnx_model, "model.onnx")
 with open("model.onnx", "wb") as f:
     f.write(onnx_model.SerializeToString())
 
 session = onnxruntime.InferenceSession("model.onnx", None)
 
-
-
 inputs = session.get_inputs()
-# gets Z in outputs[0]
 outputs = session.get_outputs()
 
 test_input = {
-    "X": numpy.random.randn(10, 1, 5).astype(numpy.float32),  # inputs
-    "W": numpy.random.randn(1, 60, 5).astype(numpy.float32),  # weight tensor for gates
-    "R": numpy.random.randn(1, 60, 20).astype(numpy.float32),  # recurrence weight tensor
-    "B": numpy.random.randn(1, 120).astype(numpy.float32),  # optional bias tensor
-    "sequence_lens": numpy.array([10], dtype=numpy.int32),  # optional tensor specifying lengths of the sequences
-    "initial_h": numpy.zeros((1, 1, 20)).astype(numpy.float32),  # optional initial value of the hidden
+    "X": numpy.random.randn(seq_length, batch_size, input_size).astype(numpy.float32),
+    "W": numpy.random.randn(num_directions, 3*hidden_size, input_size).astype(numpy.float32),
+    "R": numpy.random.randn(num_directions, 3*hidden_size, hidden_size).astype(numpy.float32),
+    "B": numpy.random.randn(num_directions, 6*hidden_size).astype(numpy.float32),
+    "sequence_lens": numpy.array([seq_length], dtype=numpy.int32),
+    "initial_h": numpy.zeros((num_directions, batch_size, hidden_size)).astype(numpy.float32),
 }
-
-# test_input and test_output are list of numpy arrays
-# each index into list is one input or one output in the
-# order it appears in the model
 
 test_output = session.run(None, test_input)
 
 print("Input:", test_input)
 print("Output:", test_output)
-# Moving to torch to handle bfloat16 as numpy does not support bfloat16
+
 E2ESHARK_CHECK["input"] = list(torch.from_numpy(arr) for arr in test_input.values())
 E2ESHARK_CHECK["output"] = list(torch.from_numpy(arr) for arr in test_output)

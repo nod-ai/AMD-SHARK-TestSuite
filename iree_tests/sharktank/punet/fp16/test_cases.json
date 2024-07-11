@@ -5,8 +5,8 @@
       "name": "real_weights",
       "runtime_flagfile": "real_weights_data_flags.txt",
       "remote_files": [
-        "https://huggingface.co/amd-shark/sdxl-quant-models/resolve/fe57fe12eeb6eac83f469793984f6ad4c06a478c/unet/fp16/export/sdxl_unet_fp16_dataset.irpa",
-        "https://huggingface.co/amd-shark/sdxl-quant-models/resolve/fe57fe12eeb6eac83f469793984f6ad4c06a478c/unet/fp16/export/sdxl_unet_fp16_export.mlir"
+        "https://huggingface.co/amd-shark/sdxl-quant-models/resolve/2acff30990a67a6ff90ad5c09615838accdf4254/unet/fp16/export/sdxl_unet_fp16_dataset.irpa",
+        "https://huggingface.co/amd-shark/sdxl-quant-models/resolve/2acff30990a67a6ff90ad5c09615838accdf4254/unet/fp16/export/sdxl_unet_fp16_export.mlir"
         // TODO: files for real inputs and real expected outputs
       ]
     }

@@ -84,7 +84,7 @@ def download_and_setup_onnxmodels(cache_dir, testList):
     priv_container_name = "onnxprivatestorage"
 
     for model in testList:
-        blob_dir =  "e2eshark/" + model
+        blob_dir =  "e2eshark/onnx/models/" + model
         blob_name = blob_dir + "/model.onnx.zip"
         dest_file = cache_dir + "/" + blob_name
         if os.path.exists(dest_file):

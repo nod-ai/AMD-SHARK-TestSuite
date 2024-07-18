@@ -88,11 +88,11 @@ def postProcess(e2esharkDict):
 def to_numpy(tensor):
     return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 
-def setup_test_image():
+def setup_test_image(height=224, weight=224):
     url = "http://images.cocodataset.org/val2017/000000039769.jpg"
     img = Image.open(requests.get(url, stream=True).raw)
 
-    resize = transforms.Resize([224, 224])
+    resize = transforms.Resize([height, weight])
     img = resize(img)
     
     # Define a transform to convert 

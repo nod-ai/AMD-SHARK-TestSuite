@@ -131,6 +131,8 @@ def getShapeString(torchtensor):
         inputshapestring += "xbf16"
     elif dtype == torch.int8:
         inputshapestring += "xi8"
+    elif dtype == torch.int32:
+        inputshapestring += "xi32"
     elif dtype == torch.bool:
         inputshapestring += "xi1"
     else:
@@ -202,6 +204,8 @@ def packTensor(modelinput):
         bytearr = struct.pack("%sh" % len(mylist), *mylist)
     elif dtype == torch.int8:
         bytearr = struct.pack("%sb" % len(mylist), *mylist)
+    elif dtype == torch.int32:
+        bytearr = struct.pack("%sl" % len(mylist), *mylist)
     elif dtype == torch.bool:
         bytearr = struct.pack("%s?" % len(mylist), *mylist)
     else:

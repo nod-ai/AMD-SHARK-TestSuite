@@ -335,6 +335,10 @@ def runCodeGeneration(
         "iree-compile --iree-input-demote-i64-to-i32 --iree-hal-target-backends="
         + args.backend
         + " "
+        + " --iree-llvmcpu-target-cpu=znver3"
+        # + " --iree-llvmcpu-enable-ukernels=mmt4d"
+        # + ' --iree-preprocessing-pass-pipeline="builtin.module(util.func(iree-preprocessing-convert-conv2d-to-img2col}))"'
+        # + " --iree-flow-collapse-reduction-dims"
     )
     scriptcommand = (
         commandname
@@ -894,6 +898,8 @@ def runTest(aTuple):
     )
     if args.mode == "vaiml":
         runTestUsingVAIML(args_tuple)
+    elif args.mode == "ort-ep":
+        runTestUsingORTEP(args_tuple)
     else:
         retStatus = runTestUsingClassicalFlow(args_tuple)
 
@@ -904,14 +910,15 @@ def runTest(aTuple):
     return 0
 
 
-def initializer(tm_path, iree_path):
-    global SHARED_TORCH_MLIR_BUILD, SHARED_IREE_BUILD
+def initializer(tm_path, iree_path, ort_path):
+    global SHARED_TORCH_MLIR_BUILD, SHARED_IREE_BUILD, SHARED_ORT_BUILD
     SHARED_TORCH_MLIR_BUILD = tm_path
     SHARED_IREE_BUILD = iree_path
+    SHARED_ORT_BUILD = ort_path
 
 
 def runFrameworkTests(
-    frameworkname, testsList, args, script_dir, run_dir, TORCH_MLIR_BUILD, IREE_BUILD
+    frameworkname, testsList, args, script_dir, run_dir, TORCH_MLIR_BUILD, IREE_BUILD, ORT_BUILD
 ):
     # print(f"In runFrameworkTests - torch mlir build - {TORCH_MLIR_BUILD}")
     if len(testsList) == 0:
@@ -943,10 +950,10 @@ def runFrameworkTests(
 
     if args.ci:
         for i in range(0, len(tupleOfListArg)):
-            initializer(TORCH_MLIR_BUILD, IREE_BUILD)
+            initializer(TORCH_MLIR_BUILD, IREE_BUILD, ORT_BUILD)
             runTest(tupleOfListArg[i])
     else:
-        with Pool(poolSize, initializer, (TORCH_MLIR_BUILD, IREE_BUILD)) as p:
+        with Pool(poolSize, initializer, (TORCH_MLIR_BUILD, IREE_BUILD, ORT_BUILD)) as p:
             result = p.map_async(runTest, tupleOfListArg)
             result.wait()
             if args.verbose:
@@ -1096,6 +1103,7 @@ def generateReport(run_dir, testsList, args):
 def checkBuild(run_dir, args):
     IREE_BUILD = ""
     TORCH_MLIR_BUILD = ""
+    ORT_BUILD = ""
     if args.torchmlirbuild:
         TORCH_MLIR_BUILD = args.torchmlirbuild
         TORCH_MLIR_BUILD = os.path.expanduser(TORCH_MLIR_BUILD)
@@ -1115,6 +1123,15 @@ def checkBuild(run_dir, args):
         if not os.path.exists(IREE_BUILD):
             print("ERROR: IREE build directory", IREE_BUILD, "does not exist.")
             sys.exit(1)
+
+    if args.ortbuild:
+        ORT_BUILD = args.ortbuild
+        ORT_BUILD = os.path.expanduser(ORT_BUILD)
+        ORT_BUILD = os.path.abspath(ORT_BUILD)
+        if not os.path.exists(ORT_BUILD):
+            print("ERROR: OnnxRunTime build directory", ORT_BUILD, "does not exist.")
+            sys.exit(1)
+
     if not os.path.exists(run_dir):
         try:
             os.mkdir(run_dir)
@@ -1126,11 +1143,11 @@ def checkBuild(run_dir, args):
                 errormsg,
             )
             sys.exit(1)
-    return (TORCH_MLIR_BUILD, IREE_BUILD)
+    return (TORCH_MLIR_BUILD, IREE_BUILD, ORT_BUILD)
 
 
 def main():
-    global TORCH_MLIR_BUILD, IREE_BUILD
+    global TORCH_MLIR_BUILD, IREE_BUILD, ORT_BUILD
     msg = "The run.py script to run e2e shark tests"
     parser = argparse.ArgumentParser(prog="run.py", description=msg, epilog="")
     parser.add_argument(
@@ -1167,6 +1184,11 @@ def main():
         "-i",
         "--ireebuild",
         help="Path to the IREE build directory",
+    )
+    parser.add_argument(
+        "-o",
+        "--ortbuild",
+        help="Path to the OnxRunTime build directory (incl. ...../RelWithDebugInfo or build type dir)",
     )
     parser.add_argument(
         "-j",
@@ -1345,7 +1367,7 @@ def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     run_dir = os.path.abspath(args.rundirectory)
     frameworks = args.frameworks
-    TORCH_MLIR_BUILD, IREE_BUILD = checkBuild(run_dir, args)
+    TORCH_MLIR_BUILD, IREE_BUILD, ORT_BUILD = checkBuild(run_dir, args)
     # assert
 
     print("Starting e2eshark tests. Using", args.jobs, "processes")
@@ -1426,6 +1448,7 @@ def main():
                     run_dir,
                     TORCH_MLIR_BUILD,
                     IREE_BUILD,
+                    ORT_BUILD,
                 )
     else:
         for framework in frameworks:
@@ -1443,6 +1466,7 @@ def main():
                     run_dir,
                     TORCH_MLIR_BUILD,
                     IREE_BUILD,
+                    ORT_BUILD,
                 )
 
     # report generation

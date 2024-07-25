@@ -1,0 +1,14 @@
+-r https://raw.githubusercontent.com/llvm/torch-mlir/main/requirements.txt
+-r https://raw.githubusercontent.com/llvm/torch-mlir/main/torchvision-requirements.txt
+tabulate
+simplejson
+ml_dtypes
+onnx
+onnxruntime
+transformers
+huggingface-hub
+sentencepiece
+accelerate
+auto-gptq
+optimum
+azure-storage-blob

@@ -7,7 +7,6 @@ import os
 from e2e_testing import azutils
 from e2e_testing.framework import OnnxModelInfo
 from e2e_testing.registry import register_test
-from .protected_list import protected_models
 
 class AzureDownloadableModel(OnnxModelInfo):
     def __init__(self, name: str, onnx_model_path: str, cache_dir: str):

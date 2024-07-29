@@ -7,3 +7,4 @@
 from .azure_models import *
 from .opt_models import *
 from .vision_models import *
+from .deeplab import *

@@ -62,6 +62,9 @@ class OnnxModelInfo:
     def apply_postprocessing(self, output: TestTensors):
         """can be overridden to define post-processing methods for individual models"""
         return output
+    
+    def save_processed_output(self, output: TestTensors, save_to: str, name: str):
+        """can be overridden to provide instructions on saving processed outputs (e.g., images, labels, text)"""
 
     # the following helper methods aren't meant to be overriden
 

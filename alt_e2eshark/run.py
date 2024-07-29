@@ -188,6 +188,9 @@ def run_tests(
             if curr_stage in stages:
                 golden_outputs = inst.apply_postprocessing(golden_outputs_raw)
                 outputs = inst.apply_postprocessing(outputs_raw)
+                inst.save_processed_output(golden_outputs, log_dir, "golden_output")
+                inst.save_processed_output(outputs, log_dir, "output")
+
         except Exception as e:
             log_exception(e, log_dir, curr_stage, t.unique_name, verbose)
             continue

@@ -19,10 +19,10 @@ from e2e_testing.registry import register_test
 
 
 class MultipleConvBase(OnnxModelInfo):
-    def __init__(self, n, omp, cd, ov=None, use_bias=False, use_clips=False):
+    def __init__(self, use_bias, use_clips, *args, **kwargs):
         self.use_bias = use_bias
         self.use_clips = use_clips
-        super().__init__(n, omp, cd, ov)
+        super().__init__(*args, **kwargs)
 
     def construct_model(self):
         # float input tensor:
@@ -175,9 +175,9 @@ class MultipleConvBase(OnnxModelInfo):
         app_node("DequantizeLinear", ["BX0", "BS1", "ZP"], ["X0"])
         app_node("DequantizeLinear", ["BK0", "BS0", "ZP"], ["K0"])
         app_node(
-            op_type="Conv",
-            inputs=["X0", "K0", "B0"] if self.use_bias else ["X0", "K0"],
-            outputs=["AX1"],
+            "Conv",
+            ["X0", "K0", "B0"] if self.use_bias else ["X0", "K0"],
+            ["AX1"],
             group=1,
             kernel_shape=[3, 3],
             pads=[1, 1, 1, 1],
@@ -191,9 +191,9 @@ class MultipleConvBase(OnnxModelInfo):
         app_node("DequantizeLinear", ["BX1", "BS1", "ZP"], ["X1"])
         app_node("DequantizeLinear", ["BK1", "KS1", "ZP"], ["K1"])
         app_node(
-            op_type="Conv",
-            inputs=["X1", "K1", "B1"] if self.use_bias else ["X1", "K1"],
-            outputs=["AX2"],
+            "Conv",
+            ["X1", "K1", "B1"] if self.use_bias else ["X1", "K1"],
+            ["AX2"],
             group=32,
             kernel_shape=[3, 3],
             pads=[1, 1, 1, 1],
@@ -207,9 +207,9 @@ class MultipleConvBase(OnnxModelInfo):
         app_node("DequantizeLinear", ["BX2", "BS1", "ZP"], ["X2"])
         app_node("DequantizeLinear", ["BK2", "BS1", "ZP"], ["K2"])
         app_node(
-            op_type="Conv",
-            inputs=["X2", "K2", "B2"] if self.use_bias else ["X2", "K2"],
-            outputs=["X3"],
+            "Conv",
+            ["X2", "K2", "B2"] if self.use_bias else ["X2", "K2"],
+            ["X3"],
             group=1,
             kernel_shape=[1, 1],
             pads=[0, 0, 0, 0],
@@ -230,23 +230,23 @@ class MultipleConvBase(OnnxModelInfo):
 
 
 class MultipleConvModel(MultipleConvBase):
-    def __init__(self, n, omp, cd, ov=None):
-        super().__init__(n, omp, cd, ov, False, False)
+    def __init__(self, *args, **kwargs):
+        super().__init__(False, False, *args, **kwargs)
 
 
 class MultipleConvModelBias(MultipleConvBase):
-    def __init__(self, n, omp, cd, ov=None):
-        super().__init__(n, omp, cd, ov, True, False)
+    def __init__(self, *args, **kwargs):
+        super().__init__(True, False, *args, **kwargs)
 
 
 class MultipleConvModelBiasClips(MultipleConvBase):
-    def __init__(self, n, omp, cd, ov=None):
-        super().__init__(n, omp, cd, ov, True, True)
+    def __init__(self, *args, **kwargs):
+        super().__init__(True, True, *args, **kwargs)
 
 
 class MultipleConvModelClips(MultipleConvBase):
-    def __init__(self, n, omp, cd, ov=None):
-        super().__init__(n, omp, cd, ov, False, True)
+    def __init__(self, *args, **kwargs):
+        super().__init__(False, True, *args, **kwargs)
 
 
 register_test(MultipleConvModel, "multi_conv")

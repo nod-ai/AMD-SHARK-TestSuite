@@ -84,8 +84,14 @@ def pack_tensor(modelinput):
     dtype = modelinput.dtype
     if dtype == torch.int64:
         bytearr = struct.pack("%sq" % len(mylist), *mylist)
+    elif dtype == torch.uint64:
+        bytearr = struct.pack("%sQ" % len(mylist), *mylist)
     elif dtype == torch.int32:
         bytearr = struct.pack("%sl" % len(mylist), *mylist)
+    elif dtype == torch.uint32:
+        bytearr = struct.pack("%sL" % len(mylist), *mylist)
+    elif dtype == torch.float64:
+        bytearr = struct.pack("%sd" % len(mylist), *mylist)
     elif dtype == torch.float32 or dtype == torch.float:
         bytearr = struct.pack("%sf" % len(mylist), *mylist)
     elif dtype == torch.bfloat16 or dtype == torch.float16:
@@ -94,6 +100,8 @@ def pack_tensor(modelinput):
         bytearr = struct.pack("%sh" % len(mylist), *mylist)
     elif dtype == torch.int16:
         bytearr = struct.pack("%sh" % len(mylist), *mylist)
+    elif dtype == torch.uint16:
+        bytearr = struct.pack("%sH" % len(mylist), *mylist)
     elif dtype == torch.int8:
         bytearr = struct.pack("%sb" % len(mylist), *mylist)
     elif dtype == torch.uint8:

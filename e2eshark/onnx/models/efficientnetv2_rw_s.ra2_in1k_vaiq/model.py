@@ -22,7 +22,7 @@ session = onnxruntime.InferenceSession("model.onnx", None)
 # Even if model is quantized, the inputs and outputs are
 # not, so apply float32
 # Get and process the image
-img_ycbcr = setup_test_image(384, 384)
+img_ycbcr = setup_test_image(288, 288)
 
 model_input_X = to_numpy(img_ycbcr)
 

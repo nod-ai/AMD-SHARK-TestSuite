@@ -113,7 +113,7 @@ jobs:
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
       ROCM_CHIP: gfx90a
-      IREE_TEST_FILES: ~/iree_tests_cache
+      IREE_TEST_FILES: /groups/aig_sharks/iree-tests-cache-nod
       IREE_TEST_PATH_EXTENSION: ${{ github.workspace }}/iree_tests/specs
       MODELS_CONFIG_FILE_PATH: iree_tests/configs/${{ matrix.models-config-file }}
       TEST_SUITE_REPO_ROOT: ${{ github.workspace }}

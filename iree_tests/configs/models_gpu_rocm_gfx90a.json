@@ -13,7 +13,6 @@
       "pytorch/models/opt-125M",
       "pytorch/models/resnet50",
       "sharktank/llama/open-llama-3b-v2-f16",
-      "sharktank/punet/fp16",
       "sharktank/punet/int8",
     ],
     "expected_run_failures": []

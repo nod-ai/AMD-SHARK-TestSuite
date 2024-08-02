@@ -10,6 +10,7 @@ from pathlib import Path
 import argparse
 import re
 import logging
+from typing import List
 
 # append alt_e2eshark dir to path to allow importing without explicit pythonpath management
 TEST_DIR = str(Path(__file__).parent)
@@ -20,22 +21,22 @@ from e2e_testing.framework import *
 # import frontend test configs:
 from e2e_testing.test_configs.onnxconfig import (
     OnnxTestConfig,
+    OnnxEpTestConfig,
     REDUCE_TO_LINALG_PIPELINE,
 )
 
 # import backends
-from e2e_testing.backends import SimpleIREEBackend
+from e2e_testing.backends import SimpleIREEBackend, OnnxrtIreeEpBackend
 
 ALL_STAGES = [
     "setup",
     "native_inference",
-    "mlir_import",
-    "torch_mlir",
+    "import_model",
+    "preprocessing",
     "compilation",
     "compiled_inference",
-    "post-processing",
+    "postprocessing",
 ]
-
 
 def get_tests(groups, test_filter):
     """imports tests based on groups and test_filter specification"""
@@ -65,20 +66,26 @@ def get_tests(groups, test_filter):
 
 def main(args):
     """Sets up config and test list based on CL args, then runs the tests"""
+    # TODO: allow for no-run/mark xfails
+    # TODO: add better logging setup
+
     # setup config
-    if args.framework != "onnx":
+    if args.mode == "onnx-iree":
+        pipeline = REDUCE_TO_LINALG_PIPELINE if args.torchtolinalg else []
+        config = OnnxTestConfig(
+            str(TEST_DIR), SimpleIREEBackend(device=args.device, hal_target_backend=args.backend), pipeline
+        )
+    elif args.mode == "ort-ep":
+        # TODO: allow specifying provider explicitly from cl args.
+        config = OnnxEpTestConfig(
+            str(TEST_DIR), OnnxrtIreeEpBackend(device=args.device, hal_target_backend=args.backend))
+    else:
         raise NotImplementedError("only onnx frontend supported now")
-    pipeline = REDUCE_TO_LINALG_PIPELINE if args.torchtolinalg else []
-    config = OnnxTestConfig(
-        str(TEST_DIR), SimpleIREEBackend(device=args.device, hal_target_backend=args.backend), pipeline
-    )
 
     # get test list
     test_list = get_tests(args.groups, args.test_filter)
 
-    # TODO: allow for no-run/mark xfails
-    # TODO: add better logging setup
-
+    #setup test stages
     stages = ALL_STAGES
 
     if args.stages:
@@ -99,7 +106,7 @@ def main(args):
 
 
 def run_tests(
-    test_list, config, dir_name, cache_dir_name, no_artifacts, verbose, stages, load_inputs
+    test_list: List[Test], config: TestConfig, dir_name: str, cache_dir_name: str, no_artifacts: bool, verbose: bool, stages: List[str], load_inputs: bool
 ):
     """runs tests in test_list based on config"""
     # TODO: multi-process
@@ -142,9 +149,9 @@ def run_tests(
             # set up test
             curr_stage = "setup"
             if curr_stage in stages:
-                # build an instance of the test class
+                # build an instance of the test info class
                 inst = t.model_constructor(t.unique_name, log_dir, cache_dir)
-                # generate inputs from the test instance
+                # generate inputs from the test info instance
                 if load_inputs:
                     inputs = inst.load_inputs(log_dir)
                 else:
@@ -158,33 +165,33 @@ def run_tests(
                 golden_outputs_raw.save_to(log_dir + "golden_output")
 
             # generate mlir from the instance using the config
-            curr_stage = "mlir_import"
+            curr_stage = "import_model"
             if curr_stage in stages:
                 artifact_save_to = None if no_artifacts else log_dir
-                mlir_module, func_name = config.mlir_import(
+                model_artifact, func_name = config.import_model(
                     inst, save_to=artifact_save_to
                 )
 
-            # apply torch-mlir lowerings
-            curr_stage = "torch_mlir"
+            # apply config-specific preprocessing to the ModelArtifact
+            curr_stage = "preprocessing"
             if curr_stage in stages:
-                mlir_module = config.apply_torch_mlir_passes(
-                    mlir_module, save_to=artifact_save_to
+                model_artifact = config.preprocess_model(
+                    model_artifact, save_to=artifact_save_to
                 )
 
             # compile mlir_module using config (calls backend compile)
             curr_stage = "compilation"
             if curr_stage in stages:
-                buffer = config.compile(mlir_module, save_to=artifact_save_to)
+                compiled_artifact = config.compile(model_artifact, save_to=artifact_save_to)
 
             # run inference with the compiled module
             curr_stage = "compiled_inference"
             if curr_stage in stages:
-                outputs_raw = config.run(buffer, inputs, func_name=func_name)
+                outputs_raw = config.run(compiled_artifact, inputs, func_name=func_name)
                 outputs_raw.save_to(log_dir + "output")
 
             # apply model-specific post-processing:
-            curr_stage = "post-processing"
+            curr_stage = "postprocessing"
             if curr_stage in stages:
                 golden_outputs = inst.apply_postprocessing(golden_outputs_raw)
                 outputs = inst.apply_postprocessing(outputs_raw)
@@ -271,25 +278,32 @@ def _get_argparse():
         default="llvm-cpu",
         help="specifies the iree-hal-target-backend for compile phase",
     )
+    # parser.add_argument(
+    #     "-f",
+    #     "--framework",
+    #     choices=["pytorch", "onnx", "tensorflow"],
+    #     default="onnx",
+    #     help="Run tests for given framework(s)",
+    # )
     parser.add_argument(
-        "-f",
-        "--framework",
-        choices=["pytorch", "onnx", "tensorflow"],
-        default="onnx",
-        help="Run tests for given framework(s)",
+        "-m",
+        "--mode",
+        choices=["onnx-iree", "ort-ep"],
+        default="onnx-iree",
+        help="onnx-iree=onnx->torch-mlir->IREE, ort=onnx->run with custom ORT EP inference session",
     )
     parser.add_argument(
         "--torchtolinalg",
         action="store_true",
         default=False,
-        help="Have torch-mlir-opt to produce linalg instead of torch mlir and pass that to iree-compile",
+        help="for mode = onnx-iree: Have torch-mlir-opt convert to linalg before passing to iree-compile",
     )
-    parser.add_argument(
-        "--torchmlirimport",
-        choices=["compile", "fximport"],
-        default="fximport",
-        help="Use torch_mlir.torchscript.compile, or Fx importer",
-    )
+    # parser.add_argument(
+    #     "--torchmlirimport",
+    #     choices=["compile", "fximport"],
+    #     default="fximport",
+    #     help="Use torch_mlir.torchscript.compile, or Fx importer",
+    # )
 
     # arguments for customizing test-stages:
     parser.add_argument(
@@ -310,18 +324,6 @@ def _get_argparse():
         default=False,
         help="If true, will try to load inputs from bin files.",
     )
-    # parser.add_argument(
-    #     "--runfrom",
-    #     choices=["model-run", "torch-mlir", "iree-compile"],
-    #     default="model-run",
-    #     help="Start from model-run, or torch MLIR, or IREE compiled artefact",
-    # )
-    # parser.add_argument(
-    #     "--runupto",
-    #     choices=["torch-mlir", "iree-compile", "inference"],
-    #     default="inference",
-    #     help="Run upto torch MLIR generation, IREE compilation, or inference",
-    # )
 
     # test-list filtering arguments:
     parser.add_argument(
@@ -336,10 +338,10 @@ def _get_argparse():
         "--test-filter",
         help="Run given specific test(s) only",
     )
-    parser.add_argument(
-        "--testsfile",
-        help="A file with lists of tests (starting with framework name) to run",
-    )
+    # parser.add_argument(
+    #     "--testsfile",
+    #     help="A file with lists of tests (starting with framework name) to run",
+    # )
 
     # test tolerance
     parser.add_argument(
@@ -387,13 +389,6 @@ def _get_argparse():
     #     type=int,
     #     default=4,
     #     help="Number of parallel processes to use per machine for running tests",
-    # )
-    # parser.add_argument(
-    #     "-m",
-    #     "--mode",
-    #     choices=["direct", "turbine", "onnx", "ort", "vaiml"],
-    #     default="onnx",
-    #     help="direct=Fx/TS->torch-mlir, turbine=aot-export->torch-mlir, onnx=exportonnx-to-torch-mlir, ort=exportonnx-to-ortep",
     # )
     # parser.add_argument(
     #     "--norun",

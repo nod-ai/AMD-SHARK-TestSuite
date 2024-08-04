@@ -1395,7 +1395,9 @@ def main():
             testsList = args.tests
             testsList = [item.strip().strip(os.sep) for item in testsList]
         if args.testsfile:
-            testsList += getTestsListFromFile(args.testsfile)
+            testfile_path = os.path.expanduser(args.testsfile)
+            testfile_path = os.path.abspath(testfile_path)
+            testsList += getTestsListFromFile(testfile_path)
 
         # Strip leading/trailing slashes
         # Construct a dictionary of framework name and list of tests in them

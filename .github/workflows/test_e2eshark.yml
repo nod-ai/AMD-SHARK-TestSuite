@@ -16,6 +16,8 @@ jobs:
     runs-on: nodai-amdgpu-mi250-x86-64
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      AZ_PRIVATE_CONNECTION: ${{ secrets.ONNXPRIVATESTORAGE_AZ_PRIVATE_CONNECTION }}
     steps:
       - name: Checkout Test Suite
         uses: actions/checkout@v2
@@ -61,10 +63,11 @@ jobs:
           pip list
           cd e2eshark
           free -mh
-          HF_TOKEN=${{ secrets.HF_TOKEN }} AZ_PRIVATE_CONNECTION=${{ secrets.AZ_PRIVATE_CONNECTION }} python3.11 ./run.py \
+          python3.11 ./run.py \
             -r ./test-onnx \
             --report \
-            --cachedir ~/sai/test-suite-ci-cache \
+            --cachedir /groups/aig_sharks/test-suite-ci-cache \
+            --testsfile ./ci-list.txt \
             --mode onnx \
             -f onnx pytorch \
             -g models \
@@ -92,7 +95,7 @@ jobs:
           HF_TOKEN=${{ secrets.HF_TOKEN }} python3.11 ./run.py \
           -r ./test-turbine \
           --report \
-          --cachedir ~/sai/test-suite-ci-cache \
+          --cachedir /groups/aig_sharks/test-suite-ci-cache \
           --mode turbine \
           -g models \
           --cleanup \

@@ -6,8 +6,10 @@
 import numpy
 import torch
 import urllib
+from pathlib import Path
 from PIL import Image
 from torchvision import transforms
+from e2e_testing.framework import SiblingModel
 from e2e_testing.registry import register_test
 from e2e_testing.storage import TestTensors
 from .azure_models import AzureDownloadableModel
@@ -36,10 +38,10 @@ label_map = numpy.array([
     (0, 64, 128),  # tv/monitor
 ])
 
-class DeeplabModel(AzureDownloadableModel):
+class DeeplabModel(SiblingModel):
     def construct_inputs(self):
-        log_dir = self.model.rstrip("model.onnx")
-        url, filename = ("https://github.com/pytorch/hub/raw/master/images/deeplab1.png", log_dir + "input.png")
+        filename = str(Path(self.model).parent.joinpath("input.png"))
+        url = "https://github.com/pytorch/hub/raw/master/images/deeplab1.png"
         try: urllib.URLopener().retrieve(url, filename)
         except: urllib.request.urlretrieve(url, filename)
         input_image = Image.open(filename)
@@ -76,4 +78,9 @@ class DeeplabModel(AzureDownloadableModel):
             im.save(fp)
             c += 1
 
-register_test(DeeplabModel, "deeplabv3")
+# base test (no post-processing or input mods)
+register_test(AzureDownloadableModel, "deeplabv3")
+
+# sibling test with all the bells & whistles
+constructor = lambda *args, **kwargs : DeeplabModel(AzureDownloadableModel, "deeplabv3", *args, **kwargs)
+register_test(constructor, "deeplabv3_real_with_pp")

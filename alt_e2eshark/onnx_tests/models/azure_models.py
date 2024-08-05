@@ -4,14 +4,20 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 import os
+from pathlib import Path
 from e2e_testing import azutils
 from e2e_testing.framework import OnnxModelInfo
 from e2e_testing.registry import register_test
 
+CACHE_DIR = os.getenv('CACHE_DIR')
+
 class AzureDownloadableModel(OnnxModelInfo):
-    def __init__(self, name: str, onnx_model_path: str, cache_dir: str):
+    def __init__(self, name: str, onnx_model_path: str):
         opset_version = 21
-        super().__init__(name, onnx_model_path, cache_dir, opset_version)
+        if not CACHE_DIR:
+            raise RuntimeError("Please specify a cache directory path in the CACHE_DIR environment variable for storing large model files.")
+        self.cache_dir = os.path.join(CACHE_DIR, name)
+        super().__init__(name, onnx_model_path, opset_version)
 
     def construct_model(self):
         # try to find a .onnx file in the test-run dir
@@ -19,7 +25,7 @@ class AzureDownloadableModel(OnnxModelInfo):
         # if that fails, try to download and setup from azure, then search again for a .onnx file
 
         # TODO: make the zip file structure more uniform so we don't need to search for extracted files
-        model_dir = self.model.rstrip("model.nx")
+        model_dir = str(Path(self.model).parent)
 
         def find_models(model_dir):
             # search for a .onnx file in the ./test-run/testname/ dir

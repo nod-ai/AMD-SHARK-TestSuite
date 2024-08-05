@@ -7,6 +7,7 @@ import onnxruntime as ort
 import torch
 import abc
 import os
+from pathlib import Path
 from typing import Union, TypeVar, Tuple, NamedTuple, Dict, Optional, Callable
 from e2e_testing.storage import TestTensors
 from e2e_testing.onnx_utils import *
@@ -23,12 +24,10 @@ class OnnxModelInfo:
         self,
         name: str,
         onnx_model_path: str,
-        cache_dir: str,
         opset_version: Optional[int] = None,
     ):
         self.name = name
-        self.model = onnx_model_path + "model.onnx"
-        self.cache_dir = cache_dir
+        self.model = os.path.join(onnx_model_path, "model.onnx")
         self.opset_version = opset_version
 
     def forward(self, input: Optional[TestTensors] = None) -> TestTensors:
@@ -95,6 +94,20 @@ class OnnxModelInfo:
         shapes, dtypes = self.get_signature(from_inputs=False)
         return TestTensors.load_from(shapes, dtypes, dir_path, "golden_output")
 
+class SiblingModel(OnnxModelInfo):
+    """convenience class for re-using an onnx model from another 'sibling' test"""
+    def __init__(self, og_model_info_class: type, og_name: str, *args, **kwargs):
+        self.og_name = og_name # name of original test
+        self.og_mic = og_model_info_class # this should be the OnnxModelInfo child class used by sibling test
+        super().__init__(*args, **kwargs)
+
+    def construct_model(self):
+        run_dir = Path(self.model).parents[1]
+        og_model_path = os.path.join(run_dir, self.og_name)
+        inst = self.og_mic(self.og_name, og_model_path)
+        if not os.path.exists(inst.model):
+            inst.construct_model()
+        self.model = inst.model
 
 # TODO: extend TestModel to a union, or make TestModel a base class when supporting other frontends
 TestModel = OnnxModelInfo 

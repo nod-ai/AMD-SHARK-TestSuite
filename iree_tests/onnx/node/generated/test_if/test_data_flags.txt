@@ -1,2 +1,2 @@
---input=xi1=@input_0.bin
+--input=i1=@input_0.bin
 --expected_output=5xf32=@output_0.bin

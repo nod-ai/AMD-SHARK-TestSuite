@@ -1,1 +1,1 @@
---expected_output=xi1=@output_0.bin
+--expected_output=i1=@output_0.bin

@@ -13,7 +13,7 @@ import shutil
 import subprocess
 import numpy as np
 import sys
-from import_tests_utils import get_shape_string, write_io_bin
+from import_tests_utils import get_io_proto_type, write_io_bin
 
 THIS_DIR = Path(__file__).parent
 REPO_ROOT = THIS_DIR.parent.parent
@@ -140,32 +140,26 @@ def import_onnx_files(test_dir_path, imported_dir_path):
     for i in range(len(test_inputs)):
         test_input = test_inputs[i]
         t = convert_io_proto(test_input, model.graph.input[i].type)
+        ty = get_io_proto_type(model.graph.input[i].type)
         if t is None:
             return False
         input_path = (imported_dir_path / test_input.stem).with_suffix(".npy")
         np.save(input_path, t)  # Only for ref, actual comparison with .bin
-        ss = get_shape_string(t)
         input_path_bin = (imported_dir_path / test_input.stem).with_suffix(".bin")
         write_io_bin(t, input_path_bin)
-        test_data_flagfile_lines.append(
-            f"--input={ss}=@{input_path_bin.name}\n"
-        )
+        test_data_flagfile_lines.append(f"--input={ty}=@{input_path_bin.name}\n")
     for i in range(len(test_outputs)):
         test_output = test_outputs[i]
         t = convert_io_proto(test_output, model.graph.output[i].type)
+        ty = get_io_proto_type(model.graph.output[i].type)
         if t is None:
             return False
         output_path = (imported_dir_path / test_output.stem).with_suffix(".npy")
         np.save(output_path, t)  # Only for ref, actual comparison with .bin
-        ss = get_shape_string(t)
-        # required for signless output comparision
-        if "xsi" in ss or "xui" in ss:
-            ss = ss.replace("xsi", "xi")
-            ss = ss.replace("xui", "xi")
         output_path_bin = (imported_dir_path / test_output.stem).with_suffix(".bin")
         write_io_bin(t, output_path_bin)
         test_data_flagfile_lines.append(
-            f"--expected_output={ss}=@{output_path_bin.name}\n"
+            f"--expected_output={ty}=@{output_path_bin.name}\n"
         )
 
     with open(test_data_flagfile_path, "wt") as f:
@@ -197,9 +191,7 @@ if __name__ == "__main__":
     passed_imports = []
     failed_imports = []
     with Pool(args.jobs) as pool:
-        results = pool.imap_unordered(
-            import_onnx_files_with_cleanup, test_dir_paths
-        )
+        results = pool.imap_unordered(import_onnx_files_with_cleanup, test_dir_paths)
         for result in results:
             if result[1]:
                 passed_imports.append(result[0])

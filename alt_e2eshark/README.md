@@ -27,8 +27,10 @@
  - e2e_testing/storage.py : contains helper functions and classes for managing the storage of tensors.
  - e2e_testing/test_configs/onnxconfig.py : defines the onnx frontend test config. Other configs (e.g. pytorch, tensorflow) should be created in sibling files.
  - onnx_tests/ : contains files that define OnnxModelInfo child classes, which customize model/input generation for various kinds of tests. Individual tests are also registered here together with their corresponding OnnxModelInfo child class.
- - dev_requirements.txt : `pip install -r dev_requirements.txt` to install additional packages if you are using local builds of torch-mlir and iree.
- - requirements.txt : `pip install -r requirements.txt` to install packages for getting started immediately. This is mostly useful if you aren't trying to test local builds of IREE or torch-mlir.
+ - base_requirements.txt : `pip install -r base_requirements.txt` installs necessary packages. Doesn't include torch-mlir or iree. If using local builds of torch-mlir or iree, this is the only pip requirements necessary. 
+ - iree_requirements.txt : `pip install -r iree_requirements.txt` to install a nightly build of IREE (compiler and runtime).
+ - torch_mlir_requirements.txt : `pip install --no-deps -r torch_mlir_requirements.txt` to install a nightly build of torch_mlir. No deps is recommended since the torch/torchvision versions from base requirements sometimes don't line up with the selected torch_mlir package. 
+
  - run.py : Run `python run.py --help` to learn about the script. This is the script to run tests.
  
  The logs are created as .log files in the test-run sub directory. Examine the logs to find and fix 
@@ -42,53 +44,63 @@
 
 ## Setting up (Quick Start)
 
-By default, a nightly build of torch_mlir and IREE is installed when you run:
+To setup your python to run the test suite, set up a venv and install the requirements:
 
 ```bash
 python -m venv test_suite.venv /
 source test_suite.venv/bin/activate /
 pip install --upgrade pip /
-pip install -r ./requirements.txt
+pip install -r ./base_requirements.txt
 ```
 
-Therefore, you are not required to have a local build of either torch mlir or iree.
+To get a nightly build of IREE and torch_mlir, you can do:
+
+```bash
+pip install -r ./iree_requirements.txt /
+pip install --no-deps -r ./torch_mlir_requirements.txt
+```
+
+Therefore, you are not required to have a local build of either torch mlir or IREE.
 
 ## Setting up (using local build of torch-mlir or iree)
 
 If you want to use a custom build of torch-mlir or iree, you need to build those projects with python bindings enabled. 
 
-If you already installed `requirements.txt` to your venv, you can uninstall whatever package you want to replace, then activate the appropriate `.env` file for the project you want to use. For example,
+If you only installed `base_requirements.txt` to your venv, and want to use a local build of iree or torch-mlir, you can activate the appropriate `.env` file for the project you want to use. For example,
+
+### Only custom IREE
 
 ```bash
-# if starting with dev_requirements, this line is uneccessary:
-pip uninstall iree-compiler iree-runtime
-# set up python to find iree compiler and iree runtime
-source /path/to/iree-build/.env && export PYTHONPATH
+source /path/to/iree-build/.env && export PYTHONPATH /
+pip install --no-deps -r ./torch_mlir_requirements.txt
 ```
 
-If you installed `dev_requirements.txt`, you won't need to uninstall iree-compiler, iree-runtime, or torch-mlir, since these aren't included there.
+### Both custom IREE and custom torch_mlir
 
 Unfortunately, the `.env` files in torch-mlir and iree completely replace the pythonpath instead of adding to it. So if you want to use a local build of both torch-mlir and iree, you could do something like:
 
 ```bash
-export IREE_BUILD_DIR="<path to iree build dir>"
-export TORCH_MLIR_BUILD_DIR="<path to torch-mlir build dir>"
+export IREE_BUILD_DIR="<path to iree build dir>" /
+export TORCH_MLIR_BUILD_DIR="<path to torch-mlir build dir>" /
 source ${IREE_BUILD_DIR}/.env && export PYTHONPATH="${TORCH_MLIR_BUILD_DIR}/tools/torch-mlir/python_packages/torch_mlir/:${PYTHONPATH}"
 ```
 
-If you are just a torch-mlir developer and don't want a custom IREE build, you can either make an `.env` file for torch-mlir with `torch-mlir/build_tools/write_env_file.sh`and use that to set your python path, or just use:
+### Only custom torch-mlir
+
+If you are just a torch-mlir developer and don't want a custom IREE build, you can pip install a nightly build of iree and then either make an `.env` file for torch-mlir with `torch-mlir/build_tools/write_env_file.sh`and use that to set your python path, or just use:
 
 ```bash
+pip install -r iree_requirements.txt /
 export PYTHONPATH="${TORCH_MLIR_BUILD_DIR}/tools/torch-mlir/python_packages/torch_mlir/"
 ```
 
 ## Adding a test
 
-For onnx framework tests, you add a test in one of the model.py files contained in '/e2eshark/onnx_tests/'.
+For onnx framework tests, you add a test in one of the model.py files contained in `/e2eshark/onnx_tests/`.
 
 The OnnxModelInfo class simply requires that you define a function called "construct_model", which should define how to build the model.onnx file (be sure that the model.onnx file gets saved to your class' self.model, which should store the filepath to the model). 
 
-We provide a conveninece function for generating inputs by default, but to override this for an individual test, you can redefine "construct_inputs" for your test class. 
+We provide a convenience function for generating inputs by default, but to override this for an individual test, you can redefine "construct_inputs" for your test class. 
 
 Once a test class is generated, register the test with the test suite with:
 
@@ -101,10 +113,31 @@ register_test(YourTestClassName,"name_of_test")
 Here is an example of running the test we made in the previous section with some commonly used flags:
 
 ```bash
-python run.py --torchtolinalg --cachedir="../cache_dir" -t name_of_test
+python run.py --torchtolinalg -t name_of_test
 ```
 
 This will generate a new folder './test-run/name_of_test/' which contains some artifacts generated during the test. These artifacts can be used to run command line scripts to debug various failures. 
+
+If you are running an `AzureDownloadableModel` or another model type that requires downloading large files, it will be necessary to set a `CACHE_DIR` environment variable. E.g., 
+
+```bash
+export CACHE_DIR="/home/username/.cache/"
+```
+
+for protected models, you may need to additionally set an `AZ_PRIVATE_CONNECTION` with your private connection string. If using the test-suite regularly with local builds of IREE and torch_mlir, I'd recommend setting up a simple shell script like `env_setup.sh` with contents similar to:
+
+```bash
+# edit these
+export IREE_BUILD_DIR="<your iree-build>"
+export TORCH_MLIR_BUILD_DIR="<your torch-mlir build>"
+export CACHE_DIR="<your cache directory>"
+# this sets up the pythonpath
+source ${IREE_BUILD_DIR}/.env && export PYTHONPATH="${TORCH_MLIR_BUILD_DIR}/tools/torch-mlir/python_packages/torch_mlir/:${PYTHONPATH}"
+# this sets up the private connection string
+export AZ_PRIVATE_CONNECTION="DefaultEndpointsProtocol=https;AccountName=onnxprivatestorage;AccountKey=<jumble of characters>;EndpointSuffix=core.windows.net"
+# for debugging iree failures, its useful to add iree-compile and iree-run-module to path
+export PATH="${IREE_BUILD_DIR}/tools/:${PATH}"
+```
 
 
 

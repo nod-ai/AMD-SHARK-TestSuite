@@ -1,0 +1,3 @@
+# install nightly build of iree-compiler and iree-runtime
+iree-compiler -f https://iree.dev/pip-release-links.html
+iree-runtime -f https://iree.dev/pip-release-links.html

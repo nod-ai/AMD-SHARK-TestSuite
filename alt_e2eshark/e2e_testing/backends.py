@@ -39,7 +39,11 @@ class SimpleIREEBackend(BackendBase):
         b = ireec.tools.compile_str(
             str(module),
             target_backends=[self.hal_target_backend],
-            extra_args=["--iree-input-demote-i64-to-i32"],
+            extra_args=[
+                "--iree-input-demote-i64-to-i32",
+                # "--iree-llvmcpu-fail-on-large-vector=0",
+                # "--iree-llvmcpu-stack-allocation-limit=300000",
+                ],
         )
         # log the vmfb
         if save_to:

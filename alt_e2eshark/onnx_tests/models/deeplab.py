@@ -4,15 +4,15 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 import numpy
+import onnxruntime
 import torch
 import urllib
 from pathlib import Path
 from PIL import Image
 from torchvision import transforms
-from e2e_testing.framework import SiblingModel
+from ..helper_classes import AzureDownloadableModel, SiblingModel, get_sibling_constructor
 from e2e_testing.registry import register_test
 from e2e_testing.storage import TestTensors
-from .azure_models import AzureDownloadableModel
 
 label_map = numpy.array([
     (0, 0, 0),  # background
@@ -39,6 +39,9 @@ label_map = numpy.array([
 ])
 
 class DeeplabModel(SiblingModel):
+    def update_sess_options(self):
+        self.sess_options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
+
     def construct_inputs(self):
         filename = str(Path(self.model).parent.joinpath("input.png"))
         url = "https://github.com/pytorch/hub/raw/master/images/deeplab1.png"
@@ -47,22 +50,38 @@ class DeeplabModel(SiblingModel):
         input_image = Image.open(filename)
         input_image = input_image.convert("RGB")
         self.img_size = input_image.size
+        (shapes, dtypes) = self.get_signature(from_inputs=True)
+        self.shape = shapes[0]
+        if self.shape[1] == 3:
+            self.spatial_shape = self.shape[2:]
+            self.channels_last = False
+        elif self.shape[3] == 3:
+            self.spatial_shape = self.shape[1:3]
+            self.channels_last = True
+        else:
+            return ValueError("Expected the input shape to have three channels (RGB)")
         preprocess = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            transforms.Resize((513,513)),
+            transforms.Resize(self.spatial_shape),
         ])
         input_tensor = preprocess(input_image)
-        input_batch = input_tensor.unsqueeze(0).transpose(1,2).transpose(2,3)
-        return TestTensors((input_batch,))
+        input_tensor = input_tensor.unsqueeze(0)
+        if self.channels_last:
+            input_tensor = input_tensor.transpose(1,2).transpose(2,3)
+        return TestTensors((input_tensor,))
 
     def apply_postprocessing(self, output: TestTensors):
         processed_outputs = []
         for d in output.to_torch().data:
-            c = torch.topk(torch.nn.functional.softmax(d, -1), 2)[-1][0,:,:,-1]
-            image = numpy.zeros([513,513,3]).astype(numpy.uint8)
-            for i in range(513):
-                for j in range(513):
+            if self.channels_last:
+                c = torch.topk(torch.nn.functional.softmax(d, -1), 2)[-1][0,:,:,-1]
+            else:
+                c = torch.topk(torch.nn.functional.softmax(d, 1), 2, 1)[-1][0,-1,:,:]
+
+            image = numpy.zeros((self.spatial_shape[0], self.spatial_shape[1], 3)).astype(numpy.uint8)
+            for i in range(self.spatial_shape[0]):
+                for j in range(self.spatial_shape[1]):
                     for k in range(3):
                         image[i,j,k] = label_map[c[i,j]][k]
             processed_outputs.append(image)
@@ -80,7 +99,10 @@ class DeeplabModel(SiblingModel):
 
 # base test (no post-processing or input mods)
 register_test(AzureDownloadableModel, "deeplabv3")
+register_test(AzureDownloadableModel, "DeepLabV3_resnet50_vaiq_int8")
 
 # sibling test with all the bells & whistles
-constructor = lambda *args, **kwargs : DeeplabModel(AzureDownloadableModel, "deeplabv3", *args, **kwargs)
-register_test(constructor, "deeplabv3_real_with_pp")
+constructor0 = get_sibling_constructor(DeeplabModel, AzureDownloadableModel, "deeplabv3")
+constructor1 = get_sibling_constructor(DeeplabModel, AzureDownloadableModel, "DeepLabV3_resnet50_vaiq_int8")
+register_test(constructor0, "deeplabv3_real_with_pp")
+register_test(constructor1, "DeepLabV3_resnet50_vaiq_int8_real_with_pp")

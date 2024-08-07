@@ -4,27 +4,23 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 from onnx import TensorProto
-import onnx
 from onnx.helper import (
-    make_model,
-    make_node,
-    make_graph,
     make_tensor_value_info,
     make_tensor,
 )
 from typing import Optional
 
-from e2e_testing.framework import OnnxModelInfo
+from ..helper_classes import BuildAModel
 from e2e_testing.registry import register_test
 
 
-class MultipleConvBase(OnnxModelInfo):
+class MultipleConvBase(BuildAModel):
     def __init__(self, use_bias, use_clips, *args, **kwargs):
         self.use_bias = use_bias
         self.use_clips = use_clips
         super().__init__(*args, **kwargs)
 
-    def construct_model(self):
+    def construct_i_o_value_info(self):
         # float input tensor:
         AX0 = make_tensor_value_info("AX0", TensorProto.FLOAT, [1, 3, 513, 513])
         # quantized weight tensor inputs
@@ -33,6 +29,10 @@ class MultipleConvBase(OnnxModelInfo):
         BK2 = make_tensor_value_info("BK2", TensorProto.INT8, [16, 32, 1, 1])
         # output tensor
         X3 = make_tensor_value_info("X3", TensorProto.FLOAT, [1, 16, 257, 257])
+        self.input_vi = [AX0, BK0, BK1, BK2]
+        self.output_vi = [X3]
+
+    def construct_nodes(self):
 
         # scale for K1
         KS1T = make_tensor("KS1T", TensorProto.FLOAT, [], [5.000000e-01])
@@ -150,10 +150,7 @@ class MultipleConvBase(OnnxModelInfo):
             LT = make_tensor("LT", TensorProto.FLOAT, [], [0.0])
             UT = make_tensor("UT", TensorProto.FLOAT, [], [6.0])
 
-        node_list = []
-        app_node = lambda op_ty, inputs, outputs, **kwargs: node_list.append(
-            make_node(op_ty, inputs, outputs, **kwargs)
-        )
+        app_node = self.get_app_node()
         # Quantization Scheme Constants
         app_node("Constant", [], ["ZP"], value=ZPT)
         app_node("Constant", [], ["BS0"], value=BS0T)
@@ -216,40 +213,13 @@ class MultipleConvBase(OnnxModelInfo):
             strides=[1, 1],
         )
 
-        graph = make_graph(
-            node_list,
-            "main",
-            [AX0, BK0, BK1, BK2],
-            [X3],
-        )
-
-        onnx_model = make_model(graph)
-        onnx_model.opset_import[0].version = 19
-
-        onnx.save(onnx_model, self.model)
+basic = lambda *args, **kwargs : MultipleConvBase(False, False, *args, **kwargs)
+bias = lambda *args, **kwargs : MultipleConvBase(True, False, *args, **kwargs)
+bias_clips = lambda *args, **kwargs : MultipleConvBase(True, True, *args, **kwargs)
+clips = lambda *args, **kwargs : MultipleConvBase(False, True, *args, **kwargs)
 
 
-class MultipleConvModel(MultipleConvBase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(False, False, *args, **kwargs)
-
-
-class MultipleConvModelBias(MultipleConvBase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(True, False, *args, **kwargs)
-
-
-class MultipleConvModelBiasClips(MultipleConvBase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(True, True, *args, **kwargs)
-
-
-class MultipleConvModelClips(MultipleConvBase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(False, True, *args, **kwargs)
-
-
-register_test(MultipleConvModel, "multi_conv")
-register_test(MultipleConvModelBias, "multi_conv_bias")
-register_test(MultipleConvModelBiasClips, "multi_conv_bias_clips")
-register_test(MultipleConvModelClips, "multi_conv_clips")
+register_test(basic, "multi_conv_basic")
+register_test(bias, "multi_conv_bias")
+register_test(bias_clips, "multi_conv_bias_clips")
+register_test(clips, "multi_conv_clips")

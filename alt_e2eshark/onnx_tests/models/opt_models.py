@@ -8,7 +8,7 @@ import torch
 from e2e_testing.framework import OnnxModelInfo
 from e2e_testing.registry import register_test
 from e2e_testing.storage import TestTensors
-from .azure_models import AzureDownloadableModel
+from ..helper_classes import AzureDownloadableModel
 
 
 class Opt125MAWQModelInfo(AzureDownloadableModel):

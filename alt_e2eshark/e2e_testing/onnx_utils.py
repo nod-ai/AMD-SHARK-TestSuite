@@ -76,31 +76,82 @@ def get_signature_for_onnx_model(model_path, *, from_inputs: bool = True):
     return shapes, dtypes
 
 
-def modify_model_output(
-    model: onnx.ModelProto, new_output_name: str
-) -> onnx.ModelProto:
-    """A helper function to change the output of an onnx model to a new output. Helpful to use with node_output_name"""
-    if len(model.graph.output) != 1:
-        raise NotImplementedError(
-            "This function currently only supports modifying models with one output."
-        )
+def get_op_frequency(model_path):
+    model = onnx.load(model_path)
+    op_freq = dict()
+    for n in model.graph.node:
+        if n.op_type in op_freq:
+            op_freq[n.op_type] += 1
+        else:
+            op_freq[n.op_type] = 1
+    return op_freq
+
+
+def modify_model_output(model: onnx.ModelProto, final_node_key: int) -> onnx.ModelProto:
+    """A helper function to change the output of an onnx model to a new output."""
+
+    final_node = model.graph.node[final_node_key]
+
+    # clear old outputs
+    n = len(model.graph.output)
+    for _ in range(n):
+        model.graph.output.pop()
+
+    # add new outputs
     for vi in model.graph.value_info:
-        if vi.name == new_output_name:
-            model.graph.output.pop()
+        if vi.name in final_node.output:
             model.graph.output.append(vi)
+
+    # remove nodes after the final output
+    for _ in range(final_node_key + 1, len(model.graph.node)):
+        model.graph.node.pop()
+
+    # remove unused nodes, inputs, value_info, and initializers before final output
+    keep_node_names, keep_vi_names = find_minimal_graph(model.graph, final_node_key)
+
+    def remove_unused(attr: str, keep_list):
+        i = 0
+        while i < len(model.graph.__getattribute__(attr)):
+            obj = model.graph.__getattribute__(attr)[i]
+            if obj.name not in keep_list:
+                model.graph.__getattribute__(attr).pop(i)
+            else:
+                i += 1
+
+    remove_unused("node", keep_node_names)
+    remove_unused("input", keep_vi_names)
+    remove_unused("value_info", keep_vi_names)
+    remove_unused("initializer", keep_vi_names)
     return model
 
 
-def node_output_name(model: onnx.ModelProto, n: int, op_name: str) -> str:
-    """returns the output name for the nth node in the onnx model with op_type given by op_name"""
-    counter = 0
+def find_minimal_graph(graph: onnx.GraphProto, top_key: int):
+    keep_vi_names = set()
+    keep_vi_names.update(set(graph.node[top_key].output))
+    keep_names = set()
+    i = top_key
+    while i >= 0:
+        node = graph.node[i]
+        if len(set(node.output).intersection(keep_vi_names)) != 0:
+            keep_names.add(node.name)
+            keep_vi_names.update(set(node.input))
+        i -= 1
+
+    return keep_names, keep_vi_names
+
+
+def find_node(model: onnx.ModelProto, n: int, op_name: str) -> onnx.NodeProto:
+    """returns the output names for the nth node in the onnx model with op_type given by op_name"""
+    match_counter = 0
+    key = -1
     for nde in model.graph.node:
+        key += 1
         if nde.op_type != op_name:
             continue
-        if counter == n:
+        if match_counter == n:
             node = nde
             break
-        counter += 1
+        match_counter += 1
     if not node:
         raise ValueError(f"Could not find {n} nodes of type {op_name} in {model}")
-    return node.output[0]
+    return key

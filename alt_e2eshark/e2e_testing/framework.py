@@ -29,13 +29,15 @@ class OnnxModelInfo:
         self.name = name
         self.model = os.path.join(onnx_model_path, "model.onnx")
         self.opset_version = opset_version
+        self.sess_options = ort.SessionOptions()
 
     def forward(self, input: Optional[TestTensors] = None) -> TestTensors:
         """Applies self.model to self.input. Only override if necessary for specific models"""
         input = input.to_numpy().data
         if not os.path.exists(self.model):
             self.construct_model()
-        session = onnxruntime.InferenceSession(self.model, None)
+        self.update_sess_options()
+        session = ort.InferenceSession(self.model, self.sess_options)
         session_inputs = session.get_inputs()
         session_outputs = session.get_outputs()
 
@@ -45,6 +47,13 @@ class OnnxModelInfo:
         )
 
         return TestTensors(model_output)
+
+    def update_sess_options(self):
+        """Can be overridden to modify session options (self.sess_options) for gold inference.
+        It is sometimes useful to disable all optimizations, which can be done with:
+        self.sess_options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
+        """
+        pass
 
     def construct_model(self):
         """a method to be overwritten. To make a new test, define a subclass with an override for this method"""
@@ -93,21 +102,6 @@ class OnnxModelInfo:
         """computes the input signature of the onnx model and loads golden outputs from bin files"""
         shapes, dtypes = self.get_signature(from_inputs=False)
         return TestTensors.load_from(shapes, dtypes, dir_path, "golden_output")
-
-class SiblingModel(OnnxModelInfo):
-    """convenience class for re-using an onnx model from another 'sibling' test"""
-    def __init__(self, og_model_info_class: type, og_name: str, *args, **kwargs):
-        self.og_name = og_name # name of original test
-        self.og_mic = og_model_info_class # this should be the OnnxModelInfo child class used by sibling test
-        super().__init__(*args, **kwargs)
-
-    def construct_model(self):
-        run_dir = Path(self.model).parents[1]
-        og_model_path = os.path.join(run_dir, self.og_name)
-        inst = self.og_mic(self.og_name, og_model_path)
-        if not os.path.exists(inst.model):
-            inst.construct_model()
-        self.model = inst.model
 
 # TODO: extend TestModel to a union, or make TestModel a base class when supporting other frontends
 TestModel = OnnxModelInfo 

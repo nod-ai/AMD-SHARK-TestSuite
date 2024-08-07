@@ -5,4 +5,6 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 from .multi_conv import *
+from .quant_relu import *
+from .quant_resize import *
 from .shape_cos import *

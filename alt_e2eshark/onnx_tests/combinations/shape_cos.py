@@ -6,38 +6,28 @@
 import numpy
 from onnx import TensorProto
 import onnx
-from onnx.helper import make_model, make_node, make_graph, make_tensor_value_info
+from onnx.helper import make_tensor_value_info
 
-from e2e_testing.framework import OnnxModelInfo
+from ..helper_classes import BuildAModel
 from e2e_testing.registry import register_test
 
-class ShapeIntoCOSCombinationModel(OnnxModelInfo):
-    def construct_model(self):
-        input_X = make_tensor_value_info("X", TensorProto.FLOAT, [1, 1, 5])
-        input_B = make_tensor_value_info("B", TensorProto.FLOAT, [3])
-        output_Y = make_tensor_value_info("Y", TensorProto.FLOAT, [None, None, None])
 
-        shape_node = make_node("Shape", ["B"], ["S"], "shape_node")
+class ShapeIntoCOSCombinationModel(BuildAModel):
+    def construct_nodes(self):
+        app_node = self.get_app_node()
+        VT = onnx.numpy_helper.from_array(numpy.array([5], dtype=numpy.int64))
+        app_node("Shape", ["B"], ["S"], name="shape_node")
+        app_node("ConstantOfShape", ["S"], ["C"], value=VT)
+        app_node("Expand", ["X", "C"], ["Y"], name="expand_node")
 
-        cos_node = make_node(
-            "ConstantOfShape",
-            ["S"],
-            ["C"],
-            value=onnx.numpy_helper.from_array(numpy.array([5], dtype=numpy.int64)),
-        )
-        expand_node = make_node("Expand", ["X", "C"], ["Y"], "expand_node")
-
-        graph = make_graph(
-            [shape_node, cos_node, expand_node],
-            "main",
-            [input_X, input_B],
-            [output_Y],
-        )
-
-        onnx_model = make_model(graph)
-        onnx_model.opset_import[0].version = 11
-
-        onnx.save(onnx_model, self.model)
+    def construct_i_o_value_info(self):
+        self.input_vi = [
+            make_tensor_value_info("X", TensorProto.FLOAT, [1, 1, 5]),
+            make_tensor_value_info("B", TensorProto.FLOAT, [3]),
+        ]
+        self.output_vi = [
+            make_tensor_value_info("Y", TensorProto.FLOAT, [None, None, None])
+        ]
 
 
 register_test(ShapeIntoCOSCombinationModel, "shape_to_cos_test")

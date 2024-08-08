@@ -333,9 +333,11 @@ def runCodeGeneration(
     # Else pick from path
     commandname += (
         "iree-compile --iree-input-demote-i64-to-i32 --iree-hal-target-backends="
-        + args.backend
+        + args.targetbackend
         + " "
     )
+    if args.targetbackend == "rocm":
+        commandname += f"--iree-rocm-target-chip={args.targetchip} "
     scriptcommand = (
         commandname
         + " "
@@ -474,6 +476,7 @@ def runInference(
         commanddir
         + "iree-run-module --module="
         + vmfbfilename
+        + f"--device={args.device}"
         + inputarg
         + outputarg
         + " > "
@@ -918,7 +921,7 @@ def runFrameworkTests(
         return
     poolSize = args.jobs
     print(
-        f"Framework:{frameworkname} mode={args.mode} backend={args.backend} runfrom={args.runfrom} runupto={args.runupto}"
+        f"Framework:{frameworkname} mode={args.mode} backend={args.targetbackend} runfrom={args.runfrom} runupto={args.runupto}"
     )
     print("Test list:", testsList)
     uniqueTestList = []
@@ -1057,7 +1060,7 @@ def generateReport(run_dir, testsList, args):
     runname = os.path.basename(run_dir)
     with open(statustablefile, "w") as statusf:
         print(
-            f"Status report for run: {runname} using mode:{args.mode} todtype:{args.todtype} backend:{args.backend}\n",
+            f"Status report for run: {runname} using mode:{args.mode} todtype:{args.todtype} backend:{args.targetbackend}\n",
             file=statusf,
         )
         print(statustable, file=statusf)
@@ -1067,7 +1070,7 @@ def generateReport(run_dir, testsList, args):
 
     with open(timetablefile, "w") as timef:
         print(
-            f"Time (in seconds) report for run: {runname} using mode:{args.mode} todtype:{args.todtype} backend:{args.backend}\n",
+            f"Time (in seconds) report for run: {runname} using mode:{args.mode} todtype:{args.todtype} backend:{args.targetbackend}\n",
             file=timef,
         )
         print(timetable, file=timef)
@@ -1077,7 +1080,7 @@ def generateReport(run_dir, testsList, args):
 
     with open(summarytablefile, "w") as summaryf:
         print(
-            f"Summary (time in seconds) for run: {runname} using mode:{args.mode} todtype:{args.todtype} backend:{args.backend}\n",
+            f"Summary (time in seconds) for run: {runname} using mode:{args.mode} todtype:{args.todtype} backend:{args.targetbackend}\n",
             file=summaryf,
         )
         print(summarytable, file=summaryf)
@@ -1135,10 +1138,11 @@ def main():
     parser = argparse.ArgumentParser(prog="run.py", description=msg, epilog="")
     parser.add_argument(
         "-b",
-        "--backend",
+        "--targetbackend",
         choices=["llvm-cpu", "amd-aie", "rocm"],
         default="llvm-cpu",
         help="Target backend i.e. hardware to run on",
+        required=True,
     )
     parser.add_argument(
         "-d",
@@ -1297,6 +1301,17 @@ def main():
         action="store_true",
         default=False,
         help="makes the dim_params for model.onnx static with param/value dict given in model.py",
+    )
+    parser.add_argument(
+        "--targetchip",
+        help="Specify vulkan target triple or rocm/cuda target chip.",
+        default="gfx942",
+    )
+    parser.add_argument(
+        "--device",
+        help="Specify device for iree-runtime.",
+        default="local-task",
+        required=True,
     )
     parser.add_argument(
         "--ci",

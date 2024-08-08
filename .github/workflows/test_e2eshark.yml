@@ -131,7 +131,6 @@ jobs:
             --testsfile ./${{ matrix.test-file }}.txt \
             --mode onnx \
             -f onnx pytorch \
-            --tests pytorch/models/bart-large \
             --targetbackend ${{ matrix.backend }} \
             --device ${{ matrix.device }} \
             --targetchip ${{ matrix.target-chip }} \
@@ -162,7 +161,7 @@ jobs:
           --report \
           --cachedir /groups/aig_sharks/test-suite-ci-cache \
           --mode turbine \
-          -g models \
+          --tests pytorch/models/bart-large \
           --cleanup \
           --postprocess \
           --ci \

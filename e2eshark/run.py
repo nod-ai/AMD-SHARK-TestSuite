@@ -1467,7 +1467,7 @@ def main():
         generateReport(run_dir, totalTestList, args)
 
     if args.ci:
-        if test_file_name is not None:
+        if testfile_path is not None:
             test_file_name = testfile_path.split("/")[-1].split(".")[0]
         else:
             test_file_name = "turbine_models"

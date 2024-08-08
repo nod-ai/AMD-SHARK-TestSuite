@@ -185,10 +185,10 @@ jobs:
           mkdir -p ${date}/ci_reports_${{ matrix.backend }}_turbine/turbine_models
           mkdir -p ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models
           cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }} ${date}/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }}
-          cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models ${date}/ci_reports_${{ matrix.backend }}_turbine/turbine_models
+          cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models/. ${date}/ci_reports_${{ matrix.backend }}_turbine/
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git add $date
-          git commit -m "add CI reports for e2eshark ${{ matrix.test-file }}"
+          git commit -m "add CI reports for e2eshark for ${{ matrix.test-file }}"
           git push origin main
         working-directory: ./e2eshark-reports

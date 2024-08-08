@@ -158,7 +158,7 @@ jobs:
           HF_TOKEN=${{ secrets.HF_TOKEN }} python3.11 ./run.py \
           -r ./test-turbine \
           --report \
-          --cachedir /groups/aig_sharks/test-suite-ci-cache \
+          --cachedir /home/sai/shark-test-suite-models-cache \
           --mode turbine \
           --tests pytorch/models/bart-large \
           --targetbackend ${{ matrix.backend }} \

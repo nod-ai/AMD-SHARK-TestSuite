@@ -1,0 +1,1 @@
+onnx/models/bat_resnext26ts.ch_in1k/

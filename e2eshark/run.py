@@ -1468,11 +1468,14 @@ def main():
         generateReport(run_dir, totalTestList, args)
 
     if args.ci:
-        today = datetime.date.today()
-        path = script_dir + "/ci_reports"
+        if test_file_name is not None:
+            test_file_name = testfile_path.split("/")[-1].split(".")[0]
+        else:
+            test_file_name = "turbine_models"
+        path = script_dir + f"/ci_reports_{test_file_name}"
         if not os.path.exists(path):
             os.mkdir(path)
-        path += "/" + str(today)
+        path += "/" + test_file_name
         if not os.path.exists(path):
             os.mkdir(path)
         mode_path = path + f"/{args.mode}_reports"

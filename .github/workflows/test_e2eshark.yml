@@ -13,23 +13,86 @@ on:
 
 jobs:
   e2eshark:
-    runs-on: nodai-amdgpu-mi250-x86-64
+    name: "Models :: ${{ matrix.backend }} :: ${{ matrix.test-file }}"
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: mi300_gpu1_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: shark-test-suite
+            visible-device: 0
+          - name: mi300_gpu1_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-hf-cnn-fp32-shard1
+            visible-device: 1
+          - name: mi300_gpu1_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-hf-cnn-fp32-shard2
+            visible-device: 2
+          - name: mi300_gpu1_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-hf-cnn-fp32-shard3
+            visible-device: 3
+          - name: mi300_gpu1_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-int8-p0p1-shard1
+            visible-device: 4
+          - name: mi300_gpu1_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-int8-p0p1-shard2
+            visible-device: 5
+          - name: mi300_gpu1_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-int8-p0p1-shard3
+            visible-device: 6
+          - name: mi300_gpu1_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-vision-int8
+            visible-device: 7
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
       AZ_PRIVATE_CONNECTION: ${{ secrets.ONNXPRIVATESTORAGE_AZ_PRIVATE_CONNECTION }}
+      ROCR_VISIBLE_DEVICES: ${{ matrix.visible-device }}
     steps:
       - name: Checkout Test Suite
         uses: actions/checkout@v2
         with:
           repository: nod-ai/SHARK-TestSuite
+          ref: mi300
           path: test-suite
 
-      - name: Checkout SHARK Turbine
-        uses: actions/checkout@v2
-        with:
-          repository: nod-ai/SHARK-Turbine
-          path: SHARK-Turbine
+      # - name: Checkout SHARK Turbine
+      #   uses: actions/checkout@v2
+      #   with:
+      #     repository: nod-ai/SHARK-Turbine
+      #     path: SHARK-Turbine
 
       - name: Checkout iree turbine
         uses: actions/checkout@v2
@@ -63,11 +126,14 @@ jobs:
           python3.11 ./run.py \
             -r ./test-onnx \
             --report \
-            --cachedir /groups/aig_sharks/test-suite-ci-cache \
-            --testsfile ./ci-list.txt \
+            --cachedir /home/sai/shark-test-suite-models-cache \
+            --testsfile ./${{ matrix.test-file }}.txt \
             --mode onnx \
             -f onnx pytorch \
             -g models \
+            --targetbackend ${{ matrix.backend }} \
+            --device ${{ matrix.device }} \
+            --targetchip ${{ matrix.target-chip }} \
             --tolerance .01 .01 \
             --cleanup \
             --postprocess \
@@ -75,36 +141,37 @@ jobs:
             -v
         working-directory: ./test-suite
 
-      - name: Setup turbine python venv
-        run: |
-          source ${E2E_VENV_DIR}/bin/activate
-          pip install -f https://iree.dev/pip-release-links.html --upgrade \
-          -r ../iree-turbine/iree-requirements.txt
-          pip install -e ../iree-turbine[testing]
-          pip install --no-compile --pre --upgrade -e ../SHARK-Turbine/models -r ../SHARK-Turbine/models/requirements.txt
-        working-directory: ./test-suite
+      # - name: Setup turbine python venv
+      #   run: |
+      #     source ${E2E_VENV_DIR}/bin/activate
+      #     pip install -f https://iree.dev/pip-release-links.html --upgrade \
+      #     -r ../iree-turbine/iree-requirements.txt
+      #     pip install -e ../iree-turbine[testing]
+      #     pip install --no-compile --pre --upgrade -e ../SHARK-Turbine/models -r ../SHARK-Turbine/models/requirements.txt
+      #   working-directory: ./test-suite
 
-      - name: Run Turbine Mode
-        run: |
-          source ${E2E_VENV_DIR}/bin/activate
-          cd e2eshark
-          free -mh
-          HF_TOKEN=${{ secrets.HF_TOKEN }} python3.11 ./run.py \
-          -r ./test-turbine \
-          --report \
-          --cachedir /groups/aig_sharks/test-suite-ci-cache \
-          --mode turbine \
-          -g models \
-          --cleanup \
-          --postprocess \
-          --ci \
-          -v
-        working-directory: ./test-suite
+      # - name: Run Turbine Mode
+      #   if: contains(matrix.test-file, 'shark-test-suite')
+      #   run: |
+      #     source ${E2E_VENV_DIR}/bin/activate
+      #     cd e2eshark
+      #     free -mh
+      #     HF_TOKEN=${{ secrets.HF_TOKEN }} python3.11 ./run.py \
+      #     -r ./test-turbine \
+      #     --report \
+      #     --cachedir /groups/aig_sharks/test-suite-ci-cache \
+      #     --mode turbine \
+      #     -g models \
+      #     --cleanup \
+      #     --postprocess \
+      #     --ci \
+      #     -v
+      #   working-directory: ./test-suite
       
       - uses: actions/upload-artifact@master
         with:
-          name: ci_reports
-          path: ./test-suite/e2eshark/ci_reports
+          name: ci_reports_${{ matrix.test-file }}
+          path: ./test-suite/e2eshark/ci_reports_${{ matrix.test-file }}
 
   upload_artifacts:
     needs: [e2eshark]

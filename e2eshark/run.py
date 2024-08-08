@@ -1473,18 +1473,15 @@ def main():
             test_file_name = testfile_path.split("/")[-1].split(".")[0]
         else:
             test_file_name = "turbine_models"
-        path = script_dir + f"/ci_reports_{test_file_name}"
+        path = script_dir + f"/ci_reports_{args.targetbackend}_{args.mode}"
         if not os.path.exists(path):
             os.mkdir(path)
         path += "/" + test_file_name
         if not os.path.exists(path):
             os.mkdir(path)
-        mode_path = path + f"/{args.mode}_reports"
-        if not os.path.exists(mode_path):
-            os.mkdir(mode_path)
-        shutil.move(run_dir + "/statusreport.md", mode_path + "/statusreport.md")
-        shutil.move(run_dir + "/summaryreport.md", mode_path + "/summaryreport.md")
-        shutil.move(run_dir + "/timereport.md", mode_path + "/timereport.md")
+        shutil.move(run_dir + "/statusreport.md", path + "/statusreport.md")
+        shutil.move(run_dir + "/summaryreport.md", path + "/summaryreport.md")
+        shutil.move(run_dir + "/timereport.md", path + "/timereport.md")
 
     # When all processes are done, print
     print("\nCompleted run of e2e shark tests")

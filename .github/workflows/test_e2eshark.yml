@@ -170,21 +170,6 @@ jobs:
           -v
         working-directory: ./test-suite
       
-      - uses: actions/upload-artifact@master
-        with:
-          name: ci_reports_${{ matrix.test-file }}
-          path: ./test-suite/e2eshark/ci_reports_${{ matrix.test-file }}
-      
-      - uses: actions/upload-artifact@master
-        if: contains(matrix.test-file, 'shark-test-suite')
-        with:
-          name: ci_reports_turbine_models
-          path: ./test-suite/e2eshark/ci_reports_turbine_models
-
-  upload_artifacts:
-    needs: [e2eshark]
-    runs-on: nodai-amdgpu-mi250-x86-64
-    steps:
       - name: Checkout repo
         uses: actions/checkout@v2
         with:
@@ -192,18 +177,18 @@ jobs:
           ref: 'main'
           token: ${{ secrets.E2ESHARK_GITHUB_TOKEN }}
           path: e2eshark-reports
-      
-      - uses: actions/download-artifact@master
-        with:
-          name: ci_reports
-          path: ./e2eshark-reports
 
       - name: Push artifacts
         run: |
           date=$(date '+%Y-%m-%d')
+          mkdir -p ${date}/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }}
+          mkdir -p ${date}/ci_reports_${{ matrix.backend }}_turbine/turbine_models
+          mkdir -p ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models
+          cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }} ${date}/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }}
+          cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models ${date}/ci_reports_${{ matrix.backend }}_turbine/turbine_models
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git add $date
-          git commit -m "add CI reports for e2eshark"
+          git commit -m "add CI reports for e2eshark ${{ matrix.test-file }}"
           git push origin main
         working-directory: ./e2eshark-reports

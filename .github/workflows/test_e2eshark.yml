@@ -184,7 +184,7 @@ jobs:
           mkdir -p ${date}/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }}
           mkdir -p ${date}/ci_reports_${{ matrix.backend }}_turbine/turbine_models
           mkdir -p ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models
-          cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }} ${date}/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }}
+          cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }} ${date}/ci_reports_${{ matrix.backend }}_onnx/
           cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models/. ${date}/ci_reports_${{ matrix.backend }}_turbine/
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"

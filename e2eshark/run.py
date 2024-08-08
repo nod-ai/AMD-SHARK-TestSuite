@@ -1410,6 +1410,8 @@ def main():
         if args.tests:
             testsList = args.tests
             testsList = [item.strip().strip(os.sep) for item in testsList]
+
+        testfile_path = None
         if args.testsfile:
             testfile_path = os.path.expanduser(args.testsfile)
             testfile_path = os.path.abspath(testfile_path)

@@ -88,7 +88,7 @@ To use local versions of `iree-compile` and `iree-run-module`, put them on your
 `$PATH` ahead of your `.venv/Scripts` directory:
 
 ```bash
-$ export PATH=path/to/iree-build;$PATH
+$ export PATH=path/to/iree-build:$PATH
 ```
 
 ### Invoking pytest

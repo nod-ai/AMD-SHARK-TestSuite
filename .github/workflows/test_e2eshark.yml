@@ -189,7 +189,7 @@ jobs:
           name: ci_reports_${{ matrix.backend }}_turbine
           path: ./test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine
 
-  merge_rocm_artifacts:
+  push_artifacts:
     needs: [e2eshark]
     runs-on: ${{ matrix.runs-on }}
     strategy:
@@ -292,35 +292,42 @@ jobs:
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3
 
           python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/combined_reports/statusreport.md \
+          -o ./e2eshark-reports/${{ matrix.backend }}/combined-reports/statusreport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1 \
           ./e2eshark-reports/${{ matrix.backend }}/shark-test-suite \
           ./e2eshark-reports/${{ matrix.backend }}/vai-vision-int8
           python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/combined_reports/timereport.md \
+          -o ./e2eshark-reports/${{ matrix.backend }}/combined-reports/timereport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1 \
           ./e2eshark-reports/${{ matrix.backend }}/shark-test-suite \
           ./e2eshark-reports/${{ matrix.backend }}/vai-vision-int8
           python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/combined_reports/summaryreport.md \
+          -o ./e2eshark-reports/${{ matrix.backend }}/combined-reports/summaryreport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1 \
           ./e2eshark-reports/${{ matrix.backend }}/shark-test-suite \
           ./e2eshark-reports/${{ matrix.backend }}/vai-vision-int8
 
-      # - name: Push artifacts
-      #   run: |
-      #     date=$(date '+%Y-%m-%d')
-      #     mkdir -p ${date}/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }}
-      #     mkdir -p ${date}/ci_reports_${{ matrix.backend }}_turbine/turbine_models
-      #     mkdir -p ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models
-      #     cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }} ${date}/ci_reports_${{ matrix.backend }}_onnx/
-      #     cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models/. ${date}/ci_reports_${{ matrix.backend }}_turbine/
-      #     git config user.name "GitHub Actions Bot"
-      #     git config user.email "<>"
-      #     git add $date
-      #     git commit -m "add CI reports for e2eshark for ${{ matrix.test-file }}"
-      #     git push origin main
-      #   working-directory: ./e2eshark-reports
+      - name: Push artifacts
+        run: |
+          date=$(date '+%Y-%m-%d')
+          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32
+          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1
+          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/shark-test-suite
+          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8
+          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports
+          mkdir -p ${date}/ci_reports_turbine/${{ matrix.backend }}/turbine_models
+          cp -r ./${{ matrix.backend }}/vai-hf-cnn-fp32/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32/
+          cp -r ./${{ matrix.backend }}/vai-int8-p0p1/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1/
+          cp -r ./${{ matrix.backend }}/shark-test-suite/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/shark-test-suite/
+          cp -r ./${{ matrix.backend }}/vai-vision-int8/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8/
+          cp -r ./${{ matrix.backend }}/combined-reports/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports/
+          cp -r ./${{ matrix.backend }}/turbine_models/*.md ${date}/ci_reports_turbine/${{ matrix.backend }}/turbine_models
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git add $date
+          git commit -m "add CI reports for e2eshark for ${{ matrix.backend }}"
+          git push origin main
+        working-directory: ./e2eshark-reports

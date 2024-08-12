@@ -59,9 +59,8 @@ def createMergedHeader(args, runnames, header):
     else:
         mergedheader = ["tests"]
     for i in range(len(header)):
-        for run in runnames:
-            columnname = header[i] + joiner + run
-            mergedheader += [columnname]
+        columnname = header[i]
+        mergedheader += [columnname]
     return mergedheader
 
 
@@ -70,10 +69,10 @@ def getCanonicalizedListOfRuns(args, runnames, dictOfRuns, column_indices, rowle
     for run in runnames:
         if dictOfRuns.get(run):
             listOfRuns += [selectColumns(dictOfRuns[run], column_indices)]
-        else:
-            listOfRuns += [
-                ["NA" if args.mode == "status" else 0 for i in range(rowlen)]
-            ]
+        # else:
+        #     listOfRuns += [
+        #         ["NA" if args.mode == "status" else 0 for i in range(rowlen)]
+        #     ]
     return listOfRuns
 
 

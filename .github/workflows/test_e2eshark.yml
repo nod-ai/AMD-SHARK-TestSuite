@@ -85,7 +85,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: nod-ai/SHARK-TestSuite
-          ref: mi300
+          ref: merge-reports
           path: test-suite
 
       - name: Checkout SHARK Turbine
@@ -155,7 +155,7 @@ jobs:
           source ${E2E_VENV_DIR}/bin/activate
           cd e2eshark
           free -mh
-          HF_TOKEN=${{ secrets.HF_TOKEN }} python3.11 ./run.py \
+          python3.11 ./run.py \
           -r ./test-turbine \
           --report \
           --cachedir /home/sai/shark-test-suite-models-cache \
@@ -177,18 +177,151 @@ jobs:
           ref: 'main'
           token: ${{ secrets.E2ESHARK_GITHUB_TOKEN }}
           path: e2eshark-reports
+      
+      - uses: actions/upload-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_onnx
+          path: ./test-suite/e2eshark/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }}
+      
+      - uses: actions/upload-artifact@master
+        if: contains(matrix.test-file, 'shark-test-suite')
+        with:
+          name: ci_reports_${{ matrix.backend }}_turbine
+          path: ./test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models
 
-      - name: Push artifacts
+  merge_rocm_artifacts:
+    needs: [e2eshark]
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: merge_rocm_reports
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+    steps:
+      - name: Checkout Test Suite
+        uses: actions/checkout@v2
+        with:
+          repository: nod-ai/SHARK-TestSuite
+          ref: merge-reports
+          path: test-suite
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          repository: nod-ai/e2eshark-reports
+          ref: 'main'
+          token: ${{ secrets.E2ESHARK_GITHUB_TOKEN }}
+          path: e2eshark-reports
+      - name: "Setup test suite venv"
         run: |
-          date=$(date '+%Y-%m-%d')
-          mkdir -p ${date}/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }}
-          mkdir -p ${date}/ci_reports_${{ matrix.backend }}_turbine/turbine_models
-          mkdir -p ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models
-          cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }} ${date}/ci_reports_${{ matrix.backend }}_onnx/
-          cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models/. ${date}/ci_reports_${{ matrix.backend }}_turbine/
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git add $date
-          git commit -m "add CI reports for e2eshark for ${{ matrix.test-file }}"
-          git push origin main
-        working-directory: ./e2eshark-reports
+          python3.11 -m venv report_venv
+          source report_venv/bin/activate
+          pip install --upgrade pip
+          pip install -r ./test-suite/e2eshark/requirements.txt
+        working-directory: ./test-suite
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_shark-test-suite_onnx
+          path: ./e2eshark-reports/${{ matrix.backend }}
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_onnx
+          path: ./e2eshark-reports/${{ matrix.backend }}
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_onnx
+          path: ./e2eshark-reports/${{ matrix.backend }}
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_onnx
+          path: ./e2eshark-reports/${{ matrix.backend }}
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_onnx
+          path: ./e2eshark-reports/${{ matrix.backend }}
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_onnx
+          path: ./e2eshark-reports/${{ matrix.backend }}
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_onnx
+          path: ./e2eshark-reports/${{ matrix.backend }}
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx
+          path: ./e2eshark-reports/${{ matrix.backend }}
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_turbine
+          path: ./e2eshark-reports/${{ matrix.backend }}
+      - name: Merge Reports
+        run: |
+          source report_venv/bin/activate
+
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status \
+          -o ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1/statusreport.md \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time \
+          -o ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1/timereport.md \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary \
+          -o ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1/summaryreport.md \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3
+
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status \
+          -o ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32/statusreport.md \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time \
+          -o ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32/timereport.md \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary \
+          -o ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32/summaryreport.md \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3
+
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status \
+          -o ./e2eshark-reports/${{ matrix.backend }}/combined_reports/statusreport.md \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1 \
+          ./e2eshark-reports/${{ matrix.backend }}/shark-test-suite \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-vision-int8
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time \
+          -o ./e2eshark-reports/${{ matrix.backend }}/combined_reports/timereport.md \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1 \
+          ./e2eshark-reports/${{ matrix.backend }}/shark-test-suite \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-vision-int8
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary \
+          -o ./e2eshark-reports/${{ matrix.backend }}/combined_reports/summaryreport.md \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32 \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1 \
+          ./e2eshark-reports/${{ matrix.backend }}/shark-test-suite \
+          ./e2eshark-reports/${{ matrix.backend }}/vai-vision-int8
+
+      # - name: Push artifacts
+      #   run: |
+      #     date=$(date '+%Y-%m-%d')
+      #     mkdir -p ${date}/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }}
+      #     mkdir -p ${date}/ci_reports_${{ matrix.backend }}_turbine/turbine_models
+      #     mkdir -p ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models
+      #     cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }} ${date}/ci_reports_${{ matrix.backend }}_onnx/
+      #     cp -r ../test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models/. ${date}/ci_reports_${{ matrix.backend }}_turbine/
+      #     git config user.name "GitHub Actions Bot"
+      #     git config user.email "<>"
+      #     git add $date
+      #     git commit -m "add CI reports for e2eshark for ${{ matrix.test-file }}"
+      #     git push origin main
+      #   working-directory: ./e2eshark-reports

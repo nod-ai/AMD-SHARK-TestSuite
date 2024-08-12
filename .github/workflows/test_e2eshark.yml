@@ -160,7 +160,7 @@ jobs:
           --report \
           --cachedir /home/sai/shark-test-suite-models-cache \
           --mode turbine \
-          --tests pytorch/models/bart-large \
+          -g models \
           --targetbackend ${{ matrix.backend }} \
           --device ${{ matrix.device }} \
           --targetchip ${{ matrix.target-chip }} \

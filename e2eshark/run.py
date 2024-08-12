@@ -1483,6 +1483,9 @@ def main():
         shutil.move(run_dir + "/statusreport.md", path + "/statusreport.md")
         shutil.move(run_dir + "/summaryreport.md", path + "/summaryreport.md")
         shutil.move(run_dir + "/timereport.md", path + "/timereport.md")
+        shutil.move(run_dir + "/statusreport.pkl", path + "/statusreport.pkl")
+        shutil.move(run_dir + "/summaryreport.pkl", path + "/summaryreport.pkl")
+        shutil.move(run_dir + "/timereport.pkl", path + "/timereport.pkl")
 
     # When all processes are done, print
     print("\nCompleted run of e2e shark tests")

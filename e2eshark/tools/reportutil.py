@@ -355,7 +355,10 @@ if __name__ == "__main__":
 
     outf = sys.stdout
     if args.output:
-        outf = open(args.output, "w")
+        outf_path = os.path.expanduser(args.output)
+        outf_path = os.path.abspath(outf_path)
+        os.makedirs(os.path.dirname(outf_path), exist_ok=True)
+        outf = open(outf_path, "w")
     runstr = ", ".join(runnames)
     extramsg = ""
     if args.mode == "time":

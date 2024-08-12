@@ -259,51 +259,51 @@ jobs:
         run: |
           source report_venv/bin/activate
 
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status \
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status -f github \
           -o ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1/statusreport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time \
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time -f github \
           -o ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1/timereport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary \
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary -f github \
           -o ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1/summaryreport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3
 
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status \
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status -f github \
           -o ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32/statusreport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time \
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time -f github \
           -o ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32/timereport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary \
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary -f github \
           -o ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32/summaryreport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3
 
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status \
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status -f github \
           -o ./e2eshark-reports/${{ matrix.backend }}/combined_reports/statusreport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1 \
           ./e2eshark-reports/${{ matrix.backend }}/shark-test-suite \
           ./e2eshark-reports/${{ matrix.backend }}/vai-vision-int8
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time \
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time -f github \
           -o ./e2eshark-reports/${{ matrix.backend }}/combined_reports/timereport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1 \
           ./e2eshark-reports/${{ matrix.backend }}/shark-test-suite \
           ./e2eshark-reports/${{ matrix.backend }}/vai-vision-int8
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary \
+          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary -f github \
           -o ./e2eshark-reports/${{ matrix.backend }}/combined_reports/summaryreport.md \
           ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32 \
           ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1 \

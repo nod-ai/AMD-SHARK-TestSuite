@@ -181,13 +181,13 @@ jobs:
       - uses: actions/upload-artifact@master
         with:
           name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_onnx
-          path: ./test-suite/e2eshark/ci_reports_${{ matrix.backend }}_onnx/${{ matrix.test-file }}
+          path: ./test-suite/e2eshark/ci_reports_${{ matrix.backend }}_onnx
       
       - uses: actions/upload-artifact@master
         if: contains(matrix.test-file, 'shark-test-suite')
         with:
           name: ci_reports_${{ matrix.backend }}_turbine
-          path: ./test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine/turbine_models
+          path: ./test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine
 
   merge_rocm_artifacts:
     needs: [e2eshark]
@@ -219,7 +219,6 @@ jobs:
           source report_venv/bin/activate
           pip install --upgrade pip
           pip install -r ./test-suite/e2eshark/requirements.txt
-        working-directory: ./test-suite
       - uses: actions/download-artifact@master
         with:
           name: ci_reports_${{ matrix.backend }}_shark-test-suite_onnx

@@ -123,7 +123,6 @@ onnx/models/crossvit_9_dagger_240/
 onnx/models/crossvit_base_240/
 onnx/models/crossvit_small_240/
 onnx/models/crossvit_tiny_240/
-onnx/models/darknet53/
 onnx/models/darknetaa53/
 onnx/models/davit_base.msft_in1k/
 onnx/models/davit_small.msft_in1k/

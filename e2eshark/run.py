@@ -1399,6 +1399,7 @@ def main():
     print("Test run directory:", run_dir)
     totalTestList = []
     skiptestslist = []
+    testfile_path = None
     # if args.tests used, that means run given specific tests, the --frameworks options will be
     # ignored in that case
     if args.skiptestsfile:
@@ -1411,7 +1412,6 @@ def main():
             testsList = args.tests
             testsList = [item.strip().strip(os.sep) for item in testsList]
 
-        testfile_path = None
         if args.testsfile:
             testfile_path = os.path.expanduser(args.testsfile)
             testfile_path = os.path.abspath(testfile_path)

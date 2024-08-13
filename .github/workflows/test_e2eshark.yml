@@ -391,6 +391,9 @@ jobs:
 
       - name: Push artifacts
         run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git pull
           date=$(date '+%Y-%m-%d')
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1
@@ -404,8 +407,6 @@ jobs:
           cp -r ./${{ matrix.backend }}/vai-vision-int8/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8/
           cp -r ./${{ matrix.backend }}/combined-reports/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports/
           cp -r ./${{ matrix.backend }}/turbine_models/*.md ${date}/ci_reports_turbine/${{ matrix.backend }}/turbine_models
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
           git add $date
           git commit -m "add CI reports for e2eshark for ${{ matrix.backend }}"
           git push origin main

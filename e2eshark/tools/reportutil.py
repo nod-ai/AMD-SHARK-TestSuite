@@ -77,26 +77,44 @@ def getCanonicalizedListOfRuns(args, runnames, dictOfRuns, column_indices, rowle
 
 
 def createOneMergedRow(
-    args, runnames, firstColumnIdentifier, dictOfRuns, column_indices, rowlen
+    args, runnames, firstColumnIdentifier, dictOfRuns, column_indices, rowlen, total_runs
 ):
+    if firstColumnIdentifier == "median-time":
+        return
     merged = [firstColumnIdentifier]
     listOfRuns = getCanonicalizedListOfRuns(
         args, runnames, dictOfRuns, column_indices, rowlen
     )
     # zip creates a tuple by taking same index value from each of the
     # unpacked (using * operator) run in listOfRuns
+    total_runs_idx = 0
     for cellItemTuple in zip(*listOfRuns):
-        merged.extend(cellItemTuple)
+        if firstColumnIdentifier == "total-count":
+            total_runs.append(cellItemTuple)
+            merged.append(sum(cellItemTuple))
+        if firstColumnIdentifier == "average-time":
+            if sum(total_runs[total_runs_idx]) != 0:
+                totalTimes = []
+                for idx in range(len(cellItemTuple)):
+                    totalTimes.append(float(cellItemTuple[idx]) * total_runs[total_runs_idx][idx])
+                merged.append(sum(totalTimes) / sum(total_runs[total_runs_idx]))
+            else:
+                merged.append(0)
+            total_runs_idx += 1
+        else:
+            merged.extend(cellItemTuple)
     return merged
 
 
 def createMergedRows(args, runnames, reportdict, column_indices, rowlen):
     mergedrows = []
+    total_runs = []
     for test, dictOfRuns in reportdict.items():
         merged = createOneMergedRow(
-            args, runnames, test, dictOfRuns, column_indices, rowlen
+            args, runnames, test, dictOfRuns, column_indices, rowlen, total_runs
         )
-        mergedrows += [merged]
+        if merged is not None:
+            mergedrows += [merged]
 
     return mergedrows
 

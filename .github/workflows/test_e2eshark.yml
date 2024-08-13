@@ -75,6 +75,54 @@ jobs:
             target-chip: gfx942
             test-file: vai-vision-int8
             visible-device: 7
+          - name: cpu_shard1_test
+            runs-on: nodai-amdgpu-mi250-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: shark-test-suite
+          - name: cpu_shard2_test
+            runs-on: nodai-amdgpu-mi250-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-hf-cnn-fp32-shard1
+          - name: cpu_shard3_test
+            runs-on: nodai-amdgpu-mi250-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-hf-cnn-fp32-shard2
+          - name: cpu_shard4_test
+            runs-on: nodai-amdgpu-mi250-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-hf-cnn-fp32-shard3
+          - name: cpu_shard5_test
+            runs-on: nodai-amdgpu-mi250-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-int8-p0p1-shard1
+          - name: cpu_shard6_test
+            runs-on: nodai-amdgpu-mi250-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-int8-p0p1-shard2
+          - name: cpu_shard7_test
+            runs-on: nodai-amdgpu-mi250-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-int8-p0p1-shard3
+          - name: cpu_shard8_test
+            runs-on: nodai-amdgpu-mi250-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-vision-int8
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -199,6 +247,9 @@ jobs:
           - name: merge_rocm_reports
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
+          - name: merge_cpu_reports
+            runs-on: nodai-amdgpu-mi250-x86-64
+            backend: llvm-cpu
     steps:
       - name: Checkout Test Suite
         uses: actions/checkout@v2

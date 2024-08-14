@@ -477,7 +477,7 @@ def runInference(
         commanddir
         + "iree-run-module --module="
         + vmfbfilename
-        + f"--device={args.device}"
+        + f" --device={args.device}"
         + inputarg
         + outputarg
         + " > "

@@ -92,7 +92,7 @@ def createOneMergedRow(
         if firstColumnIdentifier == "total-count":
             total_runs.append(cellItemTuple)
             merged.append(sum(cellItemTuple))
-        if firstColumnIdentifier == "average-time":
+        elif firstColumnIdentifier == "average-time":
             if sum(total_runs[total_runs_idx]) != 0:
                 totalTimes = []
                 for idx in range(len(cellItemTuple)):

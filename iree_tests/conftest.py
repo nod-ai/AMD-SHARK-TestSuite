@@ -60,7 +60,7 @@ def pytest_addoption(parser):
         this_dir = Path(__file__).parent
         repo_root = this_dir.parent
         default_config_files = [
-            repo_root / "iree_tests/configs/onnx_cpu_llvm_sync.json",
+            repo_root / "iree_tests/configs/cpu_llvm_sync.json",
         ]
     parser.addoption(
         "--config-files",

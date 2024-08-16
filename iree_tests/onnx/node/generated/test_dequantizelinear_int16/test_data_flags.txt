@@ -1,4 +1,0 @@
---input=4xi16=@input_0.bin
---input=f32=@input_1.bin
---input=i16=@input_2.bin
---expected_output=4xf32=@output_0.bin

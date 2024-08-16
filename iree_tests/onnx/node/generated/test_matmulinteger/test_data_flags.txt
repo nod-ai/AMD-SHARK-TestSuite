@@ -1,5 +1,0 @@
---input=4x3xi8=@input_0.bin
---input=3x2xi8=@input_1.bin
---input=1xi8=@input_2.bin
---input=1xi8=@input_3.bin
---expected_output=4x2xi32=@output_0.bin

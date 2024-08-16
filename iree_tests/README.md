@@ -67,7 +67,7 @@ Tests are run using the [pytest](https://docs.pytest.org/en/stable/) framework.
 A [`conftest.py`](conftest.py) file collects test cases from subdirectories,
 wrapping each directory matching the format described above to one test case
 per test configuration. Test configurations are defined in JSON config files
-like [`configs/onnx_cpu_llvm_sync.json`](./configs/onnx_cpu_llvm_sync.json).
+like [`configs/cpu_llvm_sync.json`](./configs/cpu_llvm_sync.json).
 
 ### Common venv setup with deps
 
@@ -116,18 +116,18 @@ $ export IREE_TEST_CONFIG_FILES=/iree/cpu_llvm_sync.json;/iree/gpu_vulkan.json
 $ pytest iree_tests
 ```
 
-Run ONNX tests on CPU and print all errors:
+Run tests on CPU and print all errors:
 
 ```bash
-$ pytest iree_tests/onnx -n auto --ignore-xfails \
-    --config-files ./iree_tests/configs/onnx_cpu_llvm_sync.json
+$ pytest iree_tests -n auto --ignore-xfails \
+    --config-files ./iree_tests/configs/cpu_llvm_sync.json
 ```
 
-Run ONNX compilation tests only and print all errors:
+Run compilation tests only and print all errors:
 
 ```bash
-$ pytest iree_tests/onnx -n auto --ignore-xfails --skip-all-runs \
-    --config-files ./iree_tests/configs/onnx_cpu_llvm_sync.json
+$ pytest iree_tests -n auto --ignore-xfails --skip-all-runs \
+    --config-files ./iree_tests/configs/cpu_llvm_sync.json
 ```
 
 ### Updating expected failure lists
@@ -149,9 +149,9 @@ To update these lists using the results of a test run:
 1. Run pytest with the `--report-log` option:
 
     ```bash
-    $ pytest iree_tests/onnx \
-      --report-log=/tmp/onnx_cpu_logs.json \
-      --config-files=onnx_cpu.json \
+    $ pytest iree_tests \
+      --report-log=/cpu_llvm_sync_logs.json \
+      --config-files=cpu_llvm_sync.json \
       ...
     ```
 
@@ -159,8 +159,8 @@ To update these lists using the results of a test run:
 
     ```bash
     $ python iree_tests/update_config_xfails.py \
-      --log-file=/tmp/onnx_cpu_logs.json \
-      --config-file=onnx_cpu.json
+      --log-file=/cpu_llvm_sync_logs.json \
+      --config-file=cpu_llvm_sync.json
     ```
 
 You can also update the config JSON files manually. The log output on its own
@@ -301,30 +301,6 @@ ERROR pytorch/models/resnet50/resnet50.mlirbc - FileNotFoundError: Missing files
 
 These are hand-authored tests demonstratating simple features about how the
 tools and test suite work.
-
-### ONNX test suite
-
-The ONNX test suite is a conversion of the upstream test suite from
-[(onnx repo) `onnx/backend/test/`](https://github.com/onnx/onnx/tree/main/onnx/backend/test/):
-
-* Python sources in
-  [(onnx repo) `onnx/backend/test/case/`](https://github.com/onnx/onnx/tree/main/onnx/backend/test/case)
-* Generated `.onnx` and `[input,output]_[0-9]+.pb` files in
-  [(onnx repo) `onnx/backend/test/data/`](https://github.com/onnx/onnx/tree/main/onnx/backend/test/data)
-* The 'node' tests are for individual ONNX operators. The 'light', 'real',
-  'simple', and other test suites may also be interesting.
-
-The [`import_tests.py`](./onnx/import_tests.py) file walks test suites in the
-'data' subdirectory and generates test cases in the format described above into
-folders like [`./onnx/node/generated/`](./onnx/node/generated/).
-
-To regenerate the test cases:
-
-```bash
-python -m pip install iree-compiler iree-runtime
-python -m pip install -r ./iree_tests/onnx/requirements.txt
-python ./iree_tests/onnx/import_tests.py
-```
 
 ### PyTorch models
 

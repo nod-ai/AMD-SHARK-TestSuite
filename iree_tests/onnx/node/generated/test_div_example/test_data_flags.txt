@@ -1,3 +1,0 @@
---input=2xf32=@input_0.bin
---input=2xf32=@input_1.bin
---expected_output=2xf32=@output_0.bin

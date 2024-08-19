@@ -54,7 +54,6 @@ onnx/models/VGG19_vaiq_int8
 onnx/models/VideoResNet_vaiq_int8
 onnx/models/WideResNet_50_2_vaiq_int8
 onnx/models/YoloNetV3_vaiq_int8
-onnx/models/opt-125M-awq
 onnx/models/pytorch-3dunet_vaiq_int8
 onnx/models/resnet50_vaiq_int8
 onnx/models/retinanet_resnet50_fpn_vaiq_int8

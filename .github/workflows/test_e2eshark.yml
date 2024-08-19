@@ -191,7 +191,7 @@ jobs:
             -r ./test-onnx \
             --report \
             --cachedir ${{ matrix.cache-dir }} \
-            --testsfile ./${{ matrix.test-file }}.txt \
+            --testsfile ./ci_model_lists/${{ matrix.test-file }}.txt \
             --mode onnx \
             -f onnx pytorch \
             --targetbackend ${{ matrix.backend }} \

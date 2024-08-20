@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 import abc
 import onnxruntime as ort
-from typing import TypeVar
+from typing import TypeVar, List
 from e2e_testing.storage import TestTensors
 from e2e_testing.framework import CompiledOutput, ModelArtifact
 from onnx import ModelProto
@@ -30,20 +30,45 @@ from iree import runtime as ireert
 
 class SimpleIREEBackend(BackendBase):
     '''This backend uses iree to compile and run MLIR modules for a specified hal_target_backend'''
-    def __init__(self, *, device="local-task", hal_target_backend="llvm-cpu"):
+    def __init__(self, *, device="local-task", hal_target_backend="llvm-cpu", extra_args : List[str] = None):
         self.device = device
         self.hal_target_backend = hal_target_backend
+        if extra_args:
+            self.extra_args = []
+            for a in extra_args:
+                if a[0:2] == "--":
+                    self.extra_args.append(a)
+                else:
+                    self.extra_args.append("--" + a)
+        elif hal_target_backend == "rocm":
+            # some extra args for Mi300x - some of these may not work for other chips
+            self.extra_args = [
+                "--iree-rocm-target-chip=gfx942",
+                # "--iree-global-opt-propagate-transposes=true",
+                # "--iree-opt-outer-dim-concat=true",
+                # "--iree-opt-const-eval=false",
+                # "--iree-rocm-waves-per-eu=2",
+                # "--iree-llvmgpu-enable-prefetch",
+                # "--iree-flow-enable-aggressive-fusion",
+                # "--iree-flow-enable-fuse-horizontal-contractions=true",
+                # "--iree-opt-aggressively-propagate-transposes=true",
+                # "--iree-codegen-llvmgpu-use-vector-distribution=true",
+                # "--iree-preprocessing-pass-pipeline=builtin.module(util.func(iree-preprocessing-pad-to-intrinsics{pad-target-type=conv}))",
+                # maybe add iree-preprocessing-transpose-convolution-pipeline to preprocessing pipeline.
+            ]
+        elif hal_target_backend == "llvm-cpu":
+            self.extra_args = [
+                "--iree-input-demote-i64-to-i32",
+                # "--iree-llvmcpu-fail-on-large-vector=0",
+                # "--iree-llvmcpu-stack-allocation-limit=300000",
+            ]
 
     def compile(self, module, *, save_to: str = None):
         # compile to a vmfb for llvm-cpu
         b = ireec.tools.compile_str(
             str(module),
             target_backends=[self.hal_target_backend],
-            extra_args=[
-                "--iree-input-demote-i64-to-i32",
-                # "--iree-llvmcpu-fail-on-large-vector=0",
-                # "--iree-llvmcpu-stack-allocation-limit=300000",
-                ],
+            extra_args=self.extra_args,
         )
         # log the vmfb
         if save_to:

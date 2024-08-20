@@ -28,13 +28,15 @@ from e2e_testing.test_configs.onnxconfig import (
 
 # import backends
 from e2e_testing.backends import SimpleIREEBackend, OnnxrtIreeEpBackend
+from utils.report import generate_report
 
 ALL_STAGES = [
     "setup",
-    "native_inference",
     "import_model",
     "preprocessing",
     "compilation",
+    "construct_inputs",
+    "native_inference",
     "compiled_inference",
     "postprocessing",
 ]
@@ -72,7 +74,7 @@ def main(args):
     if args.mode == "onnx-iree":
         pipeline = REDUCE_TO_LINALG_PIPELINE if args.torchtolinalg else []
         config = OnnxTestConfig(
-            str(TEST_DIR), SimpleIREEBackend(device=args.device, hal_target_backend=args.backend), pipeline
+            str(TEST_DIR), SimpleIREEBackend(device=args.device, hal_target_backend=args.backend, extra_args=args.iree_compile_args), pipeline
         )
     elif args.mode == "ort-ep":
         # TODO: allow specifying provider explicitly from cl args.
@@ -92,30 +94,33 @@ def main(args):
     if args.skip_stages:
         stages = [s for s in stages if s not in args.skip_stages]
     
+    parent_log_dir = os.path.join(TEST_DIR, args.rundirectory)
 
-    run_tests(
+    status_dict = run_tests(
         test_list,
         config,
-        args.rundirectory,
+        parent_log_dir,
         args.no_artifacts,
         args.verbose,
         stages,
         args.load_inputs
     )
 
+    if args.report:
+        generate_report(args, stages, test_list, status_dict)
+
 
 def run_tests(
-    test_list: List[Test], config: TestConfig, dir_name: str, no_artifacts: bool, verbose: bool, stages: List[str], load_inputs: bool
-):
-    """runs tests in test_list based on config"""
+    test_list: List[Test], config: TestConfig, parent_log_dir: str, no_artifacts: bool, verbose: bool, stages: List[str], load_inputs: bool
+) -> Dict[str, str]:
+    """runs tests in test_list based on config. Returns a dictionary containing the test statuses."""
     # TODO: multi-process
     # TODO: setup exception handling and better logging
     # TODO: log command-line reproducers for each step
 
     # set up a parent log directory to store results
-    parent_log_dir = str(TEST_DIR) + "/" + dir_name + "/"
     if not os.path.exists(parent_log_dir):
-        os.mkdir(parent_log_dir)
+        os.makedirs(parent_log_dir)
 
     num_passes = 0
     warnings.filterwarnings("ignore")
@@ -124,15 +129,17 @@ def run_tests(
         print(f"Stages to be run: {stages}")
         print(f'Test list: {[test.unique_name for test in test_list]}')
 
+    status_dict = dict()
+
     for t in test_list:
 
         if verbose:
             print(f"running test {t.unique_name}...")
 
         # set log directory for the individual test
-        log_dir = parent_log_dir + t.unique_name + "/"
+        log_dir = os.path.join(parent_log_dir, t.unique_name) + "/"
         if not os.path.exists(log_dir):
-            os.mkdir(log_dir)
+            os.makedirs(log_dir)
 
         try:
             # TODO: convert staging to an Enum and figure out how to specify staging from args
@@ -143,23 +150,15 @@ def run_tests(
             if curr_stage in stages:
                 # build an instance of the test info class
                 inst = t.model_constructor(t.unique_name, log_dir)
-                # generate inputs from the test info instance
-                if load_inputs:
-                    inputs = inst.load_inputs(log_dir)
-                else:
-                    inputs = inst.construct_inputs()
-                    inputs.save_to(log_dir + "input")
-
-            # run native inference
-            curr_stage = "native_inference"
-            if curr_stage in stages:
-                golden_outputs_raw = inst.forward(inputs)
-                golden_outputs_raw.save_to(log_dir + "golden_output")
-
+                # this is highly onnx specific. 
+                # TODO: Figure out how to factor this out of run.py
+                if not os.path.exists(inst.model):
+                    inst.construct_model()
+            
+            artifact_save_to = None if no_artifacts else log_dir
             # generate mlir from the instance using the config
             curr_stage = "import_model"
             if curr_stage in stages:
-                artifact_save_to = None if no_artifacts else log_dir
                 model_artifact, func_name = config.import_model(
                     inst, save_to=artifact_save_to
                 )
@@ -176,6 +175,21 @@ def run_tests(
             if curr_stage in stages:
                 compiled_artifact = config.compile(model_artifact, save_to=artifact_save_to)
 
+            # get inputs from inst
+            curr_stage = "construct_inputs"
+            if curr_stage in stages:
+                if load_inputs:
+                    inputs = inst.load_inputs(log_dir)
+                else:
+                    inputs = inst.construct_inputs()
+                    inputs.save_to(log_dir + "input")
+
+            # run native inference
+            curr_stage = "native_inference"
+            if curr_stage in stages:
+                golden_outputs_raw = inst.forward(inputs)
+                golden_outputs_raw.save_to(log_dir + "golden_output")
+
             # run inference with the compiled module
             curr_stage = "compiled_inference"
             if curr_stage in stages:
@@ -191,6 +205,7 @@ def run_tests(
                 inst.save_processed_output(outputs, log_dir, "output")
 
         except Exception as e:
+            status_dict[t.unique_name] = curr_stage
             log_exception(e, log_dir, curr_stage, t.unique_name, verbose)
             continue
 
@@ -205,18 +220,26 @@ def run_tests(
                 )
                 # log the results
                 test_passed = log_result(result, log_dir, [1e-3, 1e-3])
-                num_passes += int(test_passed)
-                if verbose:
-                    to_print = "\tPASS" if test_passed else "\tFAILED (Numerics)"
-                    print(to_print)
-                elif not test_passed:
-                    print(f"FAILED: {t.unique_name}")
+                if test_passed:
+                    status_dict[t.unique_name] = "PASS"
+                    num_passes+=1
+                else:
+                    status_dict[t.unique_name] = "Numerics"
             except Exception as e:
+                status_dict[inst.name] = "results-summary"
                 log_exception(e, log_dir, "results-summary", t.unique_name, verbose)
+        
+        if verbose:
+            if t.unique_name not in status_dict.keys() or status_dict[t.unique_name] == "PASS":
+                print(f"\tPASSED")
+            else:
+                print(f"\tFAILED ({status_dict[t.unique_name]})")
 
     print("\nTest Summary:")
     print(f"\tPASSES: {num_passes}\n\tTOTAL: {len(test_list)}")
     print(f"results stored in {parent_log_dir}")
+    status_dict = dict(sorted(status_dict.items(), key=lambda item : item[0].lower()))
+    return status_dict
 
 
 def log_result(result, log_dir, tol):
@@ -259,9 +282,8 @@ def _get_argparse():
     parser.add_argument(
         "-d",
         "--device",
-        choices=["local-task","local-sync","vulkan","hip","cuda"],
         default="local-task",
-        help="specifies the device for runtime config",
+        help="specifies the device for runtime config. E.g. local-task, local-sync, vulkan, hip, cuda",
     )
     parser.add_argument(
         "-b",
@@ -269,6 +291,13 @@ def _get_argparse():
         choices=["llvm-cpu", "amd-aie", "rocm", "cuda", "vmvx", "metal-spirv", "vulkan-spirv"],
         default="llvm-cpu",
         help="specifies the iree-hal-target-backend for compile phase",
+    )
+    parser.add_argument(
+        "-ica",
+        "--iree-compile-args",
+        nargs="*",
+        default = None,
+        help="Manually specify a space-seperated list of extra args for iree-compile. Do not put `--` before the args.",
     )
     # parser.add_argument(
     #     "-f",
@@ -363,6 +392,17 @@ def _get_argparse():
         action="store_true",
         default=False,
     )
+    parser.add_argument(
+        "--report",
+        action="store_true",
+        default=False,
+        help="Generate test report summary",
+    )
+    parser.add_argument(
+        "--report-file",
+        default="report.md",
+        help="output filename for the report summary.",
+    )
     # parser.add_argument(
     #     "-d",
     #     "--todtype",
@@ -382,18 +422,6 @@ def _get_argparse():
     #     action="store_true",
     #     default=False,
     #     help="Skip running of tests. Useful for generating test summary after the run",
-    # )
-    # parser.add_argument(
-    #     "--report",
-    #     action="store_true",
-    #     default=False,
-    #     help="Generate test report summary",
-    # )
-    # parser.add_argument(
-    #     "--reportformat",
-    #     choices=["pipe", "github", "html", "csv"],
-    #     default="pipe",
-    #     help="Format of the test report summary file. It takes subset of tablefmt value of python tabulate",
     # )
     # parser.add_argument(
     #     "--uploadtestsfile",

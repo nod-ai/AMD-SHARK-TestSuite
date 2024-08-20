@@ -1,3 +1,4 @@
-#install nightly build of torch_mlir, if on Linux (no macOS or Windows nightly builds)
+--pre
 -f https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
+#install nightly build of torch_mlir, if on Linux (no macOS or Windows nightly builds)
 torch-mlir ; sys_platform == "linux"

@@ -27,8 +27,8 @@ class AzureDownloadableModel(OnnxModelInfo):
         self.cache_dir = os.path.join(parent_cache_dir, name)
         super().__init__(name, onnx_model_path, opset_version)
     
-    # def update_sess_options(self):
-    #     self.sess_options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
+    def update_sess_options(self):
+        self.sess_options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
 
     def construct_model(self):
         # try to find a .onnx file in the test-run dir
@@ -79,7 +79,10 @@ class SiblingModel(OnnxModelInfo):
         if not os.path.exists(self.sibling_inst.model):
             self.sibling_inst.construct_model()
         self.model = self.sibling_inst.model
-
+    
+    def update_dim_param_dict(self):
+        self.sibling_inst.update_dim_param_dict()
+        self.dim_param_dict = self.sibling_inst.dim_param_dict
 
 def get_sibling_constructor(sibling_class, og_constructor, og_name):
     """Returns a constructor for the sibling class. Useful for convenient registration.

@@ -30,6 +30,7 @@ class OnnxModelInfo:
         self.model = os.path.join(onnx_model_path, "model.onnx")
         self.opset_version = opset_version
         self.sess_options = ort.SessionOptions()
+        self.dim_param_dict = None
 
     def forward(self, input: Optional[TestTensors] = None) -> TestTensors:
         """Applies self.model to self.input. Only override if necessary for specific models"""
@@ -55,6 +56,12 @@ class OnnxModelInfo:
         """
         pass
 
+    def update_dim_param_dict(self):
+        """Can be overridden to modify a dictionary of dim parameters (self.dim_param_dict) used to 
+        construct inputs for a model with dynamic dims.
+        """
+        pass
+
     def construct_model(self):
         """a method to be overwritten. To make a new test, define a subclass with an override for this method"""
         raise NotImplementedError(
@@ -65,7 +72,10 @@ class OnnxModelInfo:
         """can be overridden to generate specific inputs, but a default is provided for convenience"""
         if not os.path.exists(self.model):
             self.construct_model()
-        return get_sample_inputs_for_onnx_model(self.model)
+        self.update_dim_param_dict()
+        # print(self.get_signature())
+        # print(get_op_frequency(self.model))
+        return get_sample_inputs_for_onnx_model(self.model, self.dim_param_dict)
 
     def apply_postprocessing(self, output: TestTensors):
         """can be overridden to define post-processing methods for individual models"""
@@ -73,6 +83,7 @@ class OnnxModelInfo:
     
     def save_processed_output(self, output: TestTensors, save_to: str, name: str):
         """can be overridden to provide instructions on saving processed outputs (e.g., images, labels, text)"""
+        pass
 
     # the following helper methods aren't meant to be overriden
 
@@ -80,7 +91,7 @@ class OnnxModelInfo:
         """Returns the input or output signature of self.model"""
         if not os.path.exists(self.model):
             self.construct_model()
-        return get_signature_for_onnx_model(self.model, from_inputs=from_inputs)
+        return get_signature_for_onnx_model(self.model, from_inputs=from_inputs, dim_param_dict=self.dim_param_dict)
 
     def load_inputs(self, dir_path):
         """computes the input signature of the onnx model and loads inputs from bin files"""
@@ -102,6 +113,16 @@ class OnnxModelInfo:
         """computes the input signature of the onnx model and loads golden outputs from bin files"""
         shapes, dtypes = self.get_signature(from_inputs=False)
         return TestTensors.load_from(shapes, dtypes, dir_path, "golden_output")
+    
+    def update_opset_version_and_overwrite(self):
+        if self.opset_version:
+            if not os.path.exists(self.model):
+                self.construct_model()
+            og_model = onnx.load(self.model)
+            model = onnx.version_converter.convert_version(
+                og_model, self.opset_version
+            )
+            onnx.save(model, self.model)
 
 # TODO: extend TestModel to a union, or make TestModel a base class when supporting other frontends
 TestModel = OnnxModelInfo 

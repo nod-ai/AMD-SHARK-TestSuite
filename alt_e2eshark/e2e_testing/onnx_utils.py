@@ -3,6 +3,8 @@ import onnx
 import onnxruntime
 import torch
 from e2e_testing.storage import TestTensors
+from typing import Optional
+from pathlib import Path
 
 
 def dtype_from_ort_node(node):
@@ -26,42 +28,52 @@ def dtype_from_ort_node(node):
     raise NotImplementedError(f"Unhandled dtype string found: {dtypestr}")
 
 
-def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg):
+def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg, dim_param_dict: Optional[dict[str, int]] = None):
     """A convenience function for generating sample inputs for an onnxruntime node"""
+    int_dims = []
     for dim in node.shape:
+        if isinstance(dim, str) and dim_param_dict:
+            if not dim in dim_param_dict.keys():
+                raise ValueError(f"input node {node.name} has a dim param='{dim}' not found in provided dim_param_dict: '{dim_param_dict}'")
+            else:
+                int_dims.append(dim_param_dict[dim])
+                continue
         if not isinstance(dim, int):
             raise TypeError(
-                f"input node '{node.name}' has a dim='{dim}', with invalid type: {type(dim)}\nexpected type: int.\nIf your model has dim_params, consider fixing them or setting custom inputs for this test."
+                f"input node '{node.name}' has dims={node.shape}. Node dim '{dim}' has invalid type: {type(dim)}\nexpected type: int.\nIf your model has dim_params, consider fixing them or setting custom inputs for this test."
             )
         if dim <= 0:
             raise ValueError(
                 f"input node '{node.name}' has a non-positive dim: {dim}. Consider setting cutsom inputs for this test."
             )
+        int_dims.append(dim)
     rng = numpy.random.default_rng(19)
     if node.type == "tensor(float)":
-        return rng.random(node.shape).astype(numpy.float32)
+        return rng.random(int_dims).astype(numpy.float32)
     if node.type == "tensor(int)" or node.type == "tensor(int32)":
-        return rng.integers(0, 10000, size=node.shape, dtype=numpy.int32)
+        return rng.integers(0, 10000, size=int_dims, dtype=numpy.int32)
     if node.type == "tensor(int8)":
-        return rng.integers(-127, 128, size=node.shape, dtype=numpy.int8)
+        return rng.integers(-127, 128, size=int_dims, dtype=numpy.int8)
     if node.type == "tensor(int64)":
-        return rng.integers(0, 5, size=node.shape, dtype=numpy.int64)
+        return rng.integers(0, 5, size=int_dims, dtype=numpy.int64)
     if node.type == "tensor(bool)":
-        return rng.integers(0, 2, size=node.shape, dtype=bool)
+        return rng.integers(0, 2, size=int_dims, dtype=bool)
     raise NotImplementedError(f"Found an unhandled dtype: {node.type}.")
 
 
-def get_sample_inputs_for_onnx_model(model_path):
+def get_sample_inputs_for_onnx_model(model_path, dim_param_dict = None):
     """A convenience function for generating sample inputs for an onnx model"""
-    s = onnxruntime.InferenceSession(model_path, None)
+    opt = onnxruntime.SessionOptions()
+    opt.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
+    s = onnxruntime.InferenceSession(model_path, opt)
     inputs = s.get_inputs()
     sample_inputs = TestTensors(
-        tuple([generate_input_from_node(node) for node in inputs])
+        tuple([generate_input_from_node(node, dim_param_dict) for node in inputs])
     )
     return sample_inputs
 
 
-def get_signature_for_onnx_model(model_path, *, from_inputs: bool = True):
+def get_signature_for_onnx_model(model_path, *, from_inputs: bool = True, dim_param_dict: Optional[dict[str, int]] = None):
     """A convenience funtion for retrieving the input or output shapes and dtypes"""
     s = onnxruntime.InferenceSession(model_path, None)
     if from_inputs:
@@ -76,8 +88,13 @@ def get_signature_for_onnx_model(model_path, *, from_inputs: bool = True):
     return shapes, dtypes
 
 
-def get_op_frequency(model_path):
-    model = onnx.load(model_path)
+def get_op_frequency(model_or_path):
+    if isinstance(model_or_path, str) or isinstance(model_or_path, Path):
+        model = onnx.load(model_or_path)
+    elif isinstance(model_or_path, onnx.ModelProto):
+        model = model_or_path
+    else:
+        raise TypeError(f'Input argument must be a path, string, or onnx model.')
     op_freq = dict()
     for n in model.graph.node:
         if n.op_type in op_freq:
@@ -89,6 +106,9 @@ def get_op_frequency(model_path):
 
 def modify_model_output(model: onnx.ModelProto, final_node_key: int) -> onnx.ModelProto:
     """A helper function to change the output of an onnx model to a new output."""
+
+    if final_node_key < 0:
+        final_node_key += len(model.graph.node)
 
     final_node = model.graph.node[final_node_key]
 
@@ -142,6 +162,12 @@ def find_minimal_graph(graph: onnx.GraphProto, top_key: int):
 
 def find_node(model: onnx.ModelProto, n: int, op_name: str) -> onnx.NodeProto:
     """returns the output names for the nth node in the onnx model with op_type given by op_name"""
+    op_freq = get_op_frequency(model)
+    N = op_freq[op_name]
+    if n > N-1 or n < -N:
+        raise ValueError(f"There are {N} nodes with op name {op_name} in model. Provided index {n} is OOB.\n{op_freq}")
+    if n < 0:
+        n += N
     match_counter = 0
     key = -1
     for nde in model.graph.node:
@@ -152,6 +178,4 @@ def find_node(model: onnx.ModelProto, n: int, op_name: str) -> onnx.NodeProto:
             node = nde
             break
         match_counter += 1
-    if not node:
-        raise ValueError(f"Could not find {n} nodes of type {op_name} in {model}")
     return key

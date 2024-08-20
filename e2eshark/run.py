@@ -120,6 +120,7 @@ def runOnnxToTorchMLIRGeneration(
         logfilename = curphase + ".log"
         scriptcommand = (
             f"{torch_mlir_pythonpath} python -m torch_mlir.tools.import_onnx "
+            + "--opset-version=21 "
             + onnxfilename
             + " -o "
             + torchonnxfilename

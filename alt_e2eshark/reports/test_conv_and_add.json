@@ -1,0 +1,20 @@
+{
+    "test_add": "PASS",
+    "test_add_bcast": "PASS",
+    "test_add_uint8": "PASS",
+    "test_conv_with_autopad_same": "compilation",
+    "test_conv_with_strides_and_asymmetric_padding": "PASS",
+    "test_conv_with_strides_no_padding": "PASS",
+    "test_conv_with_strides_padding": "PASS",
+    "test_convinteger_with_padding": "PASS",
+    "test_convinteger_without_padding": "PASS",
+    "test_convtranspose": "PASS",
+    "test_convtranspose_1d": "PASS",
+    "test_convtranspose_3d": "PASS",
+    "test_convtranspose_autopad_same": "compilation",
+    "test_convtranspose_dilations": "PASS",
+    "test_convtranspose_kernel_shape": "compilation",
+    "test_convtranspose_output_shape": "compilation",
+    "test_convtranspose_pad": "PASS",
+    "test_convtranspose_pads": "PASS"
+}

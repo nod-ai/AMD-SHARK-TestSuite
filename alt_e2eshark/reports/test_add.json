@@ -1,0 +1,5 @@
+{
+    "test_add": "PASS",
+    "test_add_bcast": "PASS",
+    "test_add_uint8": "PASS"
+}

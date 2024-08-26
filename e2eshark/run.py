@@ -338,7 +338,7 @@ def runCodeGeneration(
         + " "
     )
     if args.targetbackend == "rocm":
-        commandname += f"--iree-rocm-target-chip={args.targetchip} "
+        commandname += f"--iree-hip-target={args.targetchip} "
     scriptcommand = (
         commandname
         + " "

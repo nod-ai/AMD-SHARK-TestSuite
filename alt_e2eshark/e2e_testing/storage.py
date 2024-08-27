@@ -3,11 +3,12 @@
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-import io
+import json
 import numpy
 import struct
 import torch
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Dict, List, Any, Union
+from pathlib import Path
 
 def get_shape_string(torch_tensor):
     input_shape = list(torch_tensor.shape)
@@ -120,6 +121,15 @@ def write_inference_input_bin_file(modelinput, modelinputbinfilename):
         f.write(bytearr)
         f.close()
 
+def load_test_txt_file(filepath : Union[str, Path]) -> List[str]:
+    with open(filepath, "r") as file:
+        contents = file.read().split()
+    return contents
+
+def load_json_dict(filepath: Union[str, Path]) -> Dict[str, Any]:
+    with open(filepath) as contents:
+        loaded_dict = json.load(contents)
+    return loaded_dict
 
 class TestTensors:
     """storage class for tuples of tensor-like objects"""

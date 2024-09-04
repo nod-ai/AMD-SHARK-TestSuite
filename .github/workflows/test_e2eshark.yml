@@ -175,10 +175,6 @@ jobs:
             --upgrade \
             iree-compiler \
             iree-runtime
-          pip install \
-            --find-links https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels \
-            --upgrade \
-            torch-mlir
         working-directory: ./test-suite
 
       - name: Run Onnx Mode

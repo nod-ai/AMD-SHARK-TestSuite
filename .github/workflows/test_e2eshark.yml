@@ -141,15 +141,17 @@ jobs:
             cache-dir: /groups/aig_sharks/test-suite-ci-cache
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
+      ALT_E2E_VENV_DIR: ${{ github.workspace }}/alt-test-suite_venv
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
       AZ_PRIVATE_CONNECTION: ${{ secrets.ONNXPRIVATESTORAGE_AZ_PRIVATE_CONNECTION }}
       ROCR_VISIBLE_DEVICES: ${{ matrix.visible-device }}
+      CACHE_DIR: ${{ matrix.cache-dir }}
     steps:
       - name: Checkout Test Suite
         uses: actions/checkout@v2
         with:
           repository: nod-ai/SHARK-TestSuite
-          ref: merge-reports
+          ref: alt-merge-reports
           path: test-suite
 
       - name: Checkout SHARK Turbine
@@ -176,27 +178,30 @@ jobs:
             iree-compiler \
             iree-runtime
         working-directory: ./test-suite
+      
+      - name: "Setup alt e2eshark python venv"
+        run: |
+          python3.11 -m venv ${ALT_E2E_VENV_DIR}
+          source ${ALT_E2E_VENV_DIR}/bin/activate
+          pip install --upgrade pip
+          pip install -r ./alt_e2eshark/base_requirements.txt
+          pip install -r ./alt_e2eshark/iree_requirements.txt
+          pip install --no-deps -r ./alt_e2eshark/torch_mlir_requirements.txt
+        working-directory: ./test-suite
 
       - name: Run Onnx Mode
         run: |
-          source ${E2E_VENV_DIR}/bin/activate
+          source ${ALT_E2E_VENV_DIR}/bin/activate
           pip list
-          cd e2eshark
+          cd alt_e2eshark
           free -mh
           python3.11 ./run.py \
             -r ./test-onnx \
             --report \
-            --cachedir ${{ matrix.cache-dir }} \
-            --testsfile ./ci_model_lists/${{ matrix.test-file }}.txt \
-            --mode onnx \
-            -f onnx pytorch \
-            --targetbackend ${{ matrix.backend }} \
-            --device ${{ matrix.device }} \
-            --targetchip ${{ matrix.target-chip }} \
-            --tolerance .01 .01 \
-            --cleanup \
-            --postprocess \
-            --ci \
+            --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
+            -b ${{ matrix.backend }} \
+            -d ${{ matrix.device }} \
+            --report-file reports/${{ matrix.test-file }}.md \
             -v
         working-directory: ./test-suite
 
@@ -230,18 +235,15 @@ jobs:
           -v
         working-directory: ./test-suite
       
-      - name: Checkout repo
-        uses: actions/checkout@v2
+      - uses: actions/upload-artifact@master
         with:
-          repository: nod-ai/e2eshark-reports
-          ref: 'main'
-          token: ${{ secrets.E2ESHARK_GITHUB_TOKEN }}
-          path: e2eshark-reports
+          name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_onnx.md
+          path: ./test-suite/alt_e2eshark/reports/${{ matrix.test-file }}.md
       
       - uses: actions/upload-artifact@master
         with:
-          name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_onnx
-          path: ./test-suite/e2eshark/ci_reports_${{ matrix.backend }}_onnx
+          name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_onnx.json
+          path: ./test-suite/alt_e2eshark/reports/${{ matrix.test-file }}.json
       
       - uses: actions/upload-artifact@master
         if: contains(matrix.test-file, 'shark-test-suite')
@@ -283,108 +285,107 @@ jobs:
           source report_venv/bin/activate
           pip install --upgrade pip
           pip install -r ./test-suite/e2eshark/requirements.txt
+      - name: "Setup alt test suite venv"
+        run: |
+          python3.11 -m venv report_venv_alt
+          source report_venv/bin/activate
+          pip install --upgrade pip
+          pip install -r ./alt_e2eshark/base_requirements.txt
+          pip install -r ./alt_e2eshark/iree_requirements.txt
+          pip install --no-deps -r ./alt_e2eshark/torch_mlir_requirements.txt
       - uses: actions/download-artifact@master
         with:
-          name: ci_reports_${{ matrix.backend }}_shark-test-suite_onnx
-          path: ./e2eshark-reports/${{ matrix.backend }}
+          name: ci_reports_${{ matrix.backend }}_shark-test-suite_onnx.md
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_shark-test-suite_onnx.md
       - uses: actions/download-artifact@master
         with:
-          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_onnx
-          path: ./e2eshark-reports/${{ matrix.backend }}
+          name: ci_reports_${{ matrix.backend }}_shark-test-suite_onnx.json
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_shark-test-suite_onnx.json
       - uses: actions/download-artifact@master
         with:
-          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_onnx
-          path: ./e2eshark-reports/${{ matrix.backend }}
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_onnx.md
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_onnx.md
       - uses: actions/download-artifact@master
         with:
-          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_onnx
-          path: ./e2eshark-reports/${{ matrix.backend }}
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_onnx.json
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_onnx.json
       - uses: actions/download-artifact@master
         with:
-          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_onnx
-          path: ./e2eshark-reports/${{ matrix.backend }}
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_onnx.md
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_onnx.md
       - uses: actions/download-artifact@master
         with:
-          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_onnx
-          path: ./e2eshark-reports/${{ matrix.backend }}
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_onnx.json
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_onnx.json
       - uses: actions/download-artifact@master
         with:
-          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_onnx
-          path: ./e2eshark-reports/${{ matrix.backend }}
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_onnx.md
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_onnx.md
       - uses: actions/download-artifact@master
         with:
-          name: ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx
-          path: ./e2eshark-reports/${{ matrix.backend }}
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_onnx.json
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_onnx.json
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_onnx.md
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_onnx.md
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_onnx.json
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_onnx.json
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_onnx.md
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_onnx.md
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_onnx.json
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_onnx.json
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_onnx.md
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_onnx.md
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_onnx.json
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_onnx.json
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx.md
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx.md
+      - uses: actions/download-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx.json
+          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx.json
       - uses: actions/download-artifact@master
         with:
           name: ci_reports_${{ matrix.backend }}_turbine
           path: ./e2eshark-reports/${{ matrix.backend }}
       - name: Merge Reports
         run: |
-          source report_venv/bin/activate
+          source report_venv_alt/bin/activate
 
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1/statusreport.md \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1/timereport.md \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1/summaryreport.md \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3
+          python ./test-suite/alt_e2eshark/utils/merge_dicts.py \
+          --sources ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_onnx.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_onnx.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_onnx.json \
+          --output ./e2eshark-reports/vai-hf-cnn-fp32.json \
+          --report --report-file ./e2eshark-reports/vai-hf-cnn-fp32.md
 
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32/statusreport.md \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32/timereport.md \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32/summaryreport.md \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3
+          python ./test-suite/alt_e2eshark/utils/merge_dicts.py \
+          --sources ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_onnx.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_onnx.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_onnx.json \
+          --output ./e2eshark-reports/vai-int8-p0p1.json \
+          --report --report-file ./e2eshark-reports/vai-int8-p0p1.md
 
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m status -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/combined-reports/statusreport.md \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3 \
-          ./e2eshark-reports/${{ matrix.backend }}/shark-test-suite \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-vision-int8
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m time -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/combined-reports/timereport.md \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3 \
-          ./e2eshark-reports/${{ matrix.backend }}/shark-test-suite \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-vision-int8
-          python ./test-suite/e2eshark/tools/reportutil.py -d merge -m summary -f github \
-          -o ./e2eshark-reports/${{ matrix.backend }}/combined-reports/summaryreport.md \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-hf-cnn-fp32-shard3 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard1 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard2 \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-int8-p0p1-shard3 \
-          ./e2eshark-reports/${{ matrix.backend }}/shark-test-suite \
-          ./e2eshark-reports/${{ matrix.backend }}/vai-vision-int8
+          python ./test-suite/alt_e2eshark/utils/merge_dicts.py \
+          --sources ./e2eshark-reports/vai-int8-p0p1.json \
+          ./e2eshark-reports/vai-hf-cnn-fp32.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_shark-test-suite_onnx.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx.json \
+          --output ./e2eshark-reports/combined_reports.json \
+          --report --report-file ./e2eshark-reports/combined_reports.md
 
       - name: Push artifacts
         run: |
@@ -398,11 +399,11 @@ jobs:
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports
           mkdir -p ${date}/ci_reports_turbine/${{ matrix.backend }}/turbine_models
-          cp -r ./${{ matrix.backend }}/vai-hf-cnn-fp32/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32/
-          cp -r ./${{ matrix.backend }}/vai-int8-p0p1/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1/
-          cp -r ./${{ matrix.backend }}/shark-test-suite/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/shark-test-suite/
-          cp -r ./${{ matrix.backend }}/vai-vision-int8/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8/
-          cp -r ./${{ matrix.backend }}/combined-reports/*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports/
+          cp vai-hf-cnn-fp32.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32/summary.md
+          cp vai-int8-p0p1.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1/summary.md
+          cp ci_reports_${{ matrix.backend }}_shark-test-suite_onnx.md ${date}/ci_reports_onnx/${{ matrix.backend }}/shark-test-suite/summary.md
+          cp ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8/summary.md
+          cp combined_reports.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports/summary.md
           cp -r ./${{ matrix.backend }}/turbine_models/*.md ${date}/ci_reports_turbine/${{ matrix.backend }}/turbine_models
           git add $date
           git commit -m "add CI reports for e2eshark for ${{ matrix.backend }}"

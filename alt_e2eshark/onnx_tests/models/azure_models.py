@@ -16,6 +16,7 @@ for i in range(1,4):
     model_names += load_test_txt_file(lists_dir.joinpath(f"vai-hf-cnn-fp32-shard{i}.txt"))
     model_names += load_test_txt_file(lists_dir.joinpath(f"vai-int8-p0p1-shard{i}.txt"))
 model_names += load_test_txt_file(lists_dir.joinpath("vai-vision-int8.txt"))
+model_names += load_test_txt_file(lists_dir.joinpath("nlp-pytorch.txt"))
 
 custom_registry = [
     "opt-125M-awq",

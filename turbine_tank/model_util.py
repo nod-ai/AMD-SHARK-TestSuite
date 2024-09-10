@@ -174,7 +174,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 def prepare_sentence_tokens(hf_model: str, sentence: str):
     tokenizer = AutoTokenizer.from_pretrained(
-        hf_model, token="***REMOVED***"
+        hf_model
     )
     return torch.tensor([tokenizer.encode(sentence)])
 
@@ -192,7 +192,6 @@ class HFCausalLM(torch.nn.Module):
             output_hidden_states=False,
             torchscript=True,
             trust_remote_code=True,
-            token="***REMOVED***",
         )
         self.model.eval()
 

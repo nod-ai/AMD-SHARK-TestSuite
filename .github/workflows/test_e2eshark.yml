@@ -270,13 +270,13 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: nod-ai/SHARK-TestSuite
-          ref: merge-reports
+          ref: alt-merge-reports
           path: test-suite
       - name: Checkout repo
         uses: actions/checkout@v2
         with:
           repository: nod-ai/e2eshark-reports
-          ref: 'main'
+          ref: main
           token: ${{ secrets.E2ESHARK_GITHUB_TOKEN }}
           path: e2eshark-reports
       - name: "Setup alt test suite venv"

@@ -45,7 +45,7 @@ class SimpleIREEBackend(BackendBase):
         elif hal_target_backend == "rocm":
             # some extra args for Mi300x - some of these may not work for other chips
             self.extra_args = [
-                "--iree-rocm-target-chip=gfx942",
+                "--iree-hip-target=gfx942",
                 # "--iree-global-opt-propagate-transposes=true",
                 # "--iree-opt-outer-dim-concat=true",
                 # "--iree-opt-const-eval=false",

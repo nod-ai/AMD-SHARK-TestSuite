@@ -360,24 +360,24 @@ jobs:
           source report_venv_alt/bin/activate
 
           python ./test-suite/alt_e2eshark/utils/merge_dicts.py \
-          --sources ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_onnx.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_onnx.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_onnx.json \
+          --sources ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_onnx.json/vai-hf-cnn-fp32-shard1.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_onnx.json/vai-hf-cnn-fp32-shard2.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_onnx.json/vai-hf-cnn-fp32-shard3.json \
           --output ./e2eshark-reports/vai-hf-cnn-fp32.json \
           --report --report-file ./e2eshark-reports/vai-hf-cnn-fp32.md
 
           python ./test-suite/alt_e2eshark/utils/merge_dicts.py \
-          --sources ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_onnx.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_onnx.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_onnx.json \
+          --sources ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_onnx.json/vai-int8-p0p1-shard1.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_onnx.json/vai-int8-p0p1-shard2.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_onnx.json/vai-int8-p0p1-shard3.json \
           --output ./e2eshark-reports/vai-int8-p0p1.json \
           --report --report-file ./e2eshark-reports/vai-int8-p0p1.md
 
           python ./test-suite/alt_e2eshark/utils/merge_dicts.py \
           --sources ./e2eshark-reports/vai-int8-p0p1.json \
           ./e2eshark-reports/vai-hf-cnn-fp32.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_shark-test-suite_onnx.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_shark-test-suite_onnx.json/shark-test-suite.json \
+          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx.json/vai-vision-int8.json \
           --output ./e2eshark-reports/combined_reports.json \
           --report --report-file ./e2eshark-reports/combined_reports.md
 
@@ -395,8 +395,8 @@ jobs:
           mkdir -p ${date}/ci_reports_turbine/${{ matrix.backend }}/turbine_models
           cp vai-hf-cnn-fp32.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32/summary.md
           cp vai-int8-p0p1.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1/summary.md
-          cp ci_reports_${{ matrix.backend }}_shark-test-suite_onnx.md ${date}/ci_reports_onnx/${{ matrix.backend }}/shark-test-suite/summary.md
-          cp ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8/summary.md
+          cp ci_reports_${{ matrix.backend }}_shark-test-suite_onnx.md/shark-test-suite.md ${date}/ci_reports_onnx/${{ matrix.backend }}/shark-test-suite/summary.md
+          cp ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx.md/vai-vision-int8.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8/summary.md
           cp combined_reports.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports/summary.md
           cp -r ./${{ matrix.backend }}/turbine_models/*.md ${date}/ci_reports_turbine/${{ matrix.backend }}/turbine_models
           git add $date

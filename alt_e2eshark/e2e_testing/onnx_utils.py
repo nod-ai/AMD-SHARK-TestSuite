@@ -40,7 +40,7 @@ def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.N
                 continue
         if not isinstance(dim, int):
             raise TypeError(
-                f"input node '{node.name}' has dims={node.shape}. Node dim '{dim}' has invalid type: {type(dim)}\nexpected type: int.\nIf your model has dim_params, consider fixing them or setting custom inputs for this test."
+                f"input node '{node.name}' has dims={node.shape}. Node dim '{dim}' has invalid type: {type(dim)}\nexpected type: int.\nIf your model has dim_params, consider setting a self.dim_param_dict for this test. See: https://github.com/nod-ai/SHARK-TestSuite/blob/63f848a42a3e5e01d6c73de142ff182fb6f6e2d2/alt_e2eshark/onnx_tests/models/migraphx.py#L136"
             )
         if dim <= 0:
             raise ValueError(

@@ -47,16 +47,16 @@
 To setup your python to run the test suite, set up a venv and install the requirements:
 
 ```bash
-python -m venv test_suite.venv /
-source test_suite.venv/bin/activate /
-pip install --upgrade pip /
+python -m venv test_suite.venv
+source test_suite.venv/bin/activate
+pip install --upgrade pip
 pip install -r ./base_requirements.txt
 ```
 
 To get a nightly build of IREE and torch_mlir, you can do:
 
 ```bash
-pip install -r ./iree_requirements.txt /
+pip install -r ./iree_requirements.txt
 pip install --no-deps -r ./torch_mlir_requirements.txt
 ```
 
@@ -71,7 +71,7 @@ If you only installed `base_requirements.txt` to your venv, and want to use a lo
 ### Only custom IREE
 
 ```bash
-source /path/to/iree-build/.env && export PYTHONPATH /
+source /path/to/iree-build/.env && export PYTHONPATH
 pip install --no-deps -r ./torch_mlir_requirements.txt
 ```
 
@@ -80,8 +80,8 @@ pip install --no-deps -r ./torch_mlir_requirements.txt
 Unfortunately, the `.env` files in torch-mlir and iree completely replace the pythonpath instead of adding to it. So if you want to use a local build of both torch-mlir and iree, you could do something like:
 
 ```bash
-export IREE_BUILD_DIR="<path to iree build dir>" /
-export TORCH_MLIR_BUILD_DIR="<path to torch-mlir build dir>" /
+export IREE_BUILD_DIR="<path to iree build dir>"
+export TORCH_MLIR_BUILD_DIR="<path to torch-mlir build dir>"
 source ${IREE_BUILD_DIR}/.env && export PYTHONPATH="${TORCH_MLIR_BUILD_DIR}/tools/torch-mlir/python_packages/torch_mlir/:${PYTHONPATH}"
 ```
 
@@ -90,7 +90,7 @@ source ${IREE_BUILD_DIR}/.env && export PYTHONPATH="${TORCH_MLIR_BUILD_DIR}/tool
 If you are just a torch-mlir developer and don't want a custom IREE build, you can pip install a nightly build of iree and then either make an `.env` file for torch-mlir with `torch-mlir/build_tools/write_env_file.sh`and use that to set your python path, or just use:
 
 ```bash
-pip install -r iree_requirements.txt /
+pip install -r iree_requirements.txt
 export PYTHONPATH="${TORCH_MLIR_BUILD_DIR}/tools/torch-mlir/python_packages/torch_mlir/"
 ```
 

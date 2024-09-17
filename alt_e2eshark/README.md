@@ -19,6 +19,7 @@
 
 ## Contents
  The contents are as below.
+ - docs/ : some additional documentation (please add more)
  - e2e_testing/azutils.py : util functions for interfacing with azure
  - e2e_testing/backends.py : where test backends are defined. Add other backends here.
  - e2e_testing/framework.py : contains two types of classes: framework-specific base classes for storing model info, and generic classes for testing infrastructure.
@@ -37,10 +38,8 @@
  cause of any failure. You can specify -r 'your dir name' to the run.py to name your test run directory 
  as per your choice. The default name for the run directory is 'test-run'.
 
- Note that, you will be required to pass --cachedir argument to the run.py to point to a directory where 
- model weights etc. from external model serving repositories such as from Torch Vision, Hugging Face etc.
- will be downloaded. The downloaded data can be large, so set it to other than your home, 
- preferably with 100 GB or more free space.
+ Note that, you may need to set a `CACHE_DIR` environment variable before using run.py.
+ This environment variable should point to a directory where model weights etc. from external model serving repositories such as from Torch Vision, Hugging Face etc. will be downloaded. The downloaded data can be large, so set it to other than your home, preferably with 100 GB or more free space.
 
 ## Setting up (Quick Start)
 
@@ -107,6 +106,8 @@ Once a test class is generated, register the test with the test suite with:
 ```python
 register_test(YourTestClassName,"name_of_test")
 ```
+
+For more information, see `alt_e2eshark/docs/adding_tests.md`.
 
 ## Running a test
 

@@ -13,38 +13,6 @@ from e2e_testing.registry import register_test
 # 3. setup dim params for other misc models
 # 4. reupload cadence model 1
 
-ALL_MODELS = [
-    "migraphx_agentmodel__AgentModel",
-    "migraphx_bert__bert-large-uncased",
-    "migraphx_bert__bertsquad-12",
-    "migraphx_cadene__dpn92i1",
-    "migraphx_cadene__inceptionv4i16",
-    "migraphx_cadene__resnext101_64x4di1",
-    "migraphx_cadene__resnext101_64x4di16",
-    "migraphx_huggingface-transformers__bert_mrpc8",
-    "migraphx_mlperf__bert_large_mlperf",
-    "migraphx_mlperf__resnet50_v1",
-    "migraphx_onnx-misc__taau_low_res_downsample_d2s_for_infer_time_fp16_opset11",
-    "migraphx_onnx-model-zoo__gpt2-10",
-    "migraphx_ORT__bert_base_cased_1",
-    "migraphx_ORT__bert_base_uncased_1",
-    "migraphx_ORT__bert_large_uncased_1",
-    "migraphx_ORT__distilgpt2_1",
-    "migraphx_ORT__onnx_models__bert_base_cased_1_fp16_gpu",
-    "migraphx_ORT__onnx_models__bert_large_uncased_1_fp16_gpu",
-    "migraphx_ORT__onnx_models__distilgpt2_1_fp16_gpu",
-    "migraphx_pytorch-examples__wlang_gru",
-    "migraphx_pytorch-examples__wlang_lstm",
-    "migraphx_sd__unet__model",
-    "migraphx_sdxl__unet__model",
-    "migraphx_torchvision__densenet121i32",
-    "migraphx_torchvision__inceptioni1",
-    "migraphx_torchvision__inceptioni32",
-    "migraphx_torchvision__resnet50i1",
-    "migraphx_torchvision__resnet50i64",
-]
-
-
 def dim_param_constructor(dim_param_dict):
     class AzureWithDimParams(AzureDownloadableModel):
         def __init__(self, *args, **kwargs):
@@ -70,8 +38,7 @@ def dim_param_constructor(dim_param_dict):
 ORT_model_names = [
     "migraphx_ORT__bert_base_cased_1",  # batch_size, seq_len
     "migraphx_ORT__bert_base_uncased_1",  # batch_size, seq_len
-    # the following test currently crashes for some reason (maybe opset version related?)
-    # "migraphx_ORT__bert_large_uncased_1", # batch_size, seq_len
+    "migraphx_ORT__bert_large_uncased_1", # batch_size, seq_len
     "migraphx_ORT__distilgpt2_1",  # batch_size, seq_len
     "migraphx_ORT__onnx_models__bert_base_cased_1_fp16_gpu",  # batch_size, seq_len
     "migraphx_ORT__onnx_models__bert_large_uncased_1_fp16_gpu",  # batch_size, seq_len
@@ -129,7 +96,7 @@ misc_models = {
     "migraphx_models__whisper-tiny-decoder" : {"batch_size" : 1, "decoder_sequence_length" : 64, "encoder_sequence_length / 2" : 32},
     "migraphx_models__whisper-tiny-encoder" : {"batch_size" : 1, "feature_size" : 80, "encoder_sequence_length" : 64},
     # this one crashes for some reason...
-    # "migraphx_sdxl__unet__model" : {"batch_size" : 1, "num_channels" : 4, "height" : 512, "width" : 512, "steps" : 2, "sequence_length" : 64}
+    "migraphx_sdxl__unet__model" : {"batch_size" : 1, "num_channels" : 4, "height" : 512, "width" : 512, "steps" : 2, "sequence_length" : 64}
 }
 
 for key, dim_param in misc_models.items():

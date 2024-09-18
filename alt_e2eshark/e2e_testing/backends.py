@@ -6,9 +6,11 @@
 import abc
 import onnxruntime as ort
 from typing import TypeVar, List
-from e2e_testing.storage import TestTensors
+from e2e_testing.storage import TestTensors, get_shape_string
 from e2e_testing.framework import CompiledOutput, ModelArtifact
 from onnx import ModelProto
+import os
+from pathlib import Path
 
 Invoker = TypeVar("Invoker")
 
@@ -72,7 +74,7 @@ class SimpleIREEBackend(BackendBase):
         )
         # log the vmfb
         if save_to:
-            with open(save_to + "compiled_model.vmfb", "wb") as f:
+            with open(os.path.join(save_to, "compiled_model.vmfb"), "wb") as f:
                 f.write(b)
         return b
 
@@ -94,6 +96,55 @@ class SimpleIREEBackend(BackendBase):
 
         return func
 
+class CLIREEBackend(BackendBase):
+    '''This backend calls iree through the command line to compile and run MLIR modules'''
+    def __init__(self, *, device="local-task", hal_target_backend="llvm-cpu", extra_args : List[str] = None):
+        self.device = device
+        self.hal_target_backend = hal_target_backend
+        self.extra_args = []
+        if extra_args:
+            for a in extra_args:
+                if a[0:2] == "--":
+                    self.extra_args.append(a)
+                else:
+                    self.extra_args.append("--" + a)
+    
+    def compile(self, module_path: str, *, save_to : str = None) -> str:
+        vmfb_path = os.path.join(save_to, "compiled_model.vmfb")
+        arg_string = f"--iree-hal-target-backends={self.hal_target_backend} "
+        for arg in self.extra_args:
+            arg_string += arg
+            arg_string += " "
+        command_error_dump = os.path.join(save_to, "detail", "compilation.detail.log")
+        commands_log = os.path.join(save_to, "commands", "compilation.commands.log")
+        script = f"iree-compile {module_path} {arg_string}-o {vmfb_path} 1> {command_error_dump} 2>&1"
+        with open(commands_log, "w") as file:
+            file.write(script) 
+        # remove old vmfb if it exists
+        Path(vmfb_path).unlink(missing_ok=True)
+        os.system(script)
+        if not os.path.exists(vmfb_path):
+            error_message = f"failure executing command: \n{script}\n failed to produce a vmfb at {vmfb_path}.\n"
+            if os.path.exists(command_error_dump):
+                error_message += "Error Details:\n\n"
+                with open(command_error_dump, "r+") as file:
+                    error_message += file.read()
+            raise FileNotFoundError(error_message)
+        return vmfb_path
+    
+    def load(self, vmfb_path: str, *, func_name=None):
+        """A bit hacky. func returns a script that would dump outputs to terminal output. Modified in config.run method"""
+        run_dir = Path(vmfb_path).parent
+        def func(x: TestTensors) -> str:
+            script = f"iree-run-module --module='{vmfb_path}' --device={self.device}"
+            if func_name:
+                script += f" --function='{func_name}'"
+            torch_inputs = x.to_torch().data
+            for index, input in enumerate(torch_inputs):
+                script += f" --input='{get_shape_string(input)}=@{run_dir}/input.{index}.bin'"
+            return script
+        return func
+            
 
 class OnnxrtIreeEpBackend(BackendBase):
     '''This backend uses onnxrt iree-ep to compile and run onnx models for a specified hal_target_backend'''

@@ -9,6 +9,7 @@ import struct
 import torch
 from typing import Tuple, Optional, Dict, List, Any, Union
 from pathlib import Path
+import os
 
 def get_shape_string(torch_tensor):
     input_shape = list(torch_tensor.shape)
@@ -211,7 +212,7 @@ class TestTensors:
         for i in range(len(shapes)):
             shape = shapes[i]
             dtype = torch_dtypes[i]
-            t = load_raw_binary_as_torch_tensor(dir_path + name + "." + str(i) + ".bin", shape, dtype)
+            t = load_raw_binary_as_torch_tensor(os.path.join(dir_path, name + "." + str(i) + ".bin"), shape, dtype)
             tensor_list.append(t)
         return TestTensors(tuple(tensor_list))
 

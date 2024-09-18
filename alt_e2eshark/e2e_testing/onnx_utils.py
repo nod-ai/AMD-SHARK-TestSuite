@@ -73,7 +73,7 @@ def get_sample_inputs_for_onnx_model(model_path, dim_param_dict = None):
     return sample_inputs
 
 
-def get_signature_for_onnx_model(model_path, *, from_inputs: bool = True, dim_param_dict: Optional[dict[str, int]] = None):
+def get_signature_for_onnx_model(model_path, *, from_inputs: bool = True, dim_param_dict: Optional[dict[str, int]] = None, leave_dynamic: bool = False):
     """A convenience funtion for retrieving the input or output shapes and dtypes"""
     s = onnxruntime.InferenceSession(model_path, None)
     if from_inputs:
@@ -83,7 +83,11 @@ def get_signature_for_onnx_model(model_path, *, from_inputs: bool = True, dim_pa
     shapes = []
     dtypes = []
     for i in nodes:
-        shapes.append(i.shape)
+        shape = i.shape
+        for index, s in enumerate(shape):
+            if not leave_dynamic and isinstance(s, str) and s in dim_param_dict.keys():
+                shape[index] = dim_param_dict[s]
+        shapes.append(shape)
         dtypes.append(dtype_from_ort_node(i))
     return shapes, dtypes
 

@@ -21,13 +21,14 @@ from e2e_testing.framework import *
 
 # import frontend test configs:
 from e2e_testing.test_configs.onnxconfig import (
+    CLOnnxTestConfig,
     OnnxTestConfig,
     OnnxEpTestConfig,
     REDUCE_TO_LINALG_PIPELINE,
 )
 
 # import backends
-from e2e_testing.backends import SimpleIREEBackend, OnnxrtIreeEpBackend
+from e2e_testing.backends import SimpleIREEBackend, OnnxrtIreeEpBackend, CLIREEBackend
 from e2e_testing.storage import load_test_txt_file, load_json_dict
 from utils.report import generate_report, save_dict
 
@@ -83,6 +84,11 @@ def main(args):
         config = OnnxTestConfig(
             str(TEST_DIR), SimpleIREEBackend(device=args.device, hal_target_backend=args.backend, extra_args=args.iree_compile_args), pipeline
         )
+    elif args.mode == "cl-onnx-iree":
+        pipeline = REDUCE_TO_LINALG_PIPELINE if args.torchtolinalg else []
+        config = CLOnnxTestConfig(
+            str(TEST_DIR), CLIREEBackend(device=args.device, hal_target_backend=args.backend, extra_args=args.iree_compile_args), pipeline
+        )
     elif args.mode == "ort-ep":
         # TODO: allow specifying provider explicitly from cl args.
         config = OnnxEpTestConfig(
@@ -131,7 +137,6 @@ def run_tests(
     if not os.path.exists(parent_log_dir):
         os.makedirs(parent_log_dir)
 
-    num_passes = 0
     warnings.filterwarnings("ignore")
 
     if verbose:
@@ -246,7 +251,6 @@ def run_tests(
                 test_passed = log_result(result, log_dir, [1e-3, 1e-3])
                 if test_passed:
                     status_dict[t.unique_name] = "PASS"
-                    num_passes+=1
                 else:
                     status_dict[t.unique_name] = "Numerics"
             except Exception as e:
@@ -254,11 +258,16 @@ def run_tests(
                 log_exception(e, log_dir, "results-summary", t.unique_name, verbose)
         
         if verbose:
-            if t.unique_name not in status_dict.keys() or status_dict[t.unique_name] == "PASS":
+            # "PASS" is only recorded if a results-summary is generated
+            # if running a subset of ALL_STAGES, manually indicate "PASS".
+            if t.unique_name not in status_dict.keys():
+                status_dict[t.unique_name] = "PASS"
+            if status_dict[t.unique_name] == "PASS":
                 print(f"\tPASSED")
             else:
                 print(f"\tFAILED ({status_dict[t.unique_name]})")
 
+    num_passes = list(status_dict.values()).count("PASS")
     print("\nTest Summary:")
     print(f"\tPASSES: {num_passes}\n\tTOTAL: {len(test_list)}")
     print(f"results stored in {parent_log_dir}")
@@ -291,9 +300,9 @@ def log_exception(e: Exception, path: str, stage: str, name: str, verbose: bool)
         f.write(base_str)
         if verbose:
             print(f"\tFAILED ({stage})")
+            tb = e.__traceback__
             import traceback
-
-            traceback.print_exception(e, file=f)
+            traceback.print_tb(tb, file=f)
         else:
             print(f"FAILED: {name}")
 
@@ -333,7 +342,7 @@ def _get_argparse():
     parser.add_argument(
         "-m",
         "--mode",
-        choices=["onnx-iree", "ort-ep"],
+        choices=["onnx-iree", "cl-onnx-iree", "ort-ep"],
         default="onnx-iree",
         help="onnx-iree=onnx->torch-mlir->IREE, ort=onnx->run with custom ORT EP inference session",
     )

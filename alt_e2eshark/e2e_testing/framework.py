@@ -87,11 +87,13 @@ class OnnxModelInfo:
 
     # the following helper methods aren't meant to be overriden
 
-    def get_signature(self, *, from_inputs=True):
+    def get_signature(self, *, from_inputs=True, leave_dynamic=False):
         """Returns the input or output signature of self.model"""
         if not os.path.exists(self.model):
             self.construct_model()
-        return get_signature_for_onnx_model(self.model, from_inputs=from_inputs, dim_param_dict=self.dim_param_dict)
+        if not leave_dynamic:
+            self.update_dim_param_dict() 
+        return get_signature_for_onnx_model(self.model, from_inputs=from_inputs, dim_param_dict=self.dim_param_dict, leave_dynamic=leave_dynamic)
 
     def load_inputs(self, dir_path):
         """computes the input signature of the onnx model and loads inputs from bin files"""

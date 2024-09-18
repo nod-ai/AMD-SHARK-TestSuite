@@ -19,70 +19,70 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - name: mi300_gpu1_test
-          #   runs-on: nodai-amdgpu-mi300-x86-64
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: shark-test-suite
-          #   visible-device: 0
-          #   cache-dir: /home/sai/shark-test-suite-models-cache
-          # - name: mi300_gpu2_test
-          #   runs-on: nodai-amdgpu-mi300-x86-64
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-hf-cnn-fp32-shard1
-          #   visible-device: 1
-          #   cache-dir: /home/sai/shark-test-suite-models-cache
-          # - name: mi300_gpu3_test
-          #   runs-on: nodai-amdgpu-mi300-x86-64
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-hf-cnn-fp32-shard2
-          #   visible-device: 2
-          #   cache-dir: /home/sai/shark-test-suite-models-cache
-          # - name: mi300_gpu4_test
-          #   runs-on: nodai-amdgpu-mi300-x86-64
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-hf-cnn-fp32-shard3
-          #   visible-device: 3
-          #   cache-dir: /home/sai/shark-test-suite-models-cache
-          # - name: mi300_gpu5_test
-          #   runs-on: nodai-amdgpu-mi300-x86-64
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-int8-p0p1-shard1
-          #   visible-device: 4
-          #   cache-dir: /home/sai/shark-test-suite-models-cache
-          # - name: mi300_gpu6_test
-          #   runs-on: nodai-amdgpu-mi300-x86-64
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-int8-p0p1-shard2
-          #   visible-device: 5
-          #   cache-dir: /home/sai/shark-test-suite-models-cache
-          # - name: mi300_gpu7_test
-          #   runs-on: nodai-amdgpu-mi300-x86-64
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-int8-p0p1-shard3
-          #   visible-device: 6
-          #   cache-dir: /home/sai/shark-test-suite-models-cache
-          # - name: mi300_gpu8_test
-          #   runs-on: nodai-amdgpu-mi300-x86-64
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-vision-int8
-          #   visible-device: 7
-          #   cache-dir: /home/sai/shark-test-suite-models-cache
+          - name: mi300_gpu1_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: shark-test-suite
+            visible-device: 0
+            cache-dir: /home/sai/shark-test-suite-models-cache
+          - name: mi300_gpu2_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-hf-cnn-fp32-shard1
+            visible-device: 1
+            cache-dir: /home/sai/shark-test-suite-models-cache
+          - name: mi300_gpu3_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-hf-cnn-fp32-shard2
+            visible-device: 2
+            cache-dir: /home/sai/shark-test-suite-models-cache
+          - name: mi300_gpu4_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-hf-cnn-fp32-shard3
+            visible-device: 3
+            cache-dir: /home/sai/shark-test-suite-models-cache
+          - name: mi300_gpu5_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-int8-p0p1-shard1
+            visible-device: 4
+            cache-dir: /home/sai/shark-test-suite-models-cache
+          - name: mi300_gpu6_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-int8-p0p1-shard2
+            visible-device: 5
+            cache-dir: /home/sai/shark-test-suite-models-cache
+          - name: mi300_gpu7_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-int8-p0p1-shard3
+            visible-device: 6
+            cache-dir: /home/sai/shark-test-suite-models-cache
+          - name: mi300_gpu8_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-vision-int8
+            visible-device: 7
+            cache-dir: /home/sai/shark-test-suite-models-cache
           - name: cpu_shard1_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
@@ -202,6 +202,7 @@ jobs:
             -b ${{ matrix.backend }} \
             -d ${{ matrix.device }} \
             --report-file reports/${{ matrix.test-file }}.md \
+            --mode=cl-onnx-iree \
             -v
         working-directory: ./test-suite
 
@@ -259,9 +260,9 @@ jobs:
       max-parallel: 1
       matrix:
         include:
-          # - name: merge_rocm_reports
-          #   runs-on: nodai-amdgpu-mi300-x86-64
-          #   backend: rocm
+          - name: merge_rocm_reports
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
           - name: merge_cpu_reports
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu

@@ -214,23 +214,6 @@ def run_tests(
             if curr_stage in stages:
                 notify_stage()
                 golden_outputs_raw = inst.forward(inputs)
-                golden_outputs_raw.save_to(log_dir + "golden_output")
-
-            # get inputs from inst
-            curr_stage = "construct_inputs"
-            if curr_stage in stages:
-                notify_stage()
-                if load_inputs:
-                    inputs = inst.load_inputs(log_dir)
-                else:
-                    inputs = inst.construct_inputs()
-                    inputs.save_to(log_dir + "input")
-
-            # run native inference
-            curr_stage = "native_inference"
-            if curr_stage in stages:
-                notify_stage()
-                golden_outputs_raw = inst.forward(inputs)
                 # most reliable way to get output shapes for dynamic models
                 # these shapes are needed to load the outputs from iree-run-module
                 if isinstance(config, CLOnnxTestConfig):

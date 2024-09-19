@@ -12,7 +12,10 @@ from e2e_testing.storage import load_test_txt_file
 this_file = Path(__file__)
 lists_dir = (this_file.parent).joinpath("external_lists")
 
-model_names = load_test_txt_file(lists_dir.joinpath("nlp-pytorch.txt"))
+model_names = []
+for i in [1,2,3]:
+    model_names += load_test_txt_file(lists_dir.joinpath(f"nlp-shard{i}.txt"))
+
 
 def dim_param_constructor(dim_param_dict):
     class AzureWithDimParams(AzureDownloadableModel):

@@ -117,14 +117,17 @@ class OnnxModelInfo:
         return TestTensors.load_from(shapes, dtypes, dir_path, "golden_output")
     
     def update_opset_version_and_overwrite(self):
-        if self.opset_version:
-            if not os.path.exists(self.model):
-                self.construct_model()
-            og_model = onnx.load(self.model)
-            model = onnx.version_converter.convert_version(
-                og_model, self.opset_version
-            )
-            onnx.save(model, self.model)
+        if not self.opset_version:
+            return
+        if not os.path.exists(self.model):
+            self.construct_model()
+        og_model = onnx.load(self.model)
+        if og_model.opset_import[0].version >= self.opset_version:
+            return
+        model = onnx.version_converter.convert_version(
+            og_model, self.opset_version
+        )
+        onnx.save(model, self.model)
 
 # TODO: extend TestModel to a union, or make TestModel a base class when supporting other frontends
 TestModel = OnnxModelInfo 

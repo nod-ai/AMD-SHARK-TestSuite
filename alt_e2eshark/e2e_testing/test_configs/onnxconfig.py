@@ -156,10 +156,7 @@ class CLOnnxTestConfig(TestConfig):
         # check if a new mlir file was generated
         if not os.path.exists(mlir_file):
             error_msg = f"failure executing command: \n{script}\n failed to produce mlir file {mlir_file}.\n"
-            if os.path.exists(detail_log):
-                error_msg += "Error detail:\n\n"
-                with open(detail_log,"r+") as file:
-                    error_msg += file.read()
+            error_msg += f"Error detail in '{detail_log}'"
             raise FileNotFoundError(error_msg)
         # store output signatures for loading the outputs of iree-run-module
         self.tensor_info_dict[program.name] = program.get_signature(from_inputs=False)
@@ -192,10 +189,7 @@ class CLOnnxTestConfig(TestConfig):
         os.system(script0)
         if not os.path.exists(torch_ir):
             error_msg = f"failure executing command: \n{script0}\n failed to produce mlir file {torch_ir}.\n"
-            if os.path.exists(detail_log):
-                error_msg += "Error detail:\n\n"
-                with open(detail_log,"r+") as file:
-                    error_msg += file.read()
+            error_msg += f"Error detail in '{detail_log}'"
             raise FileNotFoundError(error_msg)
         # remove old linalg ir
         Path(linalg_ir).unlink(missing_ok=True)
@@ -203,10 +197,7 @@ class CLOnnxTestConfig(TestConfig):
         os.system(script1)
         if not os.path.exists(linalg_ir):
             error_msg = f"failure executing command: \n{script1}\n failed to produce mlir file {linalg_ir}.\n"
-            if os.path.exists(detail_log):
-                error_msg += "Error detail:\n\n"
-                with open(detail_log,"r+") as file:
-                    error_msg += file.read()
+            error_msg += f"Error detail in '{detail_log}'"
             raise FileNotFoundError(error_msg)
         return linalg_ir
     
@@ -236,10 +227,7 @@ class CLOnnxTestConfig(TestConfig):
         for file in output_files:
             if not os.path.exists(file):
                 error_msg = f"failure executing command: \n{script}\n failed to produce output file {file}.\n"
-                if os.path.exists(detail_log):
-                    error_msg += "Error detail:\n\n"
-                    with open(detail_log,"r+") as file:
-                        error_msg += file.read()
+                error_msg += f"Error detail in '{detail_log}'"
                 raise FileNotFoundError(error_msg)
         return TestTensors.load_from(self.tensor_info_dict[test_name][0], self.tensor_info_dict[test_name][1], run_dir, "output")
 

@@ -6,6 +6,7 @@
 
 from ..helper_classes import AzureDownloadableModel
 from e2e_testing.registry import register_test
+import numpy as np
 
 # TODOs:
 # 1. just update the opset versions and re-upload to azure.
@@ -31,6 +32,15 @@ def dim_param_constructor(dim_param_dict):
 
         def update_dim_param_dict(self):
             self.dim_param_dict = dim_param_dict
+        
+        def construct_inputs(self):
+            inputs = super().construct_inputs()
+            # this model has an input used for indexing into a dim of size 2
+            if self.name == "migraphx_mlperf__bert_large_mlperf":
+                data = list(inputs.data)
+                data[2] = np.clip(data[2],-2,1)
+                inputs.data = tuple(data)
+            return inputs
 
     return AzureWithDimParams
 

@@ -115,21 +115,18 @@ class CLIREEBackend(BackendBase):
         for arg in self.extra_args:
             arg_string += arg
             arg_string += " "
-        command_error_dump = os.path.join(save_to, "detail", "compilation.detail.log")
+        detail_log = os.path.join(save_to, "detail", "compilation.detail.log")
         commands_log = os.path.join(save_to, "commands", "compilation.commands.log")
-        script = f"iree-compile {module_path} {arg_string}-o {vmfb_path} 1> {command_error_dump} 2>&1"
+        script = f"iree-compile {module_path} {arg_string}-o {vmfb_path} 1> {detail_log} 2>&1"
         with open(commands_log, "w") as file:
             file.write(script) 
         # remove old vmfb if it exists
         Path(vmfb_path).unlink(missing_ok=True)
         os.system(script)
         if not os.path.exists(vmfb_path):
-            error_message = f"failure executing command: \n{script}\n failed to produce a vmfb at {vmfb_path}.\n"
-            if os.path.exists(command_error_dump):
-                error_message += "Error Details:\n\n"
-                with open(command_error_dump, "r+") as file:
-                    error_message += file.read()
-            raise FileNotFoundError(error_message)
+            error_msg = f"failure executing command: \n{script}\n failed to produce a vmfb at {vmfb_path}.\n"
+            error_msg += f"Error detail in '{detail_log}'"
+            raise FileNotFoundError(error_msg)
         return vmfb_path
     
     def load(self, vmfb_path: str, *, func_name=None):

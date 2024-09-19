@@ -72,6 +72,8 @@ def get_tests(groups: Literal["all", "combinations", "operators"], test_filter: 
     else:
         test_list = pre_test_list
 
+    test_list = sorted(test_list, key=lambda test : test.unique_name.lower())
+
     return test_list
 
 
@@ -154,6 +156,10 @@ def run_tests(
         log_dir = os.path.join(parent_log_dir, t.unique_name) + "/"
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
+        
+        # setup stage notifications
+        ws = lambda curr_stage : " "*(max(*[len(s) for s in stages]) - len(curr_stage))
+        notify_stage = lambda : print(f"\tRunning stage '{curr_stage}'..." + ws(curr_stage), end="\r")
 
         try:
             # TODO: convert staging to an Enum and figure out how to specify staging from args
@@ -162,6 +168,7 @@ def run_tests(
             # set up test
             curr_stage = "setup"
             if curr_stage in stages:
+                notify_stage()
                 # build an instance of the test info class
                 inst = t.model_constructor(t.unique_name, log_dir)
                 # this is highly onnx specific. 
@@ -173,6 +180,7 @@ def run_tests(
             # generate mlir from the instance using the config
             curr_stage = "import_model"
             if curr_stage in stages:
+                notify_stage()
                 model_artifact, func_name = config.import_model(
                     inst, save_to=artifact_save_to
                 )
@@ -180,6 +188,7 @@ def run_tests(
             # apply config-specific preprocessing to the ModelArtifact
             curr_stage = "preprocessing"
             if curr_stage in stages:
+                notify_stage()
                 model_artifact = config.preprocess_model(
                     model_artifact, save_to=artifact_save_to
                 )
@@ -187,11 +196,13 @@ def run_tests(
             # compile mlir_module using config (calls backend compile)
             curr_stage = "compilation"
             if curr_stage in stages:
+                notify_stage()
                 compiled_artifact = config.compile(model_artifact, save_to=artifact_save_to)
 
             # get inputs from inst
             curr_stage = "construct_inputs"
             if curr_stage in stages:
+                notify_stage()
                 if load_inputs:
                     inputs = inst.load_inputs(log_dir)
                 else:
@@ -201,12 +212,14 @@ def run_tests(
             # run native inference
             curr_stage = "native_inference"
             if curr_stage in stages:
+                notify_stage()
                 golden_outputs_raw = inst.forward(inputs)
                 golden_outputs_raw.save_to(log_dir + "golden_output")
 
             # get inputs from inst
             curr_stage = "construct_inputs"
             if curr_stage in stages:
+                notify_stage()
                 if load_inputs:
                     inputs = inst.load_inputs(log_dir)
                 else:
@@ -216,18 +229,25 @@ def run_tests(
             # run native inference
             curr_stage = "native_inference"
             if curr_stage in stages:
+                notify_stage()
                 golden_outputs_raw = inst.forward(inputs)
+                # most reliable way to get output shapes for dynamic models
+                # these shapes are needed to load the outputs from iree-run-module
+                if isinstance(config, CLOnnxTestConfig):
+                    config.tensor_info_dict[t.unique_name] = ([list(d.shape) for d in golden_outputs_raw.data], [d.dtype for d in golden_outputs_raw.to_torch().data])
                 golden_outputs_raw.save_to(log_dir + "golden_output")
 
             # run inference with the compiled module
             curr_stage = "compiled_inference"
             if curr_stage in stages:
+                notify_stage()
                 outputs_raw = config.run(compiled_artifact, inputs, func_name=func_name)
                 outputs_raw.save_to(log_dir + "output")
 
             # apply model-specific post-processing:
             curr_stage = "postprocessing"
             if curr_stage in stages:
+                notify_stage()
                 golden_outputs = inst.apply_postprocessing(golden_outputs_raw)
                 outputs = inst.apply_postprocessing(outputs_raw)
                 inst.save_processed_output(golden_outputs, log_dir, "golden_output")
@@ -263,9 +283,9 @@ def run_tests(
             if t.unique_name not in status_dict.keys():
                 status_dict[t.unique_name] = "PASS"
             if status_dict[t.unique_name] == "PASS":
-                print(f"\tPASSED")
+                print(f"\tPASSED" + " "*30)
             else:
-                print(f"\tFAILED ({status_dict[t.unique_name]})")
+                print(f"\tFAILED ({status_dict[t.unique_name]})" + " "*20)
 
     num_passes = list(status_dict.values()).count("PASS")
     print("\nTest Summary:")
@@ -299,10 +319,9 @@ def log_exception(e: Exception, path: str, stage: str, name: str, verbose: bool)
     with open(log_filename, "w") as f:
         f.write(base_str)
         if verbose:
-            print(f"\tFAILED ({stage})")
-            tb = e.__traceback__
+            print(f"\tFAILED ({stage})" + " "*20)
             import traceback
-            traceback.print_tb(tb, file=f)
+            traceback.print_exception(e, file=f)
         else:
             print(f"FAILED: {name}")
 

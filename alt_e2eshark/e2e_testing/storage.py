@@ -68,7 +68,7 @@ def load_raw_binary_as_torch_tensor(binaryfile, shape, dtype):
     with open(binaryfile, "rb") as f:
         binarydata = f.read()
     # Number of elements in tensor
-    num_elem = torch.prod(torch.tensor(list(shape)))
+    num_elem = torch.prod(torch.tensor(list(shape))) if len(shape) > 0 else torch.tensor([1])
     # Total bytes
     tensor_num_bytes = (num_elem * dtype.itemsize).item()
     barray = bytearray(binarydata[0:tensor_num_bytes])
@@ -215,6 +215,3 @@ class TestTensors:
             t = load_raw_binary_as_torch_tensor(os.path.join(dir_path, name + "." + str(i) + ".bin"), shape, dtype)
             tensor_list.append(t)
         return TestTensors(tuple(tensor_list))
-
-
-

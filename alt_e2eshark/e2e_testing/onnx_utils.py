@@ -75,7 +75,9 @@ def get_sample_inputs_for_onnx_model(model_path, dim_param_dict = None):
 
 def get_signature_for_onnx_model(model_path, *, from_inputs: bool = True, dim_param_dict: Optional[dict[str, int]] = None, leave_dynamic: bool = False):
     """A convenience funtion for retrieving the input or output shapes and dtypes"""
-    s = onnxruntime.InferenceSession(model_path, None)
+    sess_opt = onnxruntime.SessionOptions()
+    sess_opt.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
+    s = onnxruntime.InferenceSession(model_path, sess_opt)
     if from_inputs:
         nodes = s.get_inputs()
     else:  # taking from outputs
@@ -156,6 +158,8 @@ def find_minimal_graph(graph: onnx.GraphProto, top_key: int):
     i = top_key
     while i >= 0:
         node = graph.node[i]
+        if node.name == '':
+            node.name = f'node_{i}'
         if len(set(node.output).intersection(keep_vi_names)) != 0:
             keep_names.add(node.name)
             keep_vi_names.update(set(node.input))

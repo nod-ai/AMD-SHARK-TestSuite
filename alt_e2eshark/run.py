@@ -10,7 +10,6 @@ import warnings
 from pathlib import Path
 import argparse
 import re
-import logging
 from typing import List, Literal, Optional
 
 # append alt_e2eshark dir to path to allow importing without explicit pythonpath management
@@ -18,6 +17,7 @@ TEST_DIR = str(Path(__file__).parent)
 sys.path.append(TEST_DIR)
 
 from e2e_testing.framework import *
+from e2e_testing.logging_utils import log_exception, log_result, post_test_clean
 
 # import frontend test configs:
 from e2e_testing.test_configs.onnxconfig import (
@@ -118,7 +118,8 @@ def main(args):
         args.no_artifacts,
         args.verbose,
         stages,
-        args.load_inputs
+        args.load_inputs,
+        int(args.cleanup),
     )
 
     if args.report:
@@ -128,7 +129,7 @@ def main(args):
 
 
 def run_tests(
-    test_list: List[Test], config: TestConfig, parent_log_dir: str, no_artifacts: bool, verbose: bool, stages: List[str], load_inputs: bool
+    test_list: List[Test], config: TestConfig, parent_log_dir: str, no_artifacts: bool, verbose: bool, stages: List[str], load_inputs: bool, cleanup: int,
 ) -> Dict[str, str]:
     """runs tests in test_list based on config. Returns a dictionary containing the test statuses."""
     # TODO: multi-process
@@ -239,6 +240,7 @@ def run_tests(
         except Exception as e:
             status_dict[t.unique_name] = curr_stage
             log_exception(e, log_dir, curr_stage, t.unique_name, verbose)
+            post_test_clean(log_dir, cleanup, verbose)
             continue
 
         # store the results
@@ -269,6 +271,9 @@ def run_tests(
                 print(f"\tPASSED" + " "*30)
             else:
                 print(f"\tFAILED ({status_dict[t.unique_name]})" + " "*20)
+        
+        # test is complete, perform cleanup
+        post_test_clean(log_dir,  cleanup, verbose)
 
     num_passes = list(status_dict.values()).count("PASS")
     print("\nTest Summary:")
@@ -276,38 +281,6 @@ def run_tests(
     print(f"results stored in {parent_log_dir}")
     status_dict = dict(sorted(status_dict.items(), key=lambda item : item[0].lower()))
     return status_dict
-
-
-def log_result(result, log_dir, tol):
-    # TODO: add more information for the result comparison (e.g., on verbose, add information on where the error is occuring, etc)
-    summary = result_comparison(result, tol)
-    num_match = 0
-    num_total = 0
-    for s in summary:
-        num_match += s.sum().item()
-        num_total += s.nelement()
-    percent_correct = num_match / num_total
-    with open(log_dir + "inference_comparison.log", "w+") as f:
-        f.write(
-            f"matching values with (rtol,atol) = {tol}: {num_match} of {num_total} = {percent_correct*100}%\n"
-        )
-        f.write(f"Test Result:\n{result}")
-    return num_match == num_total
-
-
-def log_exception(e: Exception, path: str, stage: str, name: str, verbose: bool):
-    '''generates a log for an exception generated during a testing stage'''
-    log_filename = path + stage + ".log"
-    base_str = f"Failed test at stage {stage} with exception:\n{e}\n"
-    with open(log_filename, "w") as f:
-        f.write(base_str)
-        if verbose:
-            print(f"\tFAILED ({stage})" + " "*20)
-            import traceback
-            traceback.print_exception(e, file=f)
-        else:
-            print(f"FAILED: {name}")
-
 
 def _get_argparse():
     msg = "The run.py script to run e2e shark tests"
@@ -426,6 +399,12 @@ def _get_argparse():
         help="If enabled, this flag will prevent saving mlir and vmfb files",
         action="store_true",
         default=False,
+    )
+    parser.add_argument(
+        "--cleanup",
+        help="Specify cleanup level: 0 (nothing), 1 (size >= 500M), 2 (.mlir and .vmfb), 3 (all but .log), 4 (everything)",
+        choices=['0','1','2','3','4'],
+        default='0',
     )
     parser.add_argument(
         "--report",

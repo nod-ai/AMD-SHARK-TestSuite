@@ -200,31 +200,6 @@ jobs:
           repository: nod-ai/SHARK-TestSuite
           ref: alt-merge-reports
           path: test-suite
-
-      - name: Checkout SHARK Turbine
-        uses: actions/checkout@v2
-        with:
-          repository: nod-ai/SHARK-Turbine
-          path: SHARK-Turbine
-
-      - name: Checkout iree turbine
-        uses: actions/checkout@v2
-        with:
-          repository: iree-org/iree-turbine
-          path: iree-turbine
-
-      - name: "Setup e2eshark python venv"
-        run: |
-          python3.11 -m venv ${E2E_VENV_DIR}
-          source ${E2E_VENV_DIR}/bin/activate
-          pip install --upgrade pip
-          pip install -r ./e2eshark/requirements.txt
-          pip install \
-            --find-links https://iree.dev/pip-release-links.html \
-            --upgrade \
-            iree-compiler \
-            iree-runtime
-        working-directory: ./test-suite
       
       - name: "Setup alt e2eshark python venv"
         run: |
@@ -239,7 +214,7 @@ jobs:
       - name: Run Onnx Mode
         run: |
           source ${ALT_E2E_VENV_DIR}/bin/activate
-          pip list
+          pip freeze
           cd alt_e2eshark
           free -mh
           python3.11 ./run.py \
@@ -252,36 +227,6 @@ jobs:
             --mode=cl-onnx-iree \
             -v
         working-directory: ./test-suite
-
-      - name: Setup turbine python venv
-        run: |
-          source ${E2E_VENV_DIR}/bin/activate
-          pip install -f https://iree.dev/pip-release-links.html --upgrade \
-          -r ../iree-turbine/iree-requirements.txt
-          pip install -e ../iree-turbine[testing]
-          pip install --no-compile --pre --upgrade -e ../SHARK-Turbine/models -r ../SHARK-Turbine/models/requirements.txt
-        working-directory: ./test-suite
-
-      - name: Run Turbine Mode
-        if: contains(matrix.test-file, 'shark-test-suite')
-        run: |
-          source ${E2E_VENV_DIR}/bin/activate
-          cd e2eshark
-          free -mh
-          python3.11 ./run.py \
-          -r ./test-turbine \
-          --report \
-          --cachedir ${{ matrix.cache-dir }} \
-          --mode turbine \
-          -g models \
-          --targetbackend ${{ matrix.backend }} \
-          --device ${{ matrix.device }} \
-          --targetchip ${{ matrix.target-chip }} \
-          --cleanup \
-          --postprocess \
-          --ci \
-          -v
-        working-directory: ./test-suite
       
       - uses: actions/upload-artifact@master
         with:
@@ -292,12 +237,6 @@ jobs:
         with:
           name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_onnx_json
           path: ./test-suite/alt_e2eshark/reports/${{ matrix.test-file }}.json
-      
-      - uses: actions/upload-artifact@master
-        if: contains(matrix.test-file, 'shark-test-suite')
-        with:
-          name: ci_reports_${{ matrix.backend }}_turbine
-          path: ./test-suite/e2eshark/ci_reports_${{ matrix.backend }}_turbine
 
   push_artifacts:
     needs: [e2eshark]
@@ -431,10 +370,6 @@ jobs:
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard3_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_onnx_json
-      - uses: actions/download-artifact@master
-        with:
-          name: ci_reports_${{ matrix.backend }}_turbine
-          path: ./e2eshark-reports/${{ matrix.backend }}
       - name: Merge Reports
         run: |
           source report_venv_alt/bin/activate
@@ -483,7 +418,6 @@ jobs:
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/migraphx
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/nlp
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports
-          mkdir -p ${date}/ci_reports_turbine/${{ matrix.backend }}/turbine_models
           cp vai-hf-cnn-fp32.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32/summary.md
           cp vai-int8-p0p1.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1/summary.md
           cp nlp.md ${date}/ci_reports_onnx/${{ matrix.backend }}/nlp/summary.md
@@ -491,7 +425,6 @@ jobs:
           cp ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx_md/vai-vision-int8.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8/summary.md
           cp ci_reports_${{ matrix.backend }}_migraphx_onnx_md/migraphx.md ${date}/ci_reports_onnx/${{ matrix.backend }}/migraphx/summary.md
           cp combined_reports.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports/summary.md
-          cp -r ./${{ matrix.backend }}/turbine_models/*.md ${date}/ci_reports_turbine/${{ matrix.backend }}/turbine_models
           git add $date
           git commit -m "add CI reports for e2eshark for ${{ matrix.backend }}"
           git push origin main

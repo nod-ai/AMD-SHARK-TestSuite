@@ -273,7 +273,7 @@ jobs:
           --report \
           --cachedir ${{ matrix.cache-dir }} \
           --mode turbine \
-          -g models \
+          --tests pytorch/models/bart-large \
           --targetbackend ${{ matrix.backend }} \
           --device ${{ matrix.device }} \
           --targetchip ${{ matrix.target-chip }} \

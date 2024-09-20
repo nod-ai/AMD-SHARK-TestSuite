@@ -225,6 +225,7 @@ jobs:
             -d ${{ matrix.device }} \
             --report-file reports/${{ matrix.test-file }}.md \
             --mode=cl-onnx-iree \
+            --cleanup=3 \
             -v
         working-directory: ./test-suite
       

@@ -21,7 +21,7 @@ def generate_report(args, stages, status_dict):
     stages.reverse()
     counts = {s : 0 for s in stages}
     for (key, value) in status_dict.items():
-        counts[value] += 1
+        counts[value["exit_status"]] += 1
     results_str = "## Summary\n\n|Stage|Count|\n|--|--|\n"
     results_str += f"| Total | {len(status_dict.keys())} |\n"
     for (key, value) in counts.items():
@@ -29,10 +29,10 @@ def generate_report(args, stages, status_dict):
 
     # set up report detail
     report_string = f"\n## Test Run Detail \nTest was run with the following arguments:\n{args}\n\n"
-    report_string += "| Test | Exit Status | Notes |\n"
-    report_string += "|--|--|--|\n"
+    report_string += "| Test | Exit Status | Mean Benchmark Time (ms) | Notes |\n"
+    report_string += "|--|--|--|--|\n"
     for (key, value) in status_dict.items():
-        report_string += f"| {key} | {value} | |\n"
+        report_string += f"| {key} | {value['exit_status']} | {value['time_ms']} | |\n"
 
     # get a report file and write to it 
     with open(args.report_file, "w") as file:

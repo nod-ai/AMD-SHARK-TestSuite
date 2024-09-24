@@ -157,6 +157,9 @@ class TestConfig(abc.ABC):
         """runs the input through the compiled artifact"""
         pass
 
+    def benchmark(self, artifact: CompiledOutput, input: TestTensors, repetitions: int, *, func_name=None) -> float:
+        """returns a float representing inference time in ms"""
+        pass
 
 class Test(NamedTuple):
     """Used to store the name and TestInfo constructor for a registered test"""

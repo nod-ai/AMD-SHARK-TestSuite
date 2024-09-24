@@ -87,7 +87,7 @@ def get_signature_for_onnx_model(model_path, *, from_inputs: bool = True, dim_pa
     for i in nodes:
         shape = i.shape
         for index, s in enumerate(shape):
-            if not leave_dynamic and isinstance(s, str) and s in dim_param_dict.keys():
+            if dim_param_dict and not leave_dynamic and isinstance(s, str) and s in dim_param_dict.keys():
                 shape[index] = dim_param_dict[s]
         shapes.append(shape)
         dtypes.append(dtype_from_ort_node(i))

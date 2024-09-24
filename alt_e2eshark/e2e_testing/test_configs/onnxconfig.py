@@ -144,6 +144,8 @@ class CLOnnxTestConfig(TestConfig):
         # get a command line script
         script = "python -m torch_mlir.tools.import_onnx "
         script += str(program.model)
+        if program.opset_version:
+            script += f" --opset-version={program.opset_version}"
         script += " -o "
         script = script + mlir_file
         script += f" 1> {detail_log} 2>&1"

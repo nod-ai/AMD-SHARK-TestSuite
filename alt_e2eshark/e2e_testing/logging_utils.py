@@ -19,7 +19,7 @@ def log_result(result, log_dir, tol):
     for s in summary:
         num_match += s.sum().item()
         num_total += s.nelement()
-    percent_correct = num_match / num_total
+    percent_correct = num_match / num_total if num_total != 0 else "N/A"
     with open(log_dir + "inference_comparison.log", "w+") as f:
         f.write(
             f"matching values with (rtol,atol) = {tol}: {num_match} of {num_total} = {percent_correct*100}%\n"

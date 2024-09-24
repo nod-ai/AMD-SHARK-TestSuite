@@ -211,7 +211,28 @@ jobs:
           pip install --no-deps -r ./alt_e2eshark/torch_mlir_requirements.txt
         working-directory: ./test-suite
 
-      - name: Run Onnx Mode
+      - name: Run Onnx Bench Mode
+        if: contains(matrix.test-file, 'migraphx')
+        run: |
+          source ${ALT_E2E_VENV_DIR}/bin/activate
+          pip freeze
+          cd alt_e2eshark
+          free -mh
+          python3.11 ./run.py \
+            -r ./test-onnx \
+            --report \
+            --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
+            -b ${{ matrix.backend }} \
+            -d ${{ matrix.device }} \
+            --report-file reports/${{ matrix.test-file }}.md \
+            --mode=cl-onnx-iree \
+            --cleanup=3 \
+            --benchmark \
+            -v
+        working-directory: ./test-suite
+
+      - name: Run Onnx Default Mode
+        if: ${{ ! contains(matrix.test-file, 'migraphx') }}
         run: |
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip freeze

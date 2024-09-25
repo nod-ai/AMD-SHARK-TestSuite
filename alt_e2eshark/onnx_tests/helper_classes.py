@@ -20,6 +20,7 @@ from e2e_testing.onnx_utils import (
 class AzureDownloadableModel(OnnxModelInfo):
     """This class can be used for models in our azure storage (both private and public)."""
     def __init__(self, name: str, onnx_model_path: str):
+        # TODO: Extract opset version from onnx.version.opset 
         opset_version = 21
         parent_cache_dir = os.getenv('CACHE_DIR')
         if not parent_cache_dir:

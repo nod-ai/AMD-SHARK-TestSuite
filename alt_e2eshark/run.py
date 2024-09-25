@@ -106,12 +106,13 @@ def main(args):
     elif args.mode == "ort-ep":
         # TODO: allow specifying provider explicitly from cl args.
         config = OnnxEpTestConfig(
-            str(TEST_DIR), OnnxrtIreeEpBackend(device=args.device, hal_target_backend=args.backend))
+            str(TEST_DIR), OnnxrtIreeEpBackend(device=args.device, hal_target_device=args.backend))
     else:
         raise NotImplementedError(f"unsupported mode: {args.mode}")
 
     # get test list
     test_list = get_tests(args.groups, args.test_filter, args.testsfile)
+    test_list.sort()
 
     #setup test stages
     stages = ALL_STAGES if args.benchmark else DEFAULT_STAGES
@@ -316,7 +317,7 @@ def _get_argparse():
     parser.add_argument(
         "-b",
         "--backend",
-        choices=["llvm-cpu", "amd-aie", "rocm", "cuda", "vmvx", "metal-spirv", "vulkan-spirv"],
+        choices=["llvm-cpu", "amd-aie", "rocm", "hip", "cuda", "vmvx", "metal-spirv", "vulkan-spirv"],
         default="llvm-cpu",
         help="specifies the iree-hal-target-backend for compile phase",
     )

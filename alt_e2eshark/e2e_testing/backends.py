@@ -145,26 +145,49 @@ class CLIREEBackend(BackendBase):
 
 class OnnxrtIreeEpBackend(BackendBase):
     '''This backend uses onnxrt iree-ep to compile and run onnx models for a specified hal_target_backend'''
-    def __init__(self, *, device="local-task", hal_target_backend="llvm-cpu", providers=["IreeExecutionProvider"], inter_op_num_threads=None, intra_op_num_threads=None):
-        # may need the device and target_backend for the future (e.g., when IREE-EP has support for specifying)
+    def __init__(self, *, device="local-task", hal_target_device="llvm-cpu", extra_args : List[str] = None):
         self.device = device
-        self.hal_target_backend = hal_target_backend
-
-        self.providers=providers
-        # TODO: have more session options be optionally configurable by init args
+        self.hal_target_device = hal_target_device
+        if extra_args:
+            self.extra_args = []
+            for a in extra_args:
+                if a[0:2] == "--":
+                    self.extra_args.append(a)
+                else:
+                    self.extra_args.append("--" + a)
+        elif hal_target_device == "hip":
+            # some extra args for Mi250 - some of these may not work for other chips
+            self.extra_args = [
+                "--iree-hip-target=gfx90a",
+            ]
+        elif hal_target_device == "llvm-cpu":
+            self.extra_args = [
+                "--iree-input-demote-i64-to-i32",
+                # "--iree-llvmcpu-fail-on-large-vector=0",
+                # "--iree-llvmcpu-stack-allocation-limit=300000",
+            ]
+        self.providers = ["IreeExecutionProvider"]
+        # set provider options.
+        provider_options_dict = dict()
+        provider_options_dict["hal_target_device"] = self.hal_target_device
+        provider_options_dict["device"] = self.device
+        provider_options_dict["compile_time_flags"] = "+".join(self.extra_args)
+        self.provider_options = [provider_options_dict]
         self.sess_opt = ort.SessionOptions()
         self.sess_opt.execution_mode  = ort.ExecutionMode.ORT_PARALLEL
-        if inter_op_num_threads:
-            self.sess_opt.inter_op_num_threads = inter_op_num_threads
-        if intra_op_num_threads:
-            self.sess_opt.intra_op_num_threads = intra_op_num_threads
         #  sess_opt.log_verbosity_level = 0
+        #  self.sess_opt.log_severity_level = 0
 
     def compile(self, model: ModelProto, *, save_to: str = None) -> ort.InferenceSession:
+        if self.provider_options:
+            provider_options_dict = self.provider_options[0]
+            provider_options_dict["save_to"] = save_to
+
         session = ort.InferenceSession(
                    model.SerializeToString(),
                    self.sess_opt,
                    providers=self.providers,
+                   provider_options=self.provider_options,
                )
         # can't save an onnx runtime session
         return session

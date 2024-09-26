@@ -103,6 +103,13 @@ jobs:
             target-chip: gfx942
             test-file: migraphx
             cache-dir: /home/sai/shark-test-suite-models-cache
+          - name: mi300_gpu13_test
+            runs-on: nodai-amdgpu-mi300-x86-64
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: onnxrt-iree-ep
+            cache-dir: /home/sai/shark-test-suite-models-cache
           - name: cpu_shard1_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
@@ -187,6 +194,13 @@ jobs:
             target-chip: x86_64-linux-gnu
             test-file: migraphx
             cache-dir: /groups/aig_sharks/test-suite-ci-cache
+          - name: cpu_shard13_test
+            runs-on: nodai-amdgpu-mi250-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: onnxrt-iree-ep
+            cache-dir: /groups/aig_sharks/test-suite-ci-cache
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
       ALT_E2E_VENV_DIR: ${{ github.workspace }}/alt-test-suite_venv
@@ -210,6 +224,18 @@ jobs:
           pip install -r ./alt_e2eshark/iree_requirements.txt
           pip install --no-deps -r ./alt_e2eshark/torch_mlir_requirements.txt
         working-directory: ./test-suite
+      
+      - name: "Setup IREE EP python venv"
+        run: |
+          python3.10 -m venv ep_venv
+          source ep_venv/bin/activate
+          pip install --upgrade pip
+          pip install -r ./alt_e2eshark/base_requirements.txt
+          pip install -r ./alt_e2eshark/iree_requirements.txt
+          pip install --no-deps -r ./alt_e2eshark/torch_mlir_requirements.txt
+          wget https://sharkpublic.blob.core.windows.net/sharkpublic/onnxruntime/pip_whl/onnxruntime-1.20.0-cp310-cp310-linux_x86_64.whl
+          pip install ./onnxruntime-1.20.0-cp310-cp310-linux_x86_64.whl
+        working-directory: ./test-suite
 
       - name: Run Onnx Bench Mode
         if: contains(matrix.test-file, 'migraphx')
@@ -232,13 +258,32 @@ jobs:
         working-directory: ./test-suite
 
       - name: Run Onnx Default Mode
-        if: ${{ ! contains(matrix.test-file, 'migraphx') }}
+        if: ${{ ! contains(matrix.test-file, 'migraphx') }} && ${{ ! contains(matrix.test-file, 'onnxrt-iree-ep') }}
         run: |
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip freeze
           cd alt_e2eshark
           free -mh
           python3.11 ./run.py \
+            -r ./test-onnx \
+            --report \
+            --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
+            -b ${{ matrix.backend }} \
+            -d ${{ matrix.device }} \
+            --report-file reports/${{ matrix.test-file }}.md \
+            --mode=cl-onnx-iree \
+            --cleanup=3 \
+            -v
+        working-directory: ./test-suite
+      
+      - name: Run OnnxRT IREE EP
+        if: contains(matrix.test-file, 'onnxrt-iree-ep')
+        run: |
+          source ep_venv/bin/activate
+          pip freeze
+          cd alt_e2eshark
+          free -mh
+          python3.11 ./run.py -m ort-ep \
             -r ./test-onnx \
             --report \
             --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \

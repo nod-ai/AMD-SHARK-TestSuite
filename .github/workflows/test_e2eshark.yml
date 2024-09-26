@@ -298,9 +298,6 @@ jobs:
             --cleanup=3 \
             -v
         working-directory: ./test-suite
-        env:
-          COMPILER_PATH: $(python -c "import iree.compiler as _; print(_.__path__[0])")
-          LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$COMPILER_PATH/_mlir_libs/
       
       - uses: actions/upload-artifact@master
         with:

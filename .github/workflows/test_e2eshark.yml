@@ -281,8 +281,10 @@ jobs:
         if: contains(matrix.test-file, 'onnxrt-iree-ep')
         run: |
           source ${EP_VENV_DIR}/bin/activate
-          echo COMPILER_PATH=$(python -c "import iree.compiler as _; print(_.__path__[0])") >> $GITHUB_ENV
-          echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$COMPILER_PATH/_mlir_libs/  >> $GITHUB_ENV
+          echo "COMPILER_PATH=$(python -c "import iree.compiler as _; print(_.__path__[0])")"
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$COMPILER_PATH/_mlir_libs/"
+          echo "COMPILER_PATH=$(python -c "import iree.compiler as _; print(_.__path__[0])")" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$COMPILER_PATH/_mlir_libs/"  >> $GITHUB_ENV
           echo $COMPILER_PATH
           echo $LD_LIBRARY_PATH
           pip freeze

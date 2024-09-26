@@ -204,6 +204,7 @@ jobs:
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
       ALT_E2E_VENV_DIR: ${{ github.workspace }}/alt-test-suite_venv
+      EP_VENV_DIR: ${{ github.workspace }}/ep_venv
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
       AZ_PRIVATE_CONNECTION: ${{ secrets.ONNXPRIVATESTORAGE_AZ_PRIVATE_CONNECTION }}
       CACHE_DIR: ${{ matrix.cache-dir }}
@@ -227,8 +228,8 @@ jobs:
       
       - name: "Setup IREE EP python venv"
         run: |
-          python3.10 -m venv ep_venv
-          source ep_venv/bin/activate
+          python3.10 -m venv ${EP_VENV_DIR}
+          source ${EP_VENV_DIR}/bin/activate
           pip install --upgrade pip
           pip install -r ./alt_e2eshark/base_requirements.txt
           pip install -r ./alt_e2eshark/iree_requirements.txt
@@ -279,7 +280,7 @@ jobs:
       - name: Run OnnxRT IREE EP
         if: contains(matrix.test-file, 'onnxrt-iree-ep')
         run: |
-          source ep_venv/bin/activate
+          source ${EP_VENV_DIR}/bin/activate
           pip freeze
           cd alt_e2eshark
           free -mh
@@ -290,7 +291,6 @@ jobs:
             -b ${{ matrix.backend }} \
             -d ${{ matrix.device }} \
             --report-file reports/${{ matrix.test-file }}.md \
-            --mode=cl-onnx-iree \
             --cleanup=3 \
             -v
         working-directory: ./test-suite

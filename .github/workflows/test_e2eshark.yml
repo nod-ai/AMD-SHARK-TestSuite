@@ -258,7 +258,7 @@ jobs:
         working-directory: ./test-suite
 
       - name: Run Onnx Default Mode
-        if: ${{ ! contains(matrix.test-file, 'migraphx') }} && ${{ ! contains(matrix.test-file, 'onnxrt-iree-ep') }}
+        if: ${{ ! contains(matrix.test-file, 'migraphx') && ! contains(matrix.test-file, 'onnxrt-iree-ep') }}
         run: |
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip freeze

@@ -16,6 +16,7 @@ from onnxruntime import InferenceSession
 import os
 from pathlib import Path
 import json
+import shutil
 
 REDUCE_TO_LINALG_PIPELINE = [
     "torch-lower-to-backend-contract",
@@ -181,13 +182,16 @@ class CLOnnxTestConfig(TestConfig):
         torch_ir = os.path.join(save_to, "model.torch.mlir")
         linalg_ir = os.path.join(save_to, "model.modified.mlir")
         # generate scripts
-        script0 = f"torch-mlir-opt -pass-pipeline='{onnx_to_torch_pipeline}' {mlir_module} -o {torch_ir} 1> {detail_log} 2>&1"
-        script1 = f"torch-mlir-opt -pass-pipeline='{self.pass_pipeline}' {torch_ir} -o {linalg_ir} 1> {detail_log} 2>&1"
+        use_tmopt = shutil.which("torch-mlir-opt")
+        opt_tool = "torch-mlir-opt" if use_tmopt is not None else "iree-opt"
+        script0 = f"{opt_tool} -pass-pipeline='{onnx_to_torch_pipeline}' {mlir_module} -o {torch_ir} 1> {detail_log} 2>&1"
+        script1 = f"{opt_tool} -pass-pipeline='{self.pass_pipeline}' {torch_ir} -o {linalg_ir} 1> {detail_log} 2>&1"
         # remove old torch_ir
         Path(torch_ir).unlink(missing_ok=True)
         with open(commands_log, "w") as file:
-            file.write(script0)
-            file.write(script1)
+            if use_tmopt is None:
+                file.write('WARNING: using iree-opt since system could not find command torch-mlir-opt\n')
+            file.write(f'{script0}\n{script1}')
         # run torch-onnx-to-torch
         os.system(script0)
         if not os.path.exists(torch_ir):
@@ -203,7 +207,7 @@ class CLOnnxTestConfig(TestConfig):
             error_msg += f"Error detail in '{detail_log}'"
             raise FileNotFoundError(error_msg)
         return linalg_ir
-    
+
     def compile(self, mlir_module: str, *, save_to: str = None) -> str:
         return self.backend.compile(mlir_module, save_to=save_to)
 

@@ -287,6 +287,7 @@ jobs:
           echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$COMPILER_PATH/_mlir_libs/"  >> $GITHUB_ENV
           echo $COMPILER_PATH
           echo $LD_LIBRARY_PATH
+          echo $GITHUB_ENV
           pip freeze
           cd alt_e2eshark
           free -mh

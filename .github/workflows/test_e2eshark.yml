@@ -280,6 +280,7 @@ jobs:
       - name: Run OnnxRT IREE EP
         if: contains(matrix.test-file, 'onnxrt-iree-ep')
         run: |
+          echo $LD_LIBRARY_PATH
           source ${EP_VENV_DIR}/bin/activate
           pip freeze
           cd alt_e2eshark

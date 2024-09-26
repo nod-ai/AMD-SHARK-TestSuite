@@ -284,7 +284,7 @@ jobs:
           pip freeze
           cd alt_e2eshark
           free -mh
-          python3.11 ./run.py -m ort-ep \
+          python ./run.py -m ort-ep \
             -r ./test-onnx \
             --report \
             --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \

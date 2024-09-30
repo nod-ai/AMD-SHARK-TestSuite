@@ -11,8 +11,9 @@ on:
   # # Runs at 12:00 PM UTC, which is 5:00 AM PST
   #  - cron: '0 12 * * *'
 
-jobs:
+jobs: 
   e2eshark:
+    timeout-minutes: 480
     name: "Models :: ${{ matrix.backend }} :: ${{ matrix.test-file }}"
     runs-on: ${{ matrix.runs-on }}
     strategy:

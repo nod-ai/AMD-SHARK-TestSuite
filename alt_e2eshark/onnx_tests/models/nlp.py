@@ -8,6 +8,12 @@ from pathlib import Path
 from ..helper_classes import AzureDownloadableModel
 from e2e_testing.registry import register_test
 from e2e_testing.storage import load_test_txt_file
+from e2e_testing.onnx_utils import get_node_shape_from_dim_param_dict
+from e2e_testing.storage import TestTensors
+import onnxruntime as ort
+import numpy
+from typing import Optional
+import os
 
 this_file = Path(__file__)
 lists_dir = (this_file.parent).joinpath("external_lists")
@@ -28,6 +34,23 @@ def dim_param_constructor(dim_param_dict):
         def update_dim_param_dict(self):
             self.dim_param_dict = dim_param_dict
 
+        def construct_inputs(self):
+            """Overrides the parent class method to construct sample inputs with the correct dimensions."""
+            default_inputs = super().construct_inputs()
+
+            tensors = list(default_inputs.data)
+
+            self.update_sess_options()
+            session = ort.InferenceSession(self.model, self.sess_options)
+
+            # nlp specific overrides
+            for i, node in enumerate(session.get_inputs()):
+                if node.name == "token_type_ids":
+                    rng = numpy.random.default_rng(19)
+                    int_dims = get_node_shape_from_dim_param_dict(node, self.dim_param_dict)
+                    tensors[i] = rng.integers(0, 2, size=int_dims, dtype=numpy.int64)
+            default_sample_inputs = TestTensors(tuple(tensors))
+            return default_sample_inputs
     return AzureWithDimParams
 
 # Default dimension parameters for NLP models

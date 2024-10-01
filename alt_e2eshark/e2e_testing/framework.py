@@ -68,7 +68,7 @@ class OnnxModelInfo:
             f"Model path {self.model} does not exist and no construct_model method is defined."
         )
 
-    def construct_inputs(self):
+    def construct_inputs(self) -> TestTensors:
         """can be overridden to generate specific inputs, but a default is provided for convenience"""
         if not os.path.exists(self.model):
             self.construct_model()

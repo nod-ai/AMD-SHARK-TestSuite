@@ -7,12 +7,17 @@
 from ..helper_classes import AzureDownloadableModel
 from e2e_testing.registry import register_test
 import numpy as np
+import onnxruntime
+from onnxruntime.tools.onnx_model_utils import make_dim_param_fixed, fix_output_shapes
+import onnx
+from pathlib import Path
 
 # TODOs:
 # 1. just update the opset versions and re-upload to azure.
 # 2. get tf models into onnx and upload
 # 3. setup dim params for other misc models
 # 4. reupload cadence model 1
+
 
 def dim_param_constructor(dim_param_dict):
     class AzureWithDimParams(AzureDownloadableModel):
@@ -32,13 +37,13 @@ def dim_param_constructor(dim_param_dict):
 
         def update_dim_param_dict(self):
             self.dim_param_dict = dim_param_dict
-        
+
         def construct_inputs(self):
             inputs = super().construct_inputs()
             # this model has an input used for indexing into a dim of size 2
             if self.name == "migraphx_mlperf__bert_large_mlperf":
                 data = list(inputs.data)
-                data[2] = np.clip(data[2],-2,1)
+                data[2] = np.clip(data[2], -2, 1)
                 inputs.data = tuple(data)
             return inputs
 
@@ -48,7 +53,7 @@ def dim_param_constructor(dim_param_dict):
 ORT_model_names = [
     "migraphx_ORT__bert_base_cased_1",  # batch_size, seq_len
     "migraphx_ORT__bert_base_uncased_1",  # batch_size, seq_len
-    "migraphx_ORT__bert_large_uncased_1", # batch_size, seq_len
+    "migraphx_ORT__bert_large_uncased_1",  # batch_size, seq_len
     "migraphx_ORT__distilgpt2_1",  # batch_size, seq_len
     "migraphx_ORT__onnx_models__bert_base_cased_1_fp16_gpu",  # batch_size, seq_len
     "migraphx_ORT__onnx_models__bert_large_uncased_1_fp16_gpu",  # batch_size, seq_len
@@ -103,10 +108,25 @@ misc_models = {
         "width": 512,
         "sequence": 64,
     },
-    "migraphx_models__whisper-tiny-decoder" : {"batch_size" : 1, "decoder_sequence_length" : 64, "encoder_sequence_length / 2" : 32},
-    "migraphx_models__whisper-tiny-encoder" : {"batch_size" : 1, "feature_size" : 80, "encoder_sequence_length" : 64},
+    "migraphx_models__whisper-tiny-decoder": {
+        "batch_size": 1,
+        "decoder_sequence_length": 64,
+        "encoder_sequence_length / 2": 32,
+    },
+    "migraphx_models__whisper-tiny-encoder": {
+        "batch_size": 1,
+        "feature_size": 80,
+        "encoder_sequence_length": 64,
+    },
     # this one crashes for some reason...
-    "migraphx_sdxl__unet__model" : {"batch_size" : 1, "num_channels" : 4, "height" : 512, "width" : 512, "steps" : 2, "sequence_length" : 64}
+    "migraphx_sdxl__unet__model": {
+        "batch_size": 1,
+        "num_channels": 4,
+        "height": 512,
+        "width": 512,
+        "steps": 2,
+        "sequence_length": 64,
+    },
 }
 
 for key, dim_param in misc_models.items():
@@ -120,16 +140,70 @@ for key, dim_param in misc_models.items():
 # some smaller repros for failed to legalize cmd.stream.dispatch:
 
 need_repro_dict = {
-    "migraphx_ORT__bert_base_cased_1" : ["cased" , 4, "MatMul"],
-    "migraphx_ORT__bert_base_uncased_1" : ["uncased", 1, "Transpose"],
-    "migraphx_ORT__distilgpt2_1" : ["gpt", 3, "Add"],
-    "migraphx_ORT__onnx_models__distilgpt2_1_fp16_gpu" : ["gptf16", 3, "Add"],
-    "migraphx_onnx-model-zoo__gpt2-10" : ["gpt2_10", 0, "NonZero"],
+    "migraphx_ORT__bert_base_cased_1": ["cased", 4, "MatMul"],
+    "migraphx_ORT__bert_base_uncased_1": ["uncased", 1, "Transpose"],
+    "migraphx_ORT__distilgpt2_1": ["gpt", 3, "Add"],
+    "migraphx_ORT__onnx_models__distilgpt2_1_fp16_gpu": ["gptf16", 3, "Add"],
+    "migraphx_onnx-model-zoo__gpt2-10": ["gpt2_10", 0, "NonZero"],
 }
 
 from ..helper_classes import TruncatedModel, get_trucated_constructor
 
-trunc_const = lambda key : get_trucated_constructor(TruncatedModel, dim_param_constructor(llm_dict_0), key)
+trunc_const = lambda key: get_trucated_constructor(
+    TruncatedModel, dim_param_constructor(llm_dict_0), key
+)
 
-for (key, value) in need_repro_dict.items():
-    register_test(trunc_const(key)(value[1], value[2]), f"mi_trunc_{value[0]}_{value[1]}_{value[2]}")
+for key, value in need_repro_dict.items():
+    register_test(
+        trunc_const(key)(value[1], value[2]),
+        f"mi_trunc_{value[0]}_{value[1]}_{value[2]}",
+    )
+
+from ..helper_classes import SiblingModel, get_sibling_constructor
+
+
+class MiGraphXBenchmarkModel(SiblingModel):
+    def construct_model(self):
+        og_model = self.model
+        super().construct_model()
+        self.update_dim_param_dict()
+        self.make_dim_param_static(self.model, og_model)
+        self.model = og_model
+        self.update_opset_version_and_overwrite()
+        self.apply_ort_basic_optimizations()
+
+    def make_dim_param_static(self, load_model, save_model):
+        model = onnx.load(load_model)
+        for p, v in self.dim_param_dict.items():
+            make_dim_param_fixed(model.graph, p, v)
+        fix_output_shapes(model)
+        onnx.save(model, save_model)
+
+    def apply_ort_basic_optimizations(self):
+        opt = onnxruntime.SessionOptions()
+        opt.graph_optimization_level = (
+            onnxruntime.GraphOptimizationLevel.ORT_ENABLE_BASIC
+        )
+        optimized_model = str(Path(self.model).parent.joinpath("model.optimized.onnx"))
+        opt.optimized_model_filepath = optimized_model
+        session = onnxruntime.InferenceSession(self.model, opt)
+        self.model = optimized_model
+        del session
+
+
+sib_const = lambda dims: get_sibling_constructor(
+    MiGraphXBenchmarkModel,
+    dim_param_constructor(dims),
+    "migraphx_ORT__bert_large_uncased_1",
+)
+
+dim_options = lambda batch, seq: {"batch_size": batch, "seq_len": seq}
+
+for i in range(0, 6):
+    for j in range(1, 4):
+        batch = 2**i
+        seq = 128 * j
+        register_test(
+            sib_const(dim_options(batch, seq)),
+            f"migx_bench_bert-large-uncased_{batch}_{seq}",
+        )

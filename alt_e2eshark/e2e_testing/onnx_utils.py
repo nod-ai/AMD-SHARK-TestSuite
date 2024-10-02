@@ -27,9 +27,8 @@ def dtype_from_ort_node(node):
         return torch.bool
     raise NotImplementedError(f"Unhandled dtype string found: {dtypestr}")
 
-
-def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg, dim_param_dict: Optional[dict[str, int]] = None):
-    """A convenience function for generating sample inputs for an onnxruntime node"""
+def get_node_shape_from_dim_param_dict(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg, dim_param_dict: Optional[dict[str, int]] = None):
+    """Get the shape of a node, replacing any string dims with values from a dim_param_dict"""
     int_dims = []
     for dim in node.shape:
         if isinstance(dim, str) and dim_param_dict:
@@ -46,7 +45,21 @@ def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.N
             raise ValueError(
                 f"input node '{node.name}' has a non-positive dim: {dim}. Consider setting cutsom inputs for this test."
             )
-        int_dims.append(dim)
+    return int_dims
+
+
+def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg, dim_param_dict: Optional[dict[str, int]] = None):
+    """
+    Generate a random input tensor for a given node
+
+    Args:
+        node: an onnx node
+        dim_param_dict: a dictionary mapping onnx string dims to int values
+    """
+
+
+    int_dims = get_node_shape_from_dim_param_dict(node, dim_param_dict)
+
     rng = numpy.random.default_rng(19)
     if node.type == "tensor(float)":
         return rng.random(int_dims).astype(numpy.float32)
@@ -61,7 +74,7 @@ def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.N
     raise NotImplementedError(f"Found an unhandled dtype: {node.type}.")
 
 
-def get_sample_inputs_for_onnx_model(model_path, dim_param_dict = None):
+def get_sample_inputs_for_onnx_model(model_path, dim_param_dict = None) -> TestTensors:
     """A convenience function for generating sample inputs for an onnx model"""
     opt = onnxruntime.SessionOptions()
     opt.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL

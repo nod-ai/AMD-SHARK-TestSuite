@@ -11,6 +11,7 @@ from pathlib import Path
 import argparse
 import re
 from typing import List, Literal, Optional
+import random
 
 # append alt_e2eshark dir to path to allow importing without explicit pythonpath management
 TEST_DIR = str(Path(__file__).parent)
@@ -88,6 +89,24 @@ def get_tests(groups: Literal["all", "combinations", "operators"], test_filter: 
 
     return test_list
 
+def select_tests_for_infrastructure(test_list, category):
+    if not category:
+        return test_list
+
+    category_dict = {}
+    for test in test_list:
+        if category == 'class':
+            key = test.model_constructor.__name__
+        else:
+            raise ValueError(f"Unknown category: {category}")
+
+        if key not in category_dict:
+            category_dict[key] = []
+        category_dict[key].append(test)
+    random.seed(a=19, version=2)
+    selected_tests = [random.choice(tests) for tests in category_dict.values()]
+    return selected_tests
+
 
 def main(args):
     """Sets up config and test list based on CL args, then runs the tests"""
@@ -113,6 +132,9 @@ def main(args):
     # get test list
     test_list = get_tests(args.groups, args.test_filter, args.testsfile)
     test_list.sort()
+
+    if args.test_infrastructure_by_category:
+        test_list = select_tests_for_infrastructure(test_list, args.test_infrastructure_by_category)
 
     #setup test stages
     stages = ALL_STAGES if args.benchmark else DEFAULT_STAGES
@@ -444,6 +466,12 @@ def _get_argparse():
         default="report.md",
         help="output filename for the report summary.",
     )
+    parser.add_argument(
+        "--test-infrastructure-by-category",
+        choices=['class'], # TODO: unique name and so on
+        help="Run one random test from each specified category to test the infrastructure",
+    )
+
     # parser.add_argument(
     #     "-d",
     #     "--todtype",

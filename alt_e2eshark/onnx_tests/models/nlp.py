@@ -41,10 +41,9 @@ def dim_param_constructor(dim_param_dict):
             tensors = list(default_inputs.data)
 
             self.update_sess_options()
-            session = ort.InferenceSession(self.model, self.sess_options)
 
             # nlp specific overrides
-            for i, node in enumerate(session.get_inputs()):
+            for i, node in enumerate(self.ort_input_nodes):
                 if node.name == "token_type_ids":
                     rng = numpy.random.default_rng(19)
                     int_dims = get_node_shape_from_dim_param_dict(node, self.dim_param_dict)

@@ -392,7 +392,7 @@ def _get_argparse():
     parser.add_argument(
         "-t",
         "--test-filter",
-        help="Run given specific test(s) only",
+        help="Run tests matching regex filter only.",
     )
     parser.add_argument(
         "--testsfile",

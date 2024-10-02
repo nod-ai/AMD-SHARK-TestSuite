@@ -74,14 +74,10 @@ def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.N
     raise NotImplementedError(f"Found an unhandled dtype: {node.type}.")
 
 
-def get_sample_inputs_for_onnx_model(model_path, dim_param_dict = None) -> TestTensors:
+def get_sample_inputs_for_onnx_model(input_nodes, dim_param_dict = None) -> TestTensors:
     """A convenience function for generating sample inputs for an onnx model"""
-    opt = onnxruntime.SessionOptions()
-    opt.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
-    s = onnxruntime.InferenceSession(model_path, opt)
-    inputs = s.get_inputs()
     sample_inputs = TestTensors(
-        tuple([generate_input_from_node(node, dim_param_dict) for node in inputs])
+        tuple([generate_input_from_node(node, dim_param_dict) for node in input_nodes])
     )
     return sample_inputs
 

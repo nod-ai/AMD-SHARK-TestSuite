@@ -8,7 +8,7 @@ import torch
 import abc
 import os
 from pathlib import Path
-from typing import Union, TypeVar, Tuple, NamedTuple, Dict, Optional, Callable
+from typing import List, Union, TypeVar, Tuple, NamedTuple, Dict, Optional, Callable, final
 from e2e_testing.storage import TestTensors
 from e2e_testing.onnx_utils import *
 
@@ -16,9 +16,26 @@ from e2e_testing.onnx_utils import *
 
 Module = TypeVar("Module")
 
-
 class OnnxModelInfo:
-    """Stores information about an onnx test: the filepath to model.onnx, how to construct/download it, and how to construct sample inputs for a test run."""
+    """
+    Stores information about an onnx test: the filepath to model.onnx, how to construct/download it,
+    and how to construct sample inputs for a test run.
+    
+    This class will maintain a onnxruntime.InferenceSession object for the model the first time the session or
+    the input / output nodes are accessed. The session can be closed via del onnx_model_info.ort_inference_session.
+    """
+
+    # _xxx properties are meant to be accessed via @property methods
+    __slots__ = [
+        "name",
+        "_model",
+        "_ort_inference_session",
+        "_ort_input_nodes",
+        "_ort_output_nodes",
+        "opset_version",
+        "sess_options",
+        "dim_param_dict",
+    ]
 
     def __init__(
         self,
@@ -27,20 +44,63 @@ class OnnxModelInfo:
         opset_version: Optional[int] = None,
     ):
         self.name = name
-        self.model = os.path.join(onnx_model_path, "model.onnx")
+        self._model = os.path.join(onnx_model_path, "model.onnx")
         self.opset_version = opset_version
         self.sess_options = ort.SessionOptions()
         self.dim_param_dict = None
 
+    # model (path to onnx file)
+
+    @property
+    def model(self):
+        if not os.path.exists(self._model):
+            self.construct_model()
+        return self._model
+    
+    @model.deleter
+    def model(self):
+        del self._model
+    
+    # inference session
+
+    @property
+    def ort_inference_session(self):
+        """
+        Getter for the onnxruntime.InferenceSession object. If it doesn't exist, it is created and stored.
+
+        Also stores the input and output nodes of the model in self._ort_input_nodes and self._ort_output_nodes,
+        such that they can be accessed via self.ort_input_nodes and self.ort_output_nodes even when the session is deleted.
+        """
+        if not hasattr(self, "_ort_inference_session"):
+            self.update_sess_options()
+            self._ort_inference_session = ort.InferenceSession(self.model, self.sess_options)
+            self._ort_input_nodes = self._ort_inference_session.get_inputs()
+            self._ort_output_nodes = self._ort_inference_session.get_outputs()
+        return self._ort_inference_session
+    
+    @ort_inference_session.deleter
+    def ort_inference_session(self):
+        del self._ort_inference_session
+
+    # input and output nodes
+    @property
+    def ort_input_nodes(self):
+        if not hasattr(self, "_ort_input_nodes"):
+            self.ort_inference_session
+        return self._ort_input_nodes
+
+    @property
+    def ort_output_nodes(self):
+        if not hasattr(self, "_ort_output_nodes"):
+            self.ort_inference_session
+        return self._ort_output_nodes
+
     def forward(self, input: Optional[TestTensors] = None) -> TestTensors:
         """Applies self.model to self.input. Only override if necessary for specific models"""
         input = input.to_numpy().data
-        if not os.path.exists(self.model):
-            self.construct_model()
-        self.update_sess_options()
-        session = ort.InferenceSession(self.model, self.sess_options)
-        session_inputs = session.get_inputs()
-        session_outputs = session.get_outputs()
+        session = self.ort_inference_session
+        session_inputs = self.ort_input_nodes
+        session_outputs = self.ort_output_nodes
 
         model_output = session.run(
             [output.name for output in session_outputs],
@@ -70,12 +130,10 @@ class OnnxModelInfo:
 
     def construct_inputs(self) -> TestTensors:
         """can be overridden to generate specific inputs, but a default is provided for convenience"""
-        if not os.path.exists(self.model):
-            self.construct_model()
         self.update_dim_param_dict()
         # print(self.get_signature())
         # print(get_op_frequency(self.model))
-        return get_sample_inputs_for_onnx_model(self.model, self.dim_param_dict)
+        return get_sample_inputs_for_onnx_model(self.ort_input_nodes, self.dim_param_dict)
 
     def apply_postprocessing(self, output: TestTensors):
         """can be overridden to define post-processing methods for individual models"""
@@ -86,15 +144,13 @@ class OnnxModelInfo:
         pass
 
     # the following helper methods aren't meant to be overriden
-
+    @final
     def get_signature(self, *, from_inputs=True, leave_dynamic=False):
         """Returns the input or output signature of self.model"""
-        if not os.path.exists(self.model):
-            self.construct_model()
         if not leave_dynamic:
             self.update_dim_param_dict() 
         return get_signature_for_onnx_model(self.model, from_inputs=from_inputs, dim_param_dict=self.dim_param_dict, leave_dynamic=leave_dynamic)
-
+    @final
     def load_inputs(self, dir_path):
         """computes the input signature of the onnx model and loads inputs from bin files"""
         shapes, dtypes = self.get_signature(from_inputs=True)
@@ -105,22 +161,23 @@ class OnnxModelInfo:
                 "\tWarning: bin files missing. Generating new inputs. Please re-run this test without --load-inputs to save input bin files."
             )
             return self.construct_inputs()
-
+    
+    @final
     def load_outputs(self, dir_path):
         """computes the input signature of the onnx model and loads outputs from bin files"""
         shapes, dtypes = self.get_signature(from_inputs=False)
         return TestTensors.load_from(shapes, dtypes, dir_path, "output")
-
+    
+    @final
     def load_golden_outputs(self, dir_path):
         """computes the input signature of the onnx model and loads golden outputs from bin files"""
         shapes, dtypes = self.get_signature(from_inputs=False)
         return TestTensors.load_from(shapes, dtypes, dir_path, "golden_output")
     
+    @final
     def update_opset_version_and_overwrite(self):
         if not self.opset_version:
             return
-        if not os.path.exists(self.model):
-            self.construct_model()
         og_model = onnx.load(self.model)
         if og_model.opset_import[0].version >= self.opset_version:
             return

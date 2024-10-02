@@ -18,6 +18,13 @@ from e2e_testing.onnx_utils import (
 """This file contains several helpful child classes of OnnxModelInfo."""
 
 class AzureDownloadableModel(OnnxModelInfo):
+
+    # slots
+    __slots__ = [
+        "cache_dir"
+    ]
+
+
     """This class can be used for models in our azure storage (both private and public)."""
     def __init__(self, name: str, onnx_model_path: str):
         # TODO: Extract opset version from onnx.version.opset 
@@ -37,7 +44,7 @@ class AzureDownloadableModel(OnnxModelInfo):
         # if that fails, try to download and setup from azure, then search again for a .onnx file
 
         # TODO: make the zip file structure more uniform so we don't need to search for extracted files
-        model_dir = str(Path(self.model).parent)
+        model_dir = str(Path(self._model).parent)
 
         def find_models(model_dir):
             # search for a .onnx file in the ./test-run/testname/ dir
@@ -52,16 +59,16 @@ class AzureDownloadableModel(OnnxModelInfo):
 
         if len(found_models) == 0:
             azutils.pre_test_onnx_model_azure_download(
-                self.name, self.cache_dir, self.model
+                self.name, self.cache_dir, self._model
             )
             found_models = find_models(model_dir)
         if len(found_models) == 1:
-            self.model = found_models[0]
+            self._model = found_models[0]
             return
         if len(found_models) > 1:
             print(f'Found multiple model.onnx files: {found_models}')
             print(f'Picking the first model found to use: {found_models[0]}')
-            self.model = found_models[0]
+            self._model = found_models[0]
             return
         raise OSError(f"No onnx model could be found, downloaded, or extracted to {model_dir}")
 
@@ -75,11 +82,6 @@ class SiblingModel(OnnxModelInfo):
         run_dir = Path(self.model).parents[1]
         og_model_path = os.path.join(run_dir, og_name)
         self.sibling_inst = og_model_info_class(og_name, og_model_path)
-
-    def construct_model(self):
-        if not os.path.exists(self.sibling_inst.model):
-            self.sibling_inst.construct_model()
-        self.model = self.sibling_inst.model
     
     def update_dim_param_dict(self):
         self.sibling_inst.update_dim_param_dict()
@@ -125,8 +127,6 @@ class TruncatedModel(SiblingModel):
         super().__init__(*args, **kwargs)
 
     def construct_model(self):
-        if not os.path.exists(self.sibling_inst.model):
-            self.sibling_inst.construct_model()
         og_model = onnx.load(self.sibling_inst.model)
         inf_model = onnx.shape_inference.infer_shapes(og_model, data_prop=True)
         output_node = (
@@ -135,9 +135,9 @@ class TruncatedModel(SiblingModel):
             else find_node(inf_model, self.n, self.op_type)
         )
         new_model = modify_model_output(inf_model, output_node)
-        onnx.save(new_model, self.model)
+        onnx.save(new_model, self._model)
         from e2e_testing.onnx_utils import get_op_frequency
-        print(get_op_frequency(self.model))
+        print(get_op_frequency(self._model))
 
 
 def get_trucated_constructor(truncated_class, og_constructor, og_name):
@@ -231,4 +231,4 @@ class BuildAModel(OnnxModelInfo):
         self.construct_initializers()
         graph = make_graph(self.node_list, "main", self.input_vi, self.output_vi, self.initializers)
         model = make_model(graph)
-        onnx.save(model, self.model)
+        onnx.save(model, self._model)

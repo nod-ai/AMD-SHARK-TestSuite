@@ -83,7 +83,7 @@ class Opt125MGPTQModelInfo(OnnxModelInfo):
         torch.onnx.export(
             self.pytorch_model,
             (self.encoding["input_ids"], self.encoding["attention_mask"]),
-            self.model,
+            self._model,
             opset_version=20,
         )
 

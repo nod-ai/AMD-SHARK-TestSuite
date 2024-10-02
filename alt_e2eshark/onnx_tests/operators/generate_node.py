@@ -40,8 +40,7 @@ class NodeTest(OnnxModelInfo):
         self.model = onnx_node_tests_dir + self.name + "/model.onnx"
 
     def construct_inputs(self):
-        model = onnx.load(self.model)
-        inputs = model.graph.input
+        inputs = len(self.ort_input_nodes)
         num_inputs = len(inputs)
         input_list = []
         for i in range(num_inputs):

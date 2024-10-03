@@ -32,13 +32,29 @@ class OnnxModelInfo:
         self.sess_options = ort.SessionOptions()
         self.dim_param_dict = None
 
+    @property
+    def ort_session(self):
+        if hasattr(self, "_cached_ort_session") and self._cached_ort_session:
+            return self._cached_ort_session
+        
+        if not os.path.exists(self.model):
+            self.construct_model()
+        
+        self.update_sess_options()
+        self._cached_ort_session = ort.InferenceSession(self.model, self.sess_options)
+        self._ort_input_nodes = self._cached_ort_session.get_inputs()
+        self._ort_output_nodes = self._cached_ort_session.get_outputs()
+        return self._cached_ort_session
+    
+    @ort_session.deleter
+    def ort_session(self):
+        if hasattr(self, "_cached_ort_session"):
+            del self._cached_ort_session
+
     def forward(self, input: Optional[TestTensors] = None) -> TestTensors:
         """Applies self.model to self.input. Only override if necessary for specific models"""
         input = input.to_numpy().data
-        if not os.path.exists(self.model):
-            self.construct_model()
-        self.update_sess_options()
-        session = ort.InferenceSession(self.model, self.sess_options)
+        session = self.ort_session
         session_inputs = session.get_inputs()
         session_outputs = session.get_outputs()
 
@@ -75,7 +91,12 @@ class OnnxModelInfo:
         self.update_dim_param_dict()
         # print(self.get_signature())
         # print(get_op_frequency(self.model))
-        return get_sample_inputs_for_onnx_model(self.model, self.dim_param_dict)
+        if hasattr(self, "_ort_input_nodes") and self._ort_input_nodes:
+            input_nodes = self._ort_input_nodes
+        else:
+            session = self.ort_session
+            input_nodes = session.get_inputs()
+        return get_sample_inputs_for_onnx_model(input_nodes, self.dim_param_dict)
 
     def apply_postprocessing(self, output: TestTensors):
         """can be overridden to define post-processing methods for individual models"""

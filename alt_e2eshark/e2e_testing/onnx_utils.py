@@ -45,6 +45,7 @@ def get_node_shape_from_dim_param_dict(node: onnxruntime.capi.onnxruntime_pybind
             raise ValueError(
                 f"input node '{node.name}' has a non-positive dim: {dim}. Consider setting cutsom inputs for this test."
             )
+        int_dims.append(dim)
     return int_dims
 
 

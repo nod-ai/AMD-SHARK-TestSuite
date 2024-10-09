@@ -19,7 +19,7 @@ this_file = Path(__file__)
 lists_dir = (this_file.parent).joinpath("external_lists")
 
 model_names = []
-for i in [1,2,3]:
+for i in [1, 2, 3]:
     model_names += load_test_txt_file(lists_dir.joinpath(f"nlp-shard{i}.txt"))
 
 
@@ -47,17 +47,27 @@ def dim_param_constructor(dim_param_dict):
             for i, node in enumerate(session.get_inputs()):
                 if node.name == "token_type_ids":
                     rng = numpy.random.default_rng(19)
-                    int_dims = get_node_shape_from_dim_param_dict(node, self.dim_param_dict)
+                    int_dims = get_node_shape_from_dim_param_dict(
+                        node, self.dim_param_dict
+                    )
                     tensors[i] = rng.integers(0, 2, size=int_dims, dtype=numpy.int64)
             default_sample_inputs = TestTensors(tuple(tensors))
             return default_sample_inputs
+
     return AzureWithDimParams
+
 
 # Default dimension parameters for NLP models
 
-default_nlp_params = {"batch_size": 1, "seq_len": 128}
+# TODO: Verify these dim params are valid for each model, or load them from a json
+default_nlp_params = {
+    "batch_size": 1,
+    "seq_len": 128,
+    "encoder_sequence_length": 128,
+    "decoder_sequence_length": 128,
+}
 dim_aliases = [
-    {'seq_len', 'sequence_length'},
+    {"seq_len", "sequence_length"},
 ]
 for alias_set in dim_aliases:
     found = set(alias_set).intersection(default_nlp_params.keys())
@@ -65,8 +75,10 @@ for alias_set in dim_aliases:
         # check if the values are the same
         val = default_nlp_params[next(iter(found))]
         if not all(default_nlp_params[alias] == val for alias in found):
-            raise ValueError(f"Multiple aliases for the same dimension have different values: {found}")
-    
+            raise ValueError(
+                f"Multiple aliases for the same dimension have different values: {found}"
+            )
+
     aliases = alias_set - found
     for alias in aliases:
         default_nlp_params[alias] = default_nlp_params[next(iter(found))]
@@ -77,7 +89,7 @@ for model_name in model_names:
 
 # Custom dimension parameters for specific models
 custom_dim_params = {
-    # Add custom dimension parameters for specific models here 
+    # Add custom dimension parameters for specific models here
     # Example:
     # "model_name": {"batch_size": 1, "seq_len": 256, "custom_dim": 64},
 }
@@ -88,4 +100,3 @@ for model_name, dim_params in custom_dim_params.items():
         register_test(dim_param_constructor(dim_params), model_name)
 
 # You can add more customizations or specific handling for certain models here
-

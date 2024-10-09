@@ -172,7 +172,7 @@ def run_tests(
             os.makedirs(log_dir)
         
         # setup stage notifications
-        ws = lambda curr_stage : " "*(max(*[len(s) for s in stages]) - len(curr_stage))
+        ws = lambda curr_stage : " "*(max([len(s) for s in stages]) - len(curr_stage))
         notify_stage = lambda : print(f"\tRunning stage '{curr_stage}'..." + ws(curr_stage), end="\r")
 
         mean_time_ms = None

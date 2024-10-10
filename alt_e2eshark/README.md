@@ -52,6 +52,11 @@ pip install --upgrade pip
 pip install -r ./base_requirements.txt
 ```
 
+> Note:<br>
+> AutoGPTQ by default requires a GPU with CUDA or ROCm support.<br>
+> To disable building the AutoGPTQ pytorch extension, set `BUILD_CUDA_EXT=0`:<br>
+> `BUILD_CUDA_EXT=0 pip install -r ./base_requirements.txt`
+
 To get a nightly build of IREE and torch_mlir, you can do:
 
 ```bash

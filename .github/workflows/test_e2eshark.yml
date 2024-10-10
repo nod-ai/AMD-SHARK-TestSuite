@@ -211,6 +211,7 @@ jobs:
           pip install -r ./alt_e2eshark/iree_requirements.txt
           pip install --no-deps -r ./alt_e2eshark/torch_mlir_requirements.txt
           pip install --find-links https://iree.dev/pip-release-links.html iree-compiler iree-runtime --upgrade
+          pip uninstall -y torch-mlir-core
         working-directory: ./test-suite
 
       - name: Run Onnx Bench Mode

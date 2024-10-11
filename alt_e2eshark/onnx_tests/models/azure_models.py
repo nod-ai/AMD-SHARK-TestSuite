@@ -42,6 +42,10 @@ no_opset_update = [
 
 # if the model has significant shape issues, consider applying basic optimizations before import by adding to this list:
 basic_opt = [
+    "mvitv2_base",
+    "mvitv2_large",
+    "mvitv2_small",
+    "mvitv2_tiny",
     "gcvit_base",
     "gcvit_small",
     "gcvit_tiny",
@@ -169,3 +173,7 @@ class AzureRemoveMetadataProps(AzureDownloadableModel):
 
 
 register_test(AzureRemoveMetadataProps, "resnetv2_50x1_bit.goog_in21k_ft_in1k_vaiq")
+
+from ..helper_classes import TruncatedModel, get_trucated_constructor
+
+const = get_trucated_constructor(TruncatedModel, AzureDownloadableModel, "mvitv2_tiny")

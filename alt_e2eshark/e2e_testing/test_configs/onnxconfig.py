@@ -18,8 +18,14 @@ from pathlib import Path
 import json
 import shutil
 
+ONNX_TO_TORCH_BACKEND_PIPELINE = [
+    "func.func(convert-torch-onnx-to-torch)",
+]
+
 REDUCE_TO_LINALG_PIPELINE = [
     "torch-lower-to-backend-contract",
+    "func.func(torch-scalarize-shapes)",
+    "torch-shape-refinement-pipeline",
     "torch-backend-to-linalg-on-tensors-backend-pipeline",
 ]
 
@@ -94,7 +100,7 @@ class OnnxTestConfig(TestConfig):
         if not self.pass_pipeline:
             return mlir_module
         # convert imported torch-onnx ir to torch
-        onnx_to_torch_pipeline = "builtin.module(func.func(convert-torch-onnx-to-torch))"
+        onnx_to_torch_pipeline = "builtin.module("+",".join(ONNX_TO_TORCH_BACKEND_PIPELINE) + ")"
         with mlir_module.context as ctx:
             pm0 = PassManager.parse(onnx_to_torch_pipeline)
             pm0.run(mlir_module.operation)
@@ -175,7 +181,7 @@ class CLOnnxTestConfig(TestConfig):
         if not self.pass_pipeline:
             return mlir_module
         # convert imported torch-onnx ir to torch
-        onnx_to_torch_pipeline = "builtin.module(func.func(convert-torch-onnx-to-torch))"
+        onnx_to_torch_pipeline = "builtin.module("+",".join(ONNX_TO_TORCH_BACKEND_PIPELINE) + ")"
         # get paths
         detail_log = os.path.join(save_to, "detail", "preprocessing.detail.log")
         commands_log = os.path.join(save_to, "commands", "preprocessing.commands.log")

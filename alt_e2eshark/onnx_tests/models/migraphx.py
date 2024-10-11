@@ -41,7 +41,11 @@ def dim_param_constructor(dim_param_dict):
         def construct_inputs(self):
             inputs = super().construct_inputs()
             # this model has an input used for indexing into a dim of size 2
-            if self.name == "migraphx_mlperf__bert_large_mlperf":
+            has_gather_size_2_indices = [
+                "migraphx_mlperf__bert_large_mlperf",
+                "migraphx_huggingface-transformers__bert_mrpc8",
+            ]
+            if self.name in has_gather_size_2_indices:
                 data = list(inputs.data)
                 data[2] = np.clip(data[2], -2, 1)
                 inputs.data = tuple(data)
@@ -110,13 +114,13 @@ misc_models = {
     },
     "migraphx_models__whisper-tiny-decoder": {
         "batch_size": 1,
-        "decoder_sequence_length": 64,
-        "encoder_sequence_length / 2": 32,
+        "decoder_sequence_length": 128,
+        "encoder_sequence_length / 2": 64,
     },
     "migraphx_models__whisper-tiny-encoder": {
         "batch_size": 1,
         "feature_size": 80,
-        "encoder_sequence_length": 64,
+        "encoder_sequence_length": 2,  # for some reason, this is the only acceptable size, otherwise an Add node is invalid
     },
     # this one crashes for some reason...
     "migraphx_sdxl__unet__model": {

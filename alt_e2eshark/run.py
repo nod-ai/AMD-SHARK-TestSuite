@@ -242,13 +242,6 @@ def run_tests(
                 outputs_raw = config.run(compiled_artifact, inputs, func_name=func_name)
                 outputs_raw.save_to(log_dir + "output")
 
-            # benchmark inference time with compiled module
-            curr_stage = "benchmark"
-            if curr_stage in stages:
-                notify_stage()
-                # TODO: make repetitions configurable from a command line arg
-                mean_time_ms = config.benchmark(compiled_artifact, inputs, repetitions=3, func_name=func_name)
-
             # apply model-specific post-processing:
             curr_stage = "postprocessing"
             if curr_stage in stages:
@@ -263,6 +256,18 @@ def run_tests(
             log_exception(e, log_dir, curr_stage, t.unique_name, verbose)
             post_test_clean(log_dir, cleanup, verbose)
             continue
+
+        # benchmark inference time with compiled module
+        curr_stage = "benchmark"
+        if curr_stage in stages:
+            notify_stage()
+            # TODO: make repetitions configurable from a command line arg
+            try:
+                mean_time_ms = config.benchmark(compiled_artifact, inputs, repetitions=3, func_name=func_name)
+            except Exception as e:
+                # don't exit test because of a benchmarking failure
+                mean_time_ms = "ERROR"
+                log_exception(e, log_dir, curr_stage, t.unique_name, verbose)
 
         # store the results
         if "setup" and "native_inference" and "compiled_inference" in stages:

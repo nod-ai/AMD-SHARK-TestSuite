@@ -68,10 +68,12 @@ def get_stage_pass_counts(exit_counts: Dict[str, int], total: int) -> Dict[str, 
         counts[key] = running_total
     return counts
 
+
 def safe_div(a, b):
-    if b==0:
+    if b == 0:
         return 0.0
-    return a/b
+    return a / b
+
 
 def get_exit_status_string(counts: Dict[str, int], total) -> str:
     results_str = "## Fail Summary\n\n"
@@ -80,7 +82,9 @@ def get_exit_status_string(counts: Dict[str, int], total) -> str:
     for key, value in counts.items():
         if key == "PASS":
             continue
-        results_str += f"| {key} | {value} | {round(safe_div(value, total)*100, 1)}% |\n"
+        results_str += (
+            f"| {key} | {value} | {round(safe_div(value, total)*100, 1)}% |\n"
+        )
     return results_str
 
 

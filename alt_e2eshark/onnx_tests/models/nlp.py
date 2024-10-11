@@ -44,13 +44,17 @@ def dim_param_constructor(dim_param_dict):
             session = ort.InferenceSession(self.model, self.sess_options)
 
             # nlp specific overrides
+            rng = numpy.random.default_rng(19)
             for i, node in enumerate(session.get_inputs()):
                 if node.name == "token_type_ids":
-                    rng = numpy.random.default_rng(19)
                     int_dims = get_node_shape_from_dim_param_dict(
                         node, self.dim_param_dict
                     )
                     tensors[i] = rng.integers(0, 2, size=int_dims, dtype=numpy.int64)
+            if self.name == "model--s2t-medium-librispeech-asr--facebook":
+                tensors[1] = rng.integers(
+                    0, 2, size=tensors[1].shape, dtype=numpy.int64
+                )
             default_sample_inputs = TestTensors(tuple(tensors))
             return default_sample_inputs
 
@@ -83,20 +87,28 @@ for alias_set in dim_aliases:
     for alias in aliases:
         default_nlp_params[alias] = default_nlp_params[next(iter(found))]
 
-# Register models with default parameters
-for model_name in model_names:
-    register_test(dim_param_constructor(default_nlp_params), model_name)
-
 # Custom dimension parameters for specific models
 custom_dim_params = {
     # Add custom dimension parameters for specific models here
     # Example:
     # "model_name": {"batch_size": 1, "seq_len": 256, "custom_dim": 64},
+    "model--s2t-medium-librispeech-asr--facebook": {
+        "batch_size": 1,
+        "feature_size": 80,
+        "encoder_sequence_length": 80,
+        "decoder_sequence_length": 80,
+    },
 }
+
+default_param_models = set(model_names).difference(set(custom_dim_params.keys()))
+
+# Register models with default parameters
+for model_name in default_param_models:
+    register_test(dim_param_constructor(default_nlp_params), model_name)
+
 
 # Register models with custom parameters
 for model_name, dim_params in custom_dim_params.items():
-    if model_name in model_names:
-        register_test(dim_param_constructor(dim_params), model_name)
+    register_test(dim_param_constructor(dim_params), model_name)
 
 # You can add more customizations or specific handling for certain models here

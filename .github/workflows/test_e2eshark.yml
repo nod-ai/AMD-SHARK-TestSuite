@@ -472,14 +472,14 @@ jobs:
           wget https://sharkpublic.blob.core.windows.net/sharkpublic/baseline-test-suite/combined_reports_${{ matrix.regression-blob }}.json -O baseline/combined_reports_${{ matrix.backend }}.json
           cd ..
 
-          python ./test-suite/alt_e2eshark/utils/regressions.py \
+          python ./test-suite/alt_e2eshark/utils/check_regressions.py \
             --new ./e2eshark-reports/combined_reports.json \
             --old ./test-suite/latest/combined_reports_${{ matrix.backend }}.json \
             --report-file ./e2eshark-reports/yesterday_comparison.md \
             --perf_tol_regression=0.05 \
             --perf_tol_progression=0.05
           
-          python ./test-suite/alt_e2eshark/utils/regressions.py \
+          python ./test-suite/alt_e2eshark/utils/check_regressions.py \
             --new ./e2eshark-reports/combined_reports.json \
             --old ./test-suite/baseline/combined_reports_${{ matrix.backend }}.json \
             --report-file ./e2eshark-reports/baseline_comparison.md \

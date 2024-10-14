@@ -279,6 +279,8 @@ jobs:
           - name: merge_cpu_reports
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
+    env:
+      AZ_PUBLIC_KEY: ${{ secrets.SHARKPUBLIC_AZ_PUBLIC_KEY }}
     steps:
       - name: Checkout Test Suite
         uses: actions/checkout@v2
@@ -433,7 +435,7 @@ jobs:
           --output ./e2eshark-reports/combined_reports.json \
           --report --report-file ./e2eshark-reports/combined_reports.md
 
-      - name: Push artifacts
+      - name: Push status artifacts
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
@@ -454,6 +456,48 @@ jobs:
           cp ci_reports_${{ matrix.backend }}_migraphx_onnx_md/migraphx.md ${date}/ci_reports_onnx/${{ matrix.backend }}/migraphx/summary.md
           cp combined_reports.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports/summary.md
           git add $date
-          git commit -m "add CI reports for e2eshark for ${{ matrix.backend }}"
+          git commit -m "add CI status reports for e2eshark for ${{ matrix.backend }}"
+          git push origin main
+        working-directory: ./e2eshark-reports
+      
+      - name: Regression Reports
+        run: |
+          source report_venv_alt/bin/activate
+          cd test-suite
+          mkdir latest
+          mkdir baseline
+          wget https://sharkpublic.blob.core.windows.net/sharkpublic/latest-test-suite/combined_reports_${{ matrix.backend }}.json --output-file latest/combined_reports_${{ matrix.backend }}.json
+          wget https://sharkpublic.blob.core.windows.net/sharkpublic/baseline-test-suite/combined_reports_${{ matrix.backend }}.json --output-file baseline/combined_reports_${{ matrix.backend }}.json
+          cd ..
+
+          python ./test-suite/alt_e2eshark/utils/regressions.py \
+            --new ./e2eshark-reports/combined_reports.json \
+            --old ./test-suite/latest/combined_reports_${{ matrix.backend }}.json \
+            --report-file ./e2eshark-reports/yesterday_comparison.md \
+            --perf_tol_regression=0.05 \
+            --perf_tol_progression=0.05
+          
+          python ./test-suite/alt_e2eshark/utils/regressions.py \
+            --new ./e2eshark-reports/combined_reports.json \
+            --old ./test-suite/baseline/combined_reports_${{ matrix.backend }}.json \
+            --report-file ./e2eshark-reports/baseline_comparison.md \
+            --perf_tol_regression=0.1 \
+            --perf_tol_progression=0.1
+          
+          az storage blob upload --account-name sharkpublic --container-name sharkpublic \
+            --name latest-test-suite/combined_reports_${{ matrix.backend }}.json \
+            --file ./e2eshark-reports/combined_reports.json \
+            --account-key ${AZ_PUBLIC_KEY} --overwrite
+
+      - name: Push regression artifacts
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git pull
+          date=$(date '+%Y-%m-%d')
+          cp yesterday_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports/yesterday_comparison.md
+          cp baseline_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports/baseline_comparison.md
+          git add $date
+          git commit -m "add CI regression reports for e2eshark for ${{ matrix.backend }}"
           git push origin main
         working-directory: ./e2eshark-reports

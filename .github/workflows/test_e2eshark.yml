@@ -540,8 +540,8 @@ jobs:
           cd test-suite
           mkdir latest
           mkdir baseline
-          wget https://sharkpublic.blob.core.windows.net/sharkpublic/latest-test-suite/combined_reports_${{ matrix.backend }}.json -O latest/combined_reports_${{ matrix.backend }}.json
-          wget https://sharkpublic.blob.core.windows.net/sharkpublic/baseline-test-suite/combined_reports_${{ matrix.backend }}.json -O baseline/combined_reports_${{ matrix.backend }}.json
+          wget https://sharkpublic.blob.core.windows.net/sharkpublic/latest-test-suite/combined_reports_${{ matrix.regression-blob }}.json -O latest/combined_reports_${{ matrix.backend }}.json
+          wget https://sharkpublic.blob.core.windows.net/sharkpublic/baseline-test-suite/combined_reports_${{ matrix.regression-blob }}.json -O baseline/combined_reports_${{ matrix.backend }}.json
           cd ..
 
           python ./test-suite/alt_e2eshark/utils/regressions.py \

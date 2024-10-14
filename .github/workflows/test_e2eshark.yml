@@ -273,12 +273,14 @@ jobs:
       max-parallel: 1
       matrix:
         include:
-          - name: merge_rocm_reports
-            runs-on: nodai-amdgpu-mi300-x86-64
-            backend: rocm
+          # - name: merge_rocm_reports
+          #   runs-on: nodai-amdgpu-mi300-x86-64
+          #   backend: rocm
+          #   regression-blob: rocm
           - name: merge_cpu_reports
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
+            regression-blob: cpu
     env:
       AZ_PUBLIC_KEY: ${{ secrets.SHARKPUBLIC_AZ_PUBLIC_KEY }}
     steps:

@@ -1,2 +1,6 @@
 *.irpa filter=lfs diff=lfs merge=lfs -text
 *.mlirbc filter=lfs diff=lfs merge=lfs -text
+
+# Ignore diffs and treat as binary in Git and on GitHub.
+*.bin -diff
+*.bin binary linguist-generated

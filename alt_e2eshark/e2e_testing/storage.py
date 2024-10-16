@@ -17,6 +17,8 @@ def get_shape_string(torch_tensor):
     dtype = torch_tensor.dtype
     if dtype == torch.int64:
         input_shape_string += "xi64"
+    if dtype == torch.int32:
+        input_shape_string += "xi32"
     elif dtype == torch.float32 or dtype == torch.float:
         input_shape_string += "xf32"
     elif dtype == torch.bfloat16 or dtype == torch.float16 or dtype == torch.int16:
@@ -142,7 +144,9 @@ class TestTensors:
 
     def __init__(self, data: Tuple):
         self.data = data
-        self.type = type(self.data[0])
+        self.type = None
+        if len(data) > 0 :
+            self.type = type(self.data[0])
         if not all([type(d) == self.type for d in data]):
             self.type == None
 

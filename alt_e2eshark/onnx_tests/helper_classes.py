@@ -75,6 +75,7 @@ class SiblingModel(OnnxModelInfo):
         run_dir = Path(self.model).parents[1]
         og_model_path = os.path.join(run_dir, og_name)
         self.sibling_inst = og_model_info_class(og_name, og_model_path)
+        self.opset_version = self.sibling_inst.opset_version
 
     def construct_model(self):
         if not os.path.exists(self.sibling_inst.model):

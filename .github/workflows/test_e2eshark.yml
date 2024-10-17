@@ -294,7 +294,6 @@ jobs:
           pip freeze
           cd alt_e2eshark
           free -mh
-          sudo ulimit -n 1000000
           python ./run.py -m ort-ep \
             -r ./test-onnx \
             --report \

@@ -49,7 +49,7 @@ def unpack_bytearray(barray, num_elem, dtype):
         rettensor = temptensor.view(dtype=torch.float16)
         return rettensor
     elif dtype == torch.int32:
-        num_array = struct.unpack("l" * num_elem, barray)
+        num_array = struct.unpack("i" * num_elem, barray)
     elif dtype == torch.int16:
         num_array = struct.unpack("h" * num_elem, barray)
     elif dtype == torch.int8:

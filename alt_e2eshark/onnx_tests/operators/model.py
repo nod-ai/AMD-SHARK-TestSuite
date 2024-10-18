@@ -11,3 +11,4 @@ from .pad import *
 from .resize import *
 from .generate_node import *
 from .conv import *
+from .convtranspose import *

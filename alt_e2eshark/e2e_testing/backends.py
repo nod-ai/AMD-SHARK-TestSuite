@@ -124,6 +124,12 @@ class CLIREEBackend(BackendBase):
                 # "--iree-preprocessing-pass-pipeline=builtin.module(util.func(iree-preprocessing-pad-to-intrinsics{pad-target-type=conv}))",
                 # maybe add iree-preprocessing-transpose-convolution-pipeline to preprocessing pipeline.
             ]
+        elif hal_target_backend == "llvm-cpu":
+            self.extra_args = [
+                "--iree-llvmcpu-target-cpu=host",
+                # "--iree-llvmcpu-fail-on-large-vector=0",
+                # "--iree-llvmcpu-stack-allocation-limit=300000",
+            ]
     
     def compile(self, module_path: str, *, save_to : str = None) -> str:
         vmfb_path = os.path.join(save_to, "compiled_model.vmfb")

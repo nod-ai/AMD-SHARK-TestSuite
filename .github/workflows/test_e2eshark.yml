@@ -112,7 +112,7 @@ jobs:
           #   test-file: onnxrt-iree-ep
           #   cache-dir: /home/sai/shark-test-suite-models-cache
           - name: cpu_shard1_test
-            runs-on: large-cpu
+            runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
@@ -140,21 +140,21 @@ jobs:
             test-file: shark-test-suite
             cache-dir: /home/sai/test-suite-ci-cache
           - name: cpu_shard5_test
-            runs-on: large-cpu
+            runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard1
             cache-dir: /home/sai/test-suite-ci-cache
           - name: cpu_shard6_test
-            runs-on: large-cpu
+            runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard2
             cache-dir: /home/sai/test-suite-ci-cache
           - name: cpu_shard7_test
-            runs-on: large-cpu
+            runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
@@ -196,7 +196,7 @@ jobs:
             test-file: migraphx
             cache-dir: /home/sai/test-suite-ci-cache
           - name: cpu_shard13_test
-            runs-on: large-cpu
+            runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu

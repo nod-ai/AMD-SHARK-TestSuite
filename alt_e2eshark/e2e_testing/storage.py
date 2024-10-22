@@ -17,7 +17,7 @@ def get_shape_string(torch_tensor):
     dtype = torch_tensor.dtype
     if dtype == torch.int64:
         input_shape_string += "xi64"
-    if dtype == torch.int32:
+    elif dtype == torch.int32:
         input_shape_string += "xi32"
     elif dtype == torch.float32 or dtype == torch.float:
         input_shape_string += "xf32"
@@ -28,7 +28,7 @@ def get_shape_string(torch_tensor):
     elif dtype == torch.bool:
         input_shape_string += "xi1"
     else:
-        print("In get_shape_string, found an unsupported data type", dtype)
+        raise NotImplementedError("In get_shape_string, found an unsupported data type: " + str(dtype))
     return input_shape_string
 
 
@@ -91,9 +91,9 @@ def pack_tensor(modelinput):
     elif dtype == torch.uint64:
         bytearr = struct.pack("%sQ" % len(mylist), *mylist)
     elif dtype == torch.int32:
-        bytearr = struct.pack("%sl" % len(mylist), *mylist)
+        bytearr = struct.pack("%si" % len(mylist), *mylist)
     elif dtype == torch.uint32:
-        bytearr = struct.pack("%sL" % len(mylist), *mylist)
+        bytearr = struct.pack("%sI" % len(mylist), *mylist)
     elif dtype == torch.float64:
         bytearr = struct.pack("%sd" % len(mylist), *mylist)
     elif dtype == torch.float32 or dtype == torch.float:

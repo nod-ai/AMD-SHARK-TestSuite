@@ -117,7 +117,7 @@ jobs:
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: nlp-shard1
-            cache-dir: /home/sai/test-suite-ci-cache
+            cache-dir: /groups/aig_sharks/test-suite-ci-cache
           - name: cpu_shard2_test
             runs-on: large-cpu
             backend: llvm-cpu
@@ -145,21 +145,21 @@ jobs:
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard1
-            cache-dir: /home/sai/test-suite-ci-cache
+            cache-dir: /groups/aig_sharks/test-suite-ci-cache
           - name: cpu_shard6_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard2
-            cache-dir: /home/sai/test-suite-ci-cache
+            cache-dir: /groups/aig_sharks/test-suite-ci-cache
           - name: cpu_shard7_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard3
-            cache-dir: /home/sai/test-suite-ci-cache
+            cache-dir: /groups/aig_sharks/test-suite-ci-cache
           - name: cpu_shard8_test
             runs-on: large-cpu
             backend: llvm-cpu
@@ -201,7 +201,7 @@ jobs:
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnxrt-iree-ep
-            cache-dir: /home/sai/test-suite-ci-cache
+            cache-dir: /groups/aig_sharks/test-suite-ci-cache
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
       EP_VENV_DIR: ${{ github.workspace }}/ep_venv
@@ -333,7 +333,7 @@ jobs:
           #   backend: rocm
           #   regression-blob: rocm
           - name: merge_cpu_reports
-            runs-on: large-cpu
+            runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             regression-blob: cpu
     env:

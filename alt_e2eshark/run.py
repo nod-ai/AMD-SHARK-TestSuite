@@ -133,6 +133,7 @@ def main(args):
         stages,
         args.load_inputs,
         int(args.cleanup),
+        args.get_metadata,
     )
 
     if args.report:
@@ -142,7 +143,7 @@ def main(args):
 
 
 def run_tests(
-    test_list: List[Test], config: TestConfig, parent_log_dir: str, no_artifacts: bool, verbose: bool, stages: List[str], load_inputs: bool, cleanup: int,
+    test_list: List[Test], config: TestConfig, parent_log_dir: str, no_artifacts: bool, verbose: bool, stages: List[str], load_inputs: bool, cleanup: int, get_metadata=bool,
 ) -> Dict[str, Dict]:
     """runs tests in test_list based on config. Returns a dictionary containing the test statuses."""
     # TODO: multi-process
@@ -190,6 +191,10 @@ def run_tests(
                 # TODO: Figure out how to factor this out of run.py
                 if not os.path.exists(inst.model):
                     inst.construct_model()
+                if get_metadata:
+                    metadata = inst.get_metadata()
+                    metadata_file = Path(log_dir) / "metadata.json"
+                    save_dict(metadata, metadata_file)
             
             artifact_save_to = None if no_artifacts else log_dir
             # generate mlir from the instance using the config
@@ -448,6 +453,12 @@ def _get_argparse():
         "--report-file",
         default="report.md",
         help="output filename for the report summary.",
+    )
+    parser.add_argument(
+        "--get-metadata",
+        action="store_true",
+        default=False,
+        help="save some model metadata to log_dir/metadata.json"
     )
     # parser.add_argument(
     #     "-d",

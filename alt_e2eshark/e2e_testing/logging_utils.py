@@ -71,7 +71,7 @@ def scan_dir_del_not_logs(dir):
     for root, dirs, files in os.walk(dir):
         for name in files:
             curr_file = os.path.join(root, name)
-            if not name.endswith(".log") and name != "benchmark.json":
+            if not name.endswith(".log") and not name.endswith(".json"):
                 removed_files.append(curr_file)
     for file in removed_files:
         os.remove(file)

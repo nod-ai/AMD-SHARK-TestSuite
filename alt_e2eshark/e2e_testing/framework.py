@@ -128,6 +128,14 @@ class OnnxModelInfo:
             og_model, self.opset_version
         )
         onnx.save(model, self.model)
+    
+    def get_metadata(self):
+        model_size = os.path.getsize(self.model)
+        freq = get_op_frequency(self.model)
+        metadata = {"model_size" : model_size, "op_frequency" : freq}
+        return metadata
+
+
 
 # TODO: extend TestModel to a union, or make TestModel a base class when supporting other frontends
 TestModel = OnnxModelInfo 
@@ -160,6 +168,7 @@ class TestConfig(abc.ABC):
     def benchmark(self, artifact: CompiledOutput, input: TestTensors, repetitions: int, *, func_name=None) -> float:
         """returns a float representing inference time in ms"""
         pass
+
 
 class Test(NamedTuple):
     """Used to store the name and TestInfo constructor for a registered test"""

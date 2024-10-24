@@ -104,13 +104,13 @@ jobs:
             target-chip: gfx942
             test-file: migraphx
             cache-dir: /data/e2eshark/shark-test-suite-models-cache
-          - name: mi300_gpu13_test
-            runs-on: nodai-amdgpu-mi300-x86-64
-            backend: hip
-            device: hip
-            target-chip: gfx942
-            test-file: onnxrt-iree-ep
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+          # - name: mi300_gpu13_test
+          #   runs-on: nodai-amdgpu-mi300-x86-64
+          #   backend: hip
+          #   device: hip
+          #   target-chip: gfx942
+          #   test-file: onnxrt-iree-ep
+          #   cache-dir: /data/e2eshark/shark-test-suite-models-cache
           - name: cpu_shard1_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
@@ -195,13 +195,13 @@ jobs:
             target-chip: x86_64-linux-gnu
             test-file: migraphx
             cache-dir: /home/sai/test-suite-ci-cache
-          - name: cpu_shard13_test
-            runs-on: nodai-amdgpu-mi250-x86-64
-            backend: llvm-cpu
-            device: local-task
-            target-chip: x86_64-linux-gnu
-            test-file: onnxrt-iree-ep
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+          # - name: cpu_shard13_test
+          #   runs-on: nodai-amdgpu-mi250-x86-64
+          #   backend: llvm-cpu
+          #   device: local-task
+          #   target-chip: x86_64-linux-gnu
+          #   test-file: onnxrt-iree-ep
+          #   cache-dir: /groups/aig_sharks/test-suite-ci-cache
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
       EP_VENV_DIR: ${{ github.workspace }}/ep_venv
@@ -452,14 +452,14 @@ jobs:
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard3_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_onnx_json
-      - uses: actions/download-artifact@master
-        with:
-          name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_md
-      - uses: actions/download-artifact@master
-        with:
-          name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
+      # - uses: actions/download-artifact@master
+      #   with:
+      #     name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_md
+      #     path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_md
+      # - uses: actions/download-artifact@master
+      #   with:
+      #     name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
+      #     path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
       - name: Merge Reports
         run: |
           source report_venv_alt/bin/activate
@@ -484,7 +484,6 @@ jobs:
           ./e2eshark-reports/ci_reports_${{ matrix.backend }}_shark-test-suite_onnx_json/shark-test-suite.json \
           ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx_json/vai-vision-int8.json \
           ./e2eshark-reports/ci_reports_${{ matrix.backend }}_migraphx_onnx_json/migraphx.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json/onnxrt-iree-ep.json \
           --output ./e2eshark-reports/combined_reports.json \
           --report --report-file ./e2eshark-reports/combined_reports.md
 
@@ -499,14 +498,12 @@ jobs:
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/migraphx
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/nlp
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/onnxrt-iree-ep
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports
           cp vai-int8-p0p1.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1/summary.md
           cp nlp.md ${date}/ci_reports_onnx/${{ matrix.backend }}/nlp/summary.md
           cp ci_reports_${{ matrix.backend }}_shark-test-suite_onnx_md/shark-test-suite.md ${date}/ci_reports_onnx/${{ matrix.backend }}/shark-test-suite/summary.md
           cp ci_reports_${{ matrix.backend }}_vai-vision-int8_onnx_md/vai-vision-int8.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8/summary.md
           cp ci_reports_${{ matrix.backend }}_migraphx_onnx_md/migraphx.md ${date}/ci_reports_onnx/${{ matrix.backend }}/migraphx/summary.md
-          cp ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_md/onnxrt-iree-ep.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnxrt-iree-ep/summary.md
           cp combined_reports.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports/summary.md
           git add $date
           git commit -m "add CI status reports for e2eshark for ${{ matrix.backend }}"

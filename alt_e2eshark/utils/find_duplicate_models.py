@@ -32,7 +32,7 @@ def save_to_json(jsonable_object, name_json: Optional[str] = None):
     if not name_json:
         print(dict_str)
         return
-    path_json = ROOT / f"{name_json.stem}.json"
+    path_json = ROOT / f"{Path(name_json).stem}.json"
     with io.open(path_json, "w", encoding="utf8") as outfile:
         outfile.write(dict_str)
 

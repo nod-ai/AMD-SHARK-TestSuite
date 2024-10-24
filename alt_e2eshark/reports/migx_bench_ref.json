@@ -1,0 +1,20 @@
+{
+    "migx_bench_bert-large-uncased_1_128" : 2.20774914019194,
+    "migx_bench_bert-large-uncased_2_128" : 2.46059965552506,
+    "migx_bench_bert-large-uncased_4_128" : 2.86693144019734,
+    "migx_bench_bert-large-uncased_8_128" : 3.78933218802248,
+    "migx_bench_bert-large-uncased_16_128" : 5.60689390602772,
+    "migx_bench_bert-large-uncased_32_128" : 9.18793029869185,
+    "migx_bench_bert-large-uncased_1_256" : 2.53562550742689,
+    "migx_bench_bert-large-uncased_2_256" : 2.88097252516873,
+    "migx_bench_bert-large-uncased_4_256" : 3.96656191213269,
+    "migx_bench_bert-large-uncased_8_256" : 5.96196282997826,
+    "migx_bench_bert-large-uncased_16_256" : 9.48541589805841,
+    "migx_bench_bert-large-uncased_32_256" : 15.088006271321,
+    "migx_bench_bert-large-uncased_1_384" : 2.76189681490116,
+    "migx_bench_bert-large-uncased_2_384" : 3.38066274938423,
+    "migx_bench_bert-large-uncased_4_384" : 4.92386477103082,
+    "migx_bench_bert-large-uncased_8_384" : 7.72625825503938,
+    "migx_bench_bert-large-uncased_16_384" : 12.7589669628885,
+    "migx_bench_bert-large-uncased_32_384" : 26.5381763669473
+}

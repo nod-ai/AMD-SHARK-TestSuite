@@ -151,9 +151,9 @@ need_repro_dict = {
     "migraphx_onnx-model-zoo__gpt2-10": ["gpt2_10", 0, "NonZero"],
 }
 
-from ..helper_classes import TruncatedModel, get_trucated_constructor
+from ..helper_classes import TruncatedModel, get_truncated_constructor
 
-trunc_const = lambda key: get_trucated_constructor(
+trunc_const = lambda key: get_truncated_constructor(
     TruncatedModel, dim_param_constructor(llm_dict_0), key
 )
 

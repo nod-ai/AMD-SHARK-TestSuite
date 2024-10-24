@@ -26,18 +26,19 @@ def get_tensor_from_pb(inputpb):
     return t
 
 
-base_dir = getsitepackages()[0]
+base_dir = Path(onnx.__file__).parent
 # you can also get the node tests from the git submodule instead by uncommenting:
 # base_dir = str(Path(__file__).parents[3]) + "/third_party/onnx"
-onnx_node_tests_dir = base_dir + "/onnx/backend/test/data/node/"
+onnx_node_tests_dir = base_dir / "backend" / "test" / "data" / "node"
 
-names = os.listdir(onnx_node_tests_dir) if os.path.exists(onnx_node_tests_dir) else []
+names = [x.name for x in onnx_node_tests_dir.glob("*") if x.is_dir()]
 
 
 class NodeTest(OnnxModelInfo):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.model = onnx_node_tests_dir + self.name + "/model.onnx"
+        self.model = str(onnx_node_tests_dir / self.name / "model.onnx")
+        self.opset_version = 21
 
     def construct_inputs(self):
         model = onnx.load(self.model)
@@ -45,7 +46,9 @@ class NodeTest(OnnxModelInfo):
         num_inputs = len(inputs)
         input_list = []
         for i in range(num_inputs):
-            inputpb = f"{onnx_node_tests_dir}{self.name}/test_data_set_0/input_{i}.pb"
+            inputpb = str(
+                onnx_node_tests_dir / self.name / "test_data_set_0" / f"input_{i}.pb"
+            )
             input_list.append(get_tensor_from_pb(inputpb))
         return TestTensors(input_list)
 
@@ -55,7 +58,9 @@ class NodeTest(OnnxModelInfo):
         num_outputs = len(outputs)
         output_list = []
         for i in range(num_outputs):
-            outputpb = f"{onnx_node_tests_dir}{self.name}/test_data_set_0/output_{i}.pb"
+            outputpb = str(
+                onnx_node_tests_dir / self.name / "test_data_set_0" / f"output_{i}.pb"
+            )
             output_list.append(get_tensor_from_pb(outputpb))
         return TestTensors(output_list)
 

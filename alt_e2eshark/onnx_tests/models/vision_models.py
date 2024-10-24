@@ -41,6 +41,6 @@ constructor3 = get_sibling_constructor(NoOptimizations, AzureDownloadableModel, 
 register_test(constructor2, "resnet50_vaiq_int8_no_opt")
 register_test(constructor3, "ResNet50_vaiq_no_opt")
 
-# truncated_constructor = get_trucated_constructor(TruncatedModel, AzureDownloadableModel, "ResNet50_vaiq")
+# truncated_constructor = get_truncated_constructor(TruncatedModel, AzureDownloadableModel, "ResNet50_vaiq")
 # for n in range(4, 10):
 #     register_test(truncated_constructor(n,""), f"ResNet50_vaiq_trunc_{n}")

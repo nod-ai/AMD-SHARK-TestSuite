@@ -174,6 +174,6 @@ class AzureRemoveMetadataProps(AzureDownloadableModel):
 
 register_test(AzureRemoveMetadataProps, "resnetv2_50x1_bit.goog_in21k_ft_in1k_vaiq")
 
-from ..helper_classes import TruncatedModel, get_trucated_constructor
+from ..helper_classes import TruncatedModel, get_truncated_constructor
 
-const = get_trucated_constructor(TruncatedModel, AzureDownloadableModel, "mvitv2_tiny")
+const = get_truncated_constructor(TruncatedModel, AzureDownloadableModel, "mvitv2_tiny")

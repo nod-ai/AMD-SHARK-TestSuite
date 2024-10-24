@@ -141,7 +141,7 @@ class TruncatedModel(SiblingModel):
         print(get_op_frequency(self.model))
 
 
-def get_trucated_constructor(truncated_class, og_constructor, og_name):
+def get_truncated_constructor(truncated_class, og_constructor, og_name):
     """returns a function that takes in (n, op_type) and returns a constructor for the truncated class.
 
     Usage:

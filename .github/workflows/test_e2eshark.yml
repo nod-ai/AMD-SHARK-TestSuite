@@ -210,11 +210,6 @@ jobs:
       AZ_PRIVATE_CONNECTION: ${{ secrets.ONNXPRIVATESTORAGE_AZ_PRIVATE_CONNECTION }}
       CACHE_DIR: ${{ matrix.cache-dir }}
     steps:
-      - name: "Setting up Python"
-        uses: actions/setup-python@75f3110429a8c05be0e1bf360334e4cced2b63fa # v2.3.3
-        with:
-          python-version: 3.11
-
       - name: Checkout Test Suite
         uses: actions/checkout@v2
         with:
@@ -339,10 +334,6 @@ jobs:
     env:
       AZ_PUBLIC_KEY: ${{ secrets.SHARKPUBLIC_AZ_PUBLIC_KEY }}
     steps:
-      - name: "Setting up Python"
-        uses: actions/setup-python@75f3110429a8c05be0e1bf360334e4cced2b63fa # v2.3.3
-        with:
-          python-version: 3.11
       - name: Checkout Test Suite
         uses: actions/checkout@v2
         with:

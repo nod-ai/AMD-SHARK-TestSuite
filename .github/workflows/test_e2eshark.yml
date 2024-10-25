@@ -260,7 +260,9 @@ jobs:
             --mode=cl-onnx-iree \
             --cleanup=3 \
             --benchmark \
+            --get-metadata \
             -v
+          python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
         working-directory: ./test-suite
 
       - name: Run Onnx Default Mode
@@ -280,7 +282,9 @@ jobs:
             --report-file reports/${{ matrix.test-file }}.md \
             --mode=cl-onnx-iree \
             --cleanup=3 \
+            --get-metadata \
             -v
+          python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
         working-directory: ./test-suite
       
       - name: Run OnnxRT IREE EP
@@ -302,7 +306,9 @@ jobs:
             -d ${{ matrix.device }} \
             --report-file reports/${{ matrix.test-file }}.md \
             --cleanup=3 \
+            --get-metadata \
             -v
+          python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
         working-directory: ./test-suite
 
       - uses: actions/upload-artifact@master
@@ -314,6 +320,11 @@ jobs:
         with:
           name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_onnx_json
           path: ./test-suite/alt_e2eshark/reports/${{ matrix.test-file }}.json
+      
+      - uses: actions/upload-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_duplicates_json
+          path: ./test-suite/alt_e2eshark/reports/duplicates.json
 
   push_artifacts:
     needs: [e2eshark]

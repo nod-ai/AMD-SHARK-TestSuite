@@ -252,7 +252,6 @@ jobs:
           python3.11 ./run.py \
             -r ./test-onnx \
             --report \
-            --torchtolinalg \
             --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
             -b ${{ matrix.backend }} \
             -d ${{ matrix.device }} \
@@ -275,7 +274,6 @@ jobs:
           python3.11 ./run.py \
             -r ./test-onnx \
             --report \
-            --torchtolinalg \
             --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
             -b ${{ matrix.backend }} \
             -d ${{ matrix.device }} \

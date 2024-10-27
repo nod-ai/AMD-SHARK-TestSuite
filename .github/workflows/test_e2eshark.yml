@@ -322,7 +322,7 @@ jobs:
       - uses: actions/upload-artifact@master
         with:
           name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_duplicates_json
-          path: ./test-suite/alt_e2eshark/reports/duplicates.json
+          path: ./test-suite/alt_e2eshark/duplicates.json
 
   push_artifacts:
     needs: [e2eshark]

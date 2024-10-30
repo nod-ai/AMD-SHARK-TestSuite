@@ -1,10 +1,6 @@
 efficientnet_b3_pruned.in1k
 efficientnet_b5.in12k
 efficientnet_b5.in12k_ft_in1k
-eva_giant_patch14_224.clip_ft_in1k
-eva_giant_patch14_336.clip_ft_in1k
-eva_giant_patch14_336.m30m_ft_in22k_in1k
-eva_giant_patch14_560.m30m_ft_in22k_in1k
 eva_large_patch14_196.in22k_ft_in1k
 eva_large_patch14_196.in22k_ft_in22k_in1k
 eva_large_patch14_336.in22k_ft_in1k
@@ -32,7 +28,6 @@ gcvit_xxtiny
 gluon_xception65
 gmixer_24_224.ra3_in1k
 gmlp_s16_224.ra3_in1k
-ig_resnext101_32x48d
 jx_nest_base
 jx_nest_small
 jx_nest_tiny
@@ -127,13 +122,8 @@ pvt_v2_b3
 pvt_v2_b4
 pvt_v2_b5
 regnety_120.sw_in12k
-regnety_1280.seer
-regnety_1280.seer_ft_in1k
-regnety_1280.swag_ft_in1k
-regnety_1280.swag_lc_in1k
 regnety_160.deit_in1k
 regnety_160.sw_in12k
-regnety_2560.seer_ft_in1k
 regnety_320.seer
 regnety_640.seer
 resmlp_big_24_224.fb_in1k
@@ -143,8 +133,6 @@ resnest269e
 resnetrs270
 resnetrs350
 resnetrs420
-resnetv2_101x3_bit.goog_in21k_ft_in1k
-resnetv2_152x4_bit.goog_in21k_ft_in1k
 rexnetr_200.sw_in12k
 rexnetr_300.sw_in12k
 sebotnet33ts_256

@@ -3,7 +3,6 @@ beit_base_patch16_224.in22k_ft_in22k_in1k
 beit_base_patch16_384.in22k_ft_in22k_in1k
 beit_large_patch16_224.in22k_ft_in22k_in1k
 beit_large_patch16_384.in22k_ft_in22k_in1k
-beit_large_patch16_512.in22k_ft_in22k_in1k
 beitv2_base_patch16_224.in1k_ft_in22k_in1k
 beitv2_large_patch16_224.in1k_ft_in22k_in1k
 botnet26t_256
@@ -84,8 +83,6 @@ convnext_tiny.in12k_ft_in1k_384
 convnext_tiny_hnf.a2h_in1k
 convnext_xlarge.fb_in22k_ft_in1k
 convnext_xlarge.fb_in22k_ft_in1k_384
-convnext_xxlarge.clip_laion2b_rewind
-convnext_xxlarge.clip_laion2b_soup
 convnextv2_atto.fcmae
 convnextv2_atto.fcmae_ft_in1k
 convnextv2_base.fcmae
@@ -94,10 +91,6 @@ convnextv2_base.fcmae_ft_in22k_in1k
 convnextv2_base.fcmae_ft_in22k_in1k_384
 convnextv2_femto.fcmae
 convnextv2_femto.fcmae_ft_in1k
-convnextv2_huge.fcmae
-convnextv2_huge.fcmae_ft_in1k
-convnextv2_huge.fcmae_ft_in22k_in1k_384
-convnextv2_huge.fcmae_ft_in22k_in1k_512
 convnextv2_large.fcmae
 convnextv2_large.fcmae_ft_in1k
 convnextv2_large.fcmae_ft_in22k_in1k
@@ -131,8 +124,6 @@ deit3_base_patch16_224.fb_in1k
 deit3_base_patch16_224.fb_in22k_ft_in1k
 deit3_base_patch16_384.fb_in1k
 deit3_base_patch16_384.fb_in22k_ft_in1k
-deit3_huge_patch14_224.fb_in1k
-deit3_huge_patch14_224.fb_in22k_ft_in1k
 deit3_large_patch16_224.fb_in1k
 deit3_large_patch16_224.fb_in22k_ft_in1k
 deit3_large_patch16_384.fb_in1k
@@ -155,8 +146,6 @@ densenet201
 dm_nfnet_f2.dm_in1k
 dm_nfnet_f3.dm_in1k
 dm_nfnet_f4.dm_in1k
-dm_nfnet_f5.dm_in1k
-dm_nfnet_f6.dm_in1k
 eca_botnext26ts_256
 ecaresnet269d
 edgenext_base

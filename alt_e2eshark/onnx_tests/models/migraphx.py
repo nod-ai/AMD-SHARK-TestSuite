@@ -43,6 +43,7 @@ def dim_param_constructor(dim_param_dict):
             # this model has an input used for indexing into a dim of size 2
             has_gather_size_2_indices = [
                 "migraphx_mlperf__bert_large_mlperf",
+                "migraphx_bert__bert-large-uncased",
                 "migraphx_huggingface-transformers__bert_mrpc8",
             ]
             if self.name in has_gather_size_2_indices:

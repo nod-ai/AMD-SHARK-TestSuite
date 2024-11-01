@@ -329,7 +329,7 @@ def _get_argparse():
         "--backend",
         choices=["llvm-cpu", "amd-aie", "rocm", "hip", "cuda", "vmvx", "metal-spirv", "vulkan-spirv"],
         default="llvm-cpu",
-        help="specifies the iree-hal-target-backend for compile phase",
+        help="specifies the iree-hal-target-device / iree-hal-target-backends for compile phase",
     )
     parser.add_argument(
         "-ica",

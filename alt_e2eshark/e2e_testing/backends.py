@@ -76,9 +76,10 @@ class SimpleIREEBackend(BackendBase):
 
 class CLIREEBackend(BackendBase):
     '''This backend calls iree through the command line to compile and run MLIR modules'''
-    def __init__(self, *, device="local-task", hal_target_backend="llvm-cpu", extra_args : List[str] = None):
+    def __init__(self, *, device="local-task", hal_target_backend="llvm-cpu", target_chip = None, extra_args : List[str] = None):
         self.device = device
         self.hal_target_backend = hal_target_backend
+        self.target_chip = target_chip
         self.extra_args = []
         if extra_args:
             for a in extra_args:
@@ -86,6 +87,14 @@ class CLIREEBackend(BackendBase):
                     self.extra_args.append(a)
                 else:
                     self.extra_args.append("--" + a)
+        if hal_target_backend == "rocm":
+            self.extra_args += [
+                f"--iree-hip-target={self.target_chip}",
+            ]
+        if hal_target_backend == "llvm-cpu":
+            self.extra_args += [
+                "--iree-llvmcpu-target-cpu=host",
+            ]
     
     def compile(self, module_path: str, *, save_to : str = None) -> str:
         vmfb_path = os.path.join(save_to, "compiled_model.vmfb")

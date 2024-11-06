@@ -18,14 +18,22 @@ from pathlib import Path
 import json
 import shutil
 
+BACKEND_LEGAL_OPS = [
+    "aten.flatten.using_ints",
+    "aten.unflatten.int",
+]
+
+OPTION_STRING = (
+            "{backend-legal-ops="
+            + ",".join(BACKEND_LEGAL_OPS)
+            + "}"
+        )
+
 ONNX_TO_TORCH_BACKEND_PIPELINE = [
-    "func.func(convert-torch-onnx-to-torch)",
+    f"torch-onnx-to-torch-backend-pipeline{OPTION_STRING}",
 ]
 
 REDUCE_TO_LINALG_PIPELINE = [
-    "torch-lower-to-backend-contract",
-    "func.func(torch-scalarize-shapes)",
-    "torch-shape-refinement-pipeline",
     "torch-backend-to-linalg-on-tensors-backend-pipeline",
 ]
 

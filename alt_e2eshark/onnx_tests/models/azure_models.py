@@ -42,6 +42,13 @@ no_opset_update = [
 
 # if the model has significant shape issues, consider applying basic optimizations before import by adding to this list:
 basic_opt = [
+    "bat_resnext26ts.ch_in1k",
+    "twins_svt_base",
+    "twins_svt_large",
+    "twins_svt_small",
+    "jx_nest_base",
+    "jx_nest_small",
+    "jx_nest_tiny",
     "coat_mini",
     "coat_tiny",
     "mvitv2_base",

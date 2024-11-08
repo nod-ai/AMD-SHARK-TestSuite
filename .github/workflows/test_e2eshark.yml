@@ -235,8 +235,7 @@ jobs:
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip install --upgrade pip
           pip install -r ./alt_e2eshark/base_requirements.txt
-          pip install --force-reinstall iree_compiler-0.dev1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-          pip install --force-reinstall iree_runtime-0.dev1-cp311-cp311-manylinux_2_28_x86_64.whl
+          pip install --force-reinstall *.whl
           pip install --no-deps -r ./alt_e2eshark/torch_mlir_requirements.txt
         working-directory: ./test-suite
       

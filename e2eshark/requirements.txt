@@ -16,5 +16,5 @@ azure-storage-blob
 -f https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
 torch-mlir ; sys_platform == "linux"
 # install nightly build of iree-compiler and iree-runtime
-iree-compiler -f https://iree.dev/pip-release-links.html
-iree-runtime -f https://iree.dev/pip-release-links.html
+iree-base-compiler -f https://iree.dev/pip-release-links.html
+iree-base-runtime -f https://iree.dev/pip-release-links.html

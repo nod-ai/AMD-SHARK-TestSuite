@@ -78,7 +78,7 @@ To use `iree-compile` and `iree-run-module` from Python packages:
 
 ```bash
 $ python -m pip install --find-links https://iree.dev/pip-release-links.html \
-  iree-compiler iree-runtime --upgrade
+  iree-base-compiler iree-base-runtime --upgrade
 ```
 
 To use local versions of `iree-compile` and `iree-run-module`, put them on your
@@ -140,7 +140,7 @@ $ pytest iree_special_models/sdxl
     $ pip install --no-compile -r <path_to_iree-turbine>/pytorch-cpu-requirements.txt
     $ pip install --no-compile --pre --upgrade -r <path_to_iree-turbine>/requirements.txt
     $ pip install --no-compile --pre -e <path_to_iree-turbine>[testing]
-    $ pip install --upgrade --pre --no-cache-dir iree-compiler iree-runtime -f https://iree.dev/      pip-release-links.html
+    $ pip install --upgrade --pre --no-cache-dir iree-base-compiler iree-base-runtime -f https://iree.dev/      pip-release-links.html
     $ pip install --no-compile --pre --upgrade -e <path_to_shark-turbine>/models -r <path_to_shark-turbine>/models/requirements.txt
     ```
 

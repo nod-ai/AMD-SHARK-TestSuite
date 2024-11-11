@@ -9,6 +9,7 @@ from .concat import *
 from .dynamic_quantize_linear import *
 from .pad import *
 from .resize import *
+from .resize_cubic import *
 from .generate_node import *
 from .conv import *
 from .convtranspose import *

@@ -225,7 +225,7 @@ jobs:
           pip install -r ./alt_e2eshark/base_requirements.txt
           pip install -r ./alt_e2eshark/iree_requirements.txt
           pip install --no-deps -r ./alt_e2eshark/torch_mlir_requirements.txt
-          pip install --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
+          pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
         working-directory: ./test-suite
       
       - name: "Setup IREE EP python venv"
@@ -365,7 +365,7 @@ jobs:
           pip install -r ./test-suite/alt_e2eshark/base_requirements.txt
           pip install -r ./test-suite/alt_e2eshark/iree_requirements.txt
           pip install --no-deps -r ./test-suite/alt_e2eshark/torch_mlir_requirements.txt
-          pip install --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
+          pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
       - uses: actions/download-artifact@master
         with:
           name: ci_reports_${{ matrix.backend }}_shark-test-suite_onnx_md

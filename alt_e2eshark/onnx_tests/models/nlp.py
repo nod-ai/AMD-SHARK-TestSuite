@@ -13,7 +13,7 @@ from e2e_testing.storage import TestTensors
 import onnxruntime as ort
 import numpy
 from typing import Optional
-import os
+import onnx
 
 this_file = Path(__file__)
 lists_dir = (this_file.parent).joinpath("external_lists")
@@ -22,14 +22,96 @@ model_names = []
 for i in [1, 2, 3]:
     model_names += load_test_txt_file(lists_dir.joinpath(f"nlp-shard{i}.txt"))
 
+large_file_size_models = [
+    "model--YuisekinAI-mistral-0.7B--yuiseki",
+    "model--financial-summarization-pegasus--human-centered-summarization",
+    "model--finetuned_gpt2-large_sst2_negation0.0001_pretrainedTrue_epochs1--jhaochenz",
+    "model--finetuned_gpt2-large_sst2_negation0.001_pretrainedTrue_epochs1--jhaochenz",
+    "model--finetuned_gpt2-large_sst2_negation0.001_pretrainedTrue_epochs2--jhaochenz",
+    "model--finetuned_gpt2-large_sst2_negation0.001_pretrainedTrue_epochs3--jhaochenz",
+    "model--finetuned_gpt2-large_sst2_negation0.01--yuhuizhang",
+    "model--finetuned_gpt2-large_sst2_negation0.01_pretrainedFalse_epochs10--jhaochenz",
+    "model--finetuned_gpt2-large_sst2_negation0.01_pretrainedTrue_epochs1--jhaochenz",
+    "model--finetuned_gpt2-large_sst2_negation0.05--yuhuizhang",
+    "model--finetuned_gpt2-large_sst2_negation0.0_pretrainedFalse--yuhuizhang",
+    "model--finetuned_gpt2-large_sst2_negation0.1_pretrainedFalse_epochs10--jhaochenz",
+    "model--finetuned_gpt2-large_sst2_negation0.1_pretrainedTrue_epochs1--jhaochenz",
+    "model--finetuned_gpt2-large_sst2_negation0.2--yuhuizhang",
+    "model--finetuned_gpt2-large_sst2_negation0.5--yuhuizhang",
+    "model--finetuned_gpt2-large_sst2_negation0.5_pretrainedFalse--yuhuizhang",
+    "model--finetuned_gpt2-large_sst2_negation0.8--yuhuizhang",
+    "model--finetuned_gpt2-large_sst2_negation0.8_pretrainedFalse--yuhuizhang",
+    "model--flan-t5-large-samsum--oguuzhansahin",
+    "model--long-t5-tglobal-large-pubmed-3k-booksum-16384-WIP--pszemraj",
+    "model--long-t5-tglobal-large-pubmed-3k-booksum-16384-WIP13--pszemraj",
+    "model--long-t5-tglobal-large-pubmed-3k-booksum-16384-WIP14--pszemraj",
+    "model--long-t5-tglobal-large-pubmed-3k-booksum-16384-WIP15--pszemraj",
+    "model--long-t5-tglobal-large-pubmed-3k-booksum-16384-WIP17--pszemraj",
+    "model--m2m100_418M-finetuned-kde4-en-to-pt_BR--danhsf",
+    "model--m2m100_418M-fr--Jour",
+    "model--m2m100_418M-fr--NDugar",
+    "model--m2m100_418M-ja--vivek-307306",
+    "model--mT5-base-HunSum-1--SZTAKI-HLT",
+    "model--mT5_multilingual_XLSum--csebuetnlp",
+    "model--manifestoberta-xlm-roberta-56policy-topics-sentence-2023-1-1--manifesto-project",
+    "model--my_xlm-roberta-large-finetuned-conll03--BahAdoR0101",
+    "model--pegasus-cnn_dailymail--google",
+    "model--pegasus-large-book-summary--pszemraj",
+    "model--pegasus-large-booksum--cnicu",
+    "model--pegasus-large-summary-explain--pszemraj",
+    "model--pegasus-xsum--google",
+    "model--pegasus_summarizer--tuner007",
+    "model--roberta-ner-multilingual--julian-schelb",
+    "model--t5-large-finetuned-xsum-cnn--sysresearch101",
+    "model--tglobal-large-booksum-WIP4-r1--pszemraj",
+    "model--xlm-roberta-large-squad2--deepset",
+    "model--xlmr-large-qa-fa--m3hrdadfi",
+]
+
 
 def dim_param_constructor(dim_param_dict):
     class AzureWithDimParams(AzureDownloadableModel):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
+            if self.name in large_file_size_models:
+                self.construct_model()
+                self.update_no_ext()
+                self.opset_version = None
             # TODO: check opset versions
             # print(f"Opset: {self.opset_version}")
             # self.update_opset_version_and_overwrite()
+
+        def update_no_ext(self):
+            """Models larger than 2GB do not allow updating opset version, so we update opset version without loading external data. Unfortunately, all external data references get wiped, and we need to manually trace through the graph and copy them back in."""
+            model = onnx.load(self.model, load_external_data=False)
+            new_model = onnx.version_converter.convert_version(
+                model, self.opset_version
+            )
+            nv_init_map = {init.name: init for init in model.graph.initializer}
+            for new_init in new_model.graph.initializer:
+                if new_init.name not in nv_init_map.keys():
+                    continue
+                old_init = nv_init_map[new_init.name]
+                if old_init.data_location:
+                    new_init.Clear()
+                    new_init.CopyFrom(old_init)
+            nv_node_map = {node.output[0]: node for node in model.graph.node}
+            for node in new_model.graph.node:
+                name = node.output[0]
+                if name not in nv_node_map.keys():
+                    continue
+                og_node = nv_node_map[name]
+                attrs_to_replace = dict()
+                for attr in og_node.attribute:
+                    if attr.t.external_data:
+                        attrs_to_replace[attr.name] = attr
+                for new_attr in node.attribute:
+                    if new_attr.name in attrs_to_replace.keys():
+                        old_attr = attrs_to_replace[new_attr.name]
+                        new_attr.Clear()
+                        new_attr.CopyFrom(old_attr)
+
+            onnx.save(new_model, self.model)
 
         def update_dim_param_dict(self):
             self.dim_param_dict = dim_param_dict

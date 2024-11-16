@@ -31,13 +31,15 @@ no_opset_update = [
     "dm_nfnet_f2.dm_in1k",
     # getting test runner crash for the following.
     # TODO: unblock these when we externalize weights on import
-    # "dm_nfnet_f3.dm_in1k",
-    # "dm_nfnet_f4.dm_in1k",
+    "dm_nfnet_f3.dm_in1k",
+    "dm_nfnet_f4.dm_in1k",
     "vit_base_r50_s16_384.orig_in21k_ft_in1k",
     "vit_small_r26_s32_224.augreg_in21k_ft_in1k",
     "vit_small_r26_s32_384.augreg_in21k_ft_in1k",
     "vit_tiny_r_s16_p8_224.augreg_in21k_ft_in1k",
     "vit_tiny_r_s16_p8_384.augreg_in21k_ft_in1k",
+    "vit_large_r50_s32_224.augreg_in21k_ft_in1k",
+    "vit_large_r50_s32_384.augreg_in21k_ft_in1k",
 ]
 
 # if the model has significant shape issues, consider applying basic optimizations before import by adding to this list:

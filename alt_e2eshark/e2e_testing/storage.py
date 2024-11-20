@@ -7,6 +7,8 @@ import json
 import numpy
 import struct
 import torch
+import glob
+import onnx
 from typing import Tuple, Optional, Dict, List, Any, Union
 from pathlib import Path
 import os
@@ -200,14 +202,20 @@ class TestTensors:
     def load_from(shapes, torch_dtypes, dir_path: str, name: str = "input"):
         """loads bin files. dir_path should end in a forward slash and should contain files of the type {name}.0.bin, {name}.1.bin, etc."""
         tensor_list = []
-        assert len(shapes) == len(
-            torch_dtypes
-        ), "must provide same number of shapes and dtypes"
-        for i in range(len(shapes)):
-            shape = shapes[i]
-            dtype = torch_dtypes[i]
-            t = load_raw_binary_as_torch_tensor(
-                os.path.join(dir_path, name + "." + str(i) + ".bin"), shape, dtype
-            )
-            tensor_list.append(t)
+        pb_input_files = glob.glob("input_?.pb", root_dir=dir_path)
+        if len(pb_input_files) > 0:
+            onnx_tensor_list = [onnx.load_tensor(dir_path + '/' + tensor) for tensor in pb_input_files]
+            for tensor in onnx_tensor_list:
+                tensor_list.append(onnx.numpy_helper.to_array(tensor, base_dir=dir_path))
+        else:
+            assert len(shapes) == len(
+                torch_dtypes
+            ), "must provide same number of shapes and dtypes"
+            for i in range(len(shapes)):
+                shape = shapes[i]
+                dtype = torch_dtypes[i]
+                t = load_raw_binary_as_torch_tensor(
+                    os.path.join(dir_path, name + "." + str(i) + ".bin"), shape, dtype
+                )
+                tensor_list.append(t)
         return TestTensors(tuple(tensor_list))

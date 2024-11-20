@@ -4,30 +4,155 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 import os
+import requests
+import tarfile
+import shutil
+import yaml
 import onnx
 import onnxruntime
 from onnx.helper import make_node, make_graph, make_model
 from pathlib import Path
 from e2e_testing import azutils
-from e2e_testing.framework import OnnxModelInfo
+from e2e_testing.framework import OnnxModelInfo, TestTensors
 from e2e_testing.onnx_utils import (
     modify_model_output,
     find_node,
+    get_sample_inputs_for_onnx_model
 )
 
 """This file contains several helpful child classes of OnnxModelInfo."""
 
+
+class OnnxModelZooDownloadableModel(OnnxModelInfo):
+    """This class should be used to download models from ONNX Model Zoo (onnx/models)."""
+
+    def __init__(self, is_validated: bool, model_url: str, name: str, onnx_model_path: str):
+        opset_version = 21
+        parent_cache_dir = os.getenv("CACHE_DIR")
+        if not parent_cache_dir:
+            raise RuntimeError(
+                "Please specify a cache directory path in the CACHE_DIR environment variable for storing large model files."
+            )
+        self.is_validated = is_validated
+        self.model_url = model_url
+        self.cache_dir = os.path.join(parent_cache_dir, name)
+
+        super().__init__(name, onnx_model_path, opset_version)
+
+
+    def unzip_model_archive(self, tar_path):
+        model_dir = str(Path(self.model).parent)
+        with tarfile.open(tar_path) as tar:
+            for subdir_and_file in tar.getmembers():
+                if "test_data_set_0/input" in subdir_and_file.name:
+                    subdir_and_file.name = subdir_and_file.name.split('/')[-1]
+                    tar.extract(subdir_and_file, path=model_dir)
+                if ".onnx" in subdir_and_file.name:
+                    subdir_and_file.name = "model.onnx"
+                    tar.extract(subdir_and_file, path=model_dir)
+
+    def download_model_yaml(self, model_url: str):
+        # The cache dir should already have model.onnx
+        if not os.path.exists(self.cache_dir + "/turnkey_stats.yaml"):
+            turnkey_yaml_url = '/'.join(model_url.split('/')[:-1]) + '/turnkey_stats.yaml'
+            content = requests.get(turnkey_yaml_url).content
+            with open(self.cache_dir + "/turnkey_stats.yaml", "wb") as out_file:
+                out_file.write(content)
+
+        shutil.copy(self.cache_dir + "/model.onnx", str(Path(self.model).parent))
+
+    def contruct_input_name_to_shape_map(self):
+        turnkey_dict = {}
+        self.input_name_to_shape_map = {}
+        with open(os.path.join(self.cache_dir, 'turnkey_stats.yaml'), 'rb') as stream:
+            turnkey_dict = yaml.safe_load(stream)
+        if 'onnx_input_dimensions' in turnkey_dict.keys():
+            for dim_param in turnkey_dict['onnx_input_dimensions']:
+                self.input_name_to_shape_map[dim_param] = turnkey_dict['onnx_input_dimensions'][dim_param]
+
+    def construct_inputs(self) -> TestTensors:
+        if not os.path.exists(self.model):
+            self.construct_model()
+        self.update_dim_param_dict()
+
+        input_path = os.path.join(str(Path(self.model).parent), 'input_0.pb')
+        if os.path.exists(input_path):
+            return self.load_inputs(str(Path(self.model).parent))
+
+        self.contruct_input_name_to_shape_map()
+        return get_sample_inputs_for_onnx_model(self.model, self.dim_param_dict, self.input_name_to_shape_map)
+
+    def construct_model(self):
+        # Look in the test-run dir for the model file.
+        # If it does not exist, pull it in from the model's Github URL, and try again.
+        # final_model_path should look like this: <directory>/<test/model_name>/<test/model_name>.onnx
+        model_dir = str(Path(self.model).parent)
+
+        # if cache directory doesn't exist, then make it
+        if not os.path.exists(self.cache_dir):
+            os.mkdir(self.cache_dir)
+
+        def find_models(model_dir):
+            # search for a .onnx file in the ./test-run/testname/ dir
+            found_models = []
+            found_model_in_cache = False
+            for root, dirs, files in os.walk(model_dir):
+                for name in files:
+                    if name[-5:] == ".onnx":
+                        found_models.append(os.path.abspath(os.path.join(root, name)))
+            if len(found_models) == 0:
+                for _, _, files in os.walk(self.cache_dir):
+                    for name in files:
+                        if name[-6:] == "tar.gz" or name[-5:] == "model.onnx":
+                            found_model_in_cache = True
+                            break
+            return found_models, found_model_in_cache
+
+        dest_file = os.path.join(self.cache_dir, self.model_url.split('/')[-1] if self.is_validated else "model.onnx")
+        find_models_in_test_dir, found_model_in_cache = find_models(model_dir)
+
+        if len(find_models_in_test_dir) == 0 and not found_model_in_cache:
+            print(f"Begin download for {self.name}")
+            content = requests.get(self.model_url, stream=True).content
+
+            with open(dest_file, "wb") as model_out_file:
+                assert (
+                    content is not None and len(content) > 0
+                ), f"Failed to download model {self.name}"
+                model_out_file.write(content)
+            if self.is_validated:
+                self.unzip_model_archive(dest_file)
+            else:
+                self.download_model_yaml(self.model_url)
+            find_models_in_test_dir, _ = find_models(model_dir)
+        if found_model_in_cache:
+            self.unzip_model_archive(dest_file) if self.is_validated else self.download_model_yaml(self.model_url)
+            find_models_in_test_dir, _ = find_models(model_dir)
+        if len(find_models_in_test_dir) == 1:
+            self.model = find_models_in_test_dir[0]
+            return
+        if len(find_models_in_test_dir) > 1:
+            print(f"Found multiple model.onnx files: {find_models_in_test_dir}")
+            print(f"Picking the first model found to use: {find_models_in_test_dir[0]}")
+            self.model = find_models_in_test_dir[0]
+            return
+        raise OSError(
+            f"No onnx model could be found, downloaded, or extracted to {model_dir}"
+        )
+
+
 class AzureDownloadableModel(OnnxModelInfo):
     """This class can be used for models in our azure storage (both private and public)."""
+
     def __init__(self, name: str, onnx_model_path: str):
-        # TODO: Extract opset version from onnx.version.opset 
+        # TODO: Extract opset version from onnx.version.opset
         opset_version = 21
         parent_cache_dir = os.getenv('CACHE_DIR')
         if not parent_cache_dir:
             raise RuntimeError("Please specify a cache directory path in the CACHE_DIR environment variable for storing large model files.")
         self.cache_dir = os.path.join(parent_cache_dir, name)
         super().__init__(name, onnx_model_path, opset_version)
-    
+
     def update_sess_options(self):
         self.sess_options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
 
@@ -44,11 +169,11 @@ class AzureDownloadableModel(OnnxModelInfo):
             found_models = []
             for root, dirs, files in os.walk(model_dir):
                 for name in files:
-                    if name[-5:] == ".onnx":  
+                    if name[-5:] == ".onnx":
                         found_models.append(os.path.abspath(os.path.join(root, name)))
             return found_models
 
-        found_models = find_models(model_dir) 
+        found_models = find_models(model_dir)
 
         if len(found_models) == 0:
             azutils.pre_test_onnx_model_azure_download(
@@ -65,7 +190,6 @@ class AzureDownloadableModel(OnnxModelInfo):
             return
         raise OSError(f"No onnx model could be found, downloaded, or extracted to {model_dir}")
 
-
 class SiblingModel(OnnxModelInfo):
     """convenience class for re-using an onnx model from another 'sibling' test"""
 
@@ -81,7 +205,7 @@ class SiblingModel(OnnxModelInfo):
         if not os.path.exists(self.sibling_inst.model):
             self.sibling_inst.construct_model()
         self.model = self.sibling_inst.model
-    
+
     def update_dim_param_dict(self):
         self.sibling_inst.update_dim_param_dict()
         self.dim_param_dict = self.sibling_inst.dim_param_dict

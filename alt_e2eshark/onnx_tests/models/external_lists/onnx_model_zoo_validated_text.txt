@@ -1,0 +1,13 @@
+gpt2-10
+gpt2-lm-head-10
+t5-encoder-12
+t5-decoder-with-lm-head-12
+gpt2-lm-head-bs-12
+bertsquad-10
+bertsquad-12
+bertsquad-8
+bertsquad-12-int8
+roberta-sequence-classification-9
+roberta-base-11
+bidaf-9
+bidaf-11-int8

@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 from .azure_models import *
+from .onnx_zoo_models import *
 from .opt_models import *
 from .vision_models import *
 from .deeplab import *

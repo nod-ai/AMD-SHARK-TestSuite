@@ -31,6 +31,7 @@ class OnnxModelInfo:
         self.opset_version = opset_version
         self.sess_options = ort.SessionOptions()
         self.dim_param_dict = None
+        self.input_name_to_shape_map = None
 
     def forward(self, input: Optional[TestTensors] = None) -> TestTensors:
         """Applies self.model to self.input. Only override if necessary for specific models"""
@@ -60,6 +61,10 @@ class OnnxModelInfo:
         """Can be overridden to modify a dictionary of dim parameters (self.dim_param_dict) used to 
         construct inputs for a model with dynamic dims.
         """
+        pass
+
+    def contruct_input_name_to_shape_map(self):
+        """Can be overriden to construct an assocation map between the name of the input nodes and their shapes."""
         pass
 
     def construct_model(self):

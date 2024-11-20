@@ -27,8 +27,14 @@ def dtype_from_ort_node(node):
         return torch.bool
     raise NotImplementedError(f"Unhandled dtype string found: {dtypestr}")
 
-def get_node_shape_from_dim_param_dict(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg, dim_param_dict: Optional[dict[str, int]] = None):
+def get_node_shape_from_dim_param_dict(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg, dim_param_dict: Optional[dict[str, int]] = None, input_name_to_shape_map: Optional[dict[str, list[int]]] = None) -> list[int]:
     """Get the shape of a node, replacing any string dims with values from a dim_param_dict"""
+    if input_name_to_shape_map and node.name in input_name_to_shape_map.keys():
+        # Particularly used for models from ONNX Model Zoo,
+        # the dim_param_dict here should contain the shapes
+        # of the input nodes.
+        return input_name_to_shape_map[node.name]
+
     int_dims = []
     for dim in node.shape:
         if isinstance(dim, str) and dim_param_dict:
@@ -49,7 +55,7 @@ def get_node_shape_from_dim_param_dict(node: onnxruntime.capi.onnxruntime_pybind
     return int_dims
 
 
-def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg, dim_param_dict: Optional[dict[str, int]] = None):
+def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg, dim_param_dict: Optional[dict[str, int]] = None, input_name_to_shape_map: Optional[dict[str, list[int]]] = None):
     """
     Generate a random input tensor for a given node
 
@@ -59,7 +65,7 @@ def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.N
     """
 
 
-    int_dims = get_node_shape_from_dim_param_dict(node, dim_param_dict)
+    int_dims = get_node_shape_from_dim_param_dict(node, dim_param_dict, input_name_to_shape_map)
 
     rng = numpy.random.default_rng(19)
     if node.type == "tensor(float)":
@@ -75,14 +81,14 @@ def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.N
     raise NotImplementedError(f"Found an unhandled dtype: {node.type}.")
 
 
-def get_sample_inputs_for_onnx_model(model_path, dim_param_dict = None) -> TestTensors:
+def get_sample_inputs_for_onnx_model(model_path, dim_param_dict = None, input_name_to_shape_map = None) -> TestTensors:
     """A convenience function for generating sample inputs for an onnx model"""
     opt = onnxruntime.SessionOptions()
     opt.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
     s = onnxruntime.InferenceSession(model_path, opt)
     inputs = s.get_inputs()
     sample_inputs = TestTensors(
-        tuple([generate_input_from_node(node, dim_param_dict) for node in inputs])
+        tuple([generate_input_from_node(node, dim_param_dict, input_name_to_shape_map) for node in inputs])
     )
     return sample_inputs
 

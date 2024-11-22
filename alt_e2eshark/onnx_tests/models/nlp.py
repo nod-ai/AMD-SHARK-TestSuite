@@ -128,7 +128,7 @@ def dim_param_constructor(dim_param_dict):
             # nlp specific overrides
             rng = numpy.random.default_rng(19)
             for i, node in enumerate(session.get_inputs()):
-                if node.name == "token_type_ids":
+                if node.name == "token_type_ids" or node.name == "attention_mask":
                     int_dims = get_node_shape_from_dim_param_dict(
                         node, self.dim_param_dict
                     )

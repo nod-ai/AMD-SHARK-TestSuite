@@ -15,6 +15,10 @@ def dtype_from_ort_node(node):
     dtypestr = typestr[7:-1]
     if dtypestr == "float":
         return torch.float
+    if dtypestr == "float16":
+        return torch.float16
+    if dtypestr == "bfloat16":
+        return torch.bfloat16
     if dtypestr == "int" or dtypestr == "int32":
         return torch.int32
     if dtypestr == "int64":
@@ -70,6 +74,10 @@ def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.N
     rng = numpy.random.default_rng(19)
     if node.type == "tensor(float)":
         return rng.random(int_dims).astype(numpy.float32)
+    if node.type == "tensor(float16)":
+        return rng.random(int_dims).astype(numpy.float16)
+    if node.type == "tensor(bfloat16)":
+        raise NotImplementedError("Numpy doesn't support bfloat16. Please consider modifying the boundary types.")
     if node.type == "tensor(int)" or node.type == "tensor(int32)":
         return rng.integers(0, 10000, size=int_dims, dtype=numpy.int32)
     if node.type == "tensor(int8)":

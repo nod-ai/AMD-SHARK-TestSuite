@@ -97,7 +97,7 @@ def pack_tensor(modelinput):
             f"In pack_tensor, found an unsupported data type {dtype}"
         )
     if dtype == torch.float16 or dtype == torch.bfloat16:
-        modelinput = modelinput.view(dtype.torch.int16)
+        modelinput = modelinput.view(dtype=torch.int16)
     mylist = modelinput.flatten().tolist()
     bytearr = struct.pack(
         f"%s{PACK_CHAR_FROM_TORCH_DTYPE[dtype]}" % len(mylist), *mylist

@@ -14,3 +14,4 @@ from .generate_node import *
 from .conv import *
 from .convtranspose import *
 from .tfidf_vectorizer import *
+from .layer_norm import *

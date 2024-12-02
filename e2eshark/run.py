@@ -200,8 +200,12 @@ def runOnnxToTorchMLIRGeneration(
         # If local iree build provided use that instead of using the one installed
         # in user's env
         if SHARED_IREE_BUILD:
-            iree_python_path = f"PYTHONPATH={SHARED_IREE_BUILD}/compiler/bindings/python"
-            iree_import_onnx = f"{iree_python_path} python -m iree.compiler.tools.import_onnx"
+            iree_python_path = (
+                f"PYTHONPATH={SHARED_IREE_BUILD}/compiler/bindings/python"
+            )
+            iree_import_onnx = (
+                f"{iree_python_path} python -m iree.compiler.tools.import_onnx"
+            )
         scriptcommand = (
             iree_import_onnx
             + " "
@@ -1284,7 +1288,7 @@ def main():
     )
     parser.add_argument(
         "--cachedir",
-        help="Please select a dir with large free space to cache all torch, hf, turbine_tank model data",
+        help="Please select a dir with large free space to cache all torch, hf model data",
         required=True,
     )
     parser.add_argument(
@@ -1309,7 +1313,6 @@ def main():
     args = parser.parse_args()
     cache_dir = args.cachedir
 
-
     cache_dir = os.path.expanduser(cache_dir)
     cache_dir = os.path.abspath(cache_dir)
 
@@ -1327,7 +1330,6 @@ def main():
 
     os.environ["TORCH_HOME"] = cache_dir
     os.environ["HF_HOME"] = cache_dir
-    os.environ["TURBINE_TANK_CACHE_DIR"] = cache_dir
 
     if args.skiptestsfile and args.testsfile:
         print(f"ERROR: Only one of --skiptestsfile or --testsfile can be used")

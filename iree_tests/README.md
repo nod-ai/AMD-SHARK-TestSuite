@@ -81,7 +81,7 @@ To use `iree-compile` and `iree-run-module` from Python packages:
 
 ```bash
 $ python -m pip install --find-links https://iree.dev/pip-release-links.html \
-  iree-base-compiler iree-base-runtime --upgrade
+  iree-base-compiler iree-base-runtime --upgrade --pre
 ```
 
 To use local versions of `iree-compile` and `iree-run-module`, put them on your

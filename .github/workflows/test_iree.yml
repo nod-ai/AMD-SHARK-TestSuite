@@ -12,8 +12,6 @@ on:
       - ".github/workflows/test_iree.yml"
       # The iree_tests subproject.
       - "iree_tests/**"
-      # The iree_special_models subproject.
-      - "iree_special_models/**"
   workflow_dispatch:
   schedule:
     # Runs at 3:00 PM UTC, which is 8:00 AM PST
@@ -38,11 +36,9 @@ jobs:
           - name: cpu_llvm_task
             runs-on: nodai-amdgpu-mi250-x86-64
             models-config-file: models_cpu_llvm_task.json
-            backend: cpu
           - name: gpu_mi250_rocm
             runs-on: nodai-amdgpu-mi250-x86-64
             models-config-file: models_gpu_rocm_gfx90a.json
-            backend: rocm
     env:
       VENV_DIR: ${{ github.workspace }}/.venv
       ROCM_CHIP: gfx90a
@@ -67,20 +63,19 @@ jobs:
           python3 -m pip install \
             --find-links https://iree.dev/pip-release-links.html \
             --upgrade \
+            --pre \
             iree-base-compiler \
             iree-base-runtime
       - name: "Installing Python test requirements"
         run: |
           source ${VENV_DIR}/bin/activate
           python3 -m pip install -r iree_tests/requirements.txt
-          python3 -m pip install -r iree_special_models/requirements.txt
           pip install --no-compile --pre --upgrade -e common_tools
 
       # Download remote files.
       - name: "Downloading remote files for real weight model tests"
         run: |
           source ${VENV_DIR}/bin/activate
-          python3 iree_tests/download_remote_files.py --root-dir iree_special_models
           python3 iree_tests/download_remote_files.py --root-dir iree_tests/pytorch/models
           python3 iree_tests/download_remote_files.py --root-dir iree_tests/sharktank
 
@@ -100,51 +95,3 @@ jobs:
             --timeout=1200 \
             --durations=0 \
             --config-files=${MODELS_CONFIG_FILE_PATH}
-
-      - name: "Running SDXL special model tests"
-        id: special_models_sdxl
-        if: ${{ !cancelled() }}
-        run: |
-          source ${VENV_DIR}/bin/activate
-          pytest iree_special_models/sdxl \
-            -k ${{ matrix.backend }} \
-            -rpfE \
-            --capture=no \
-            --log-cli-level=info \
-            --timeout=1200 \
-            --durations=0
-
-      - name: "Running SD3 special model tests"
-        id: special_models_sd3
-        if: ${{ !cancelled() }}
-        run: |
-          source ${VENV_DIR}/bin/activate
-          pytest iree_special_models/sd3 \
-            -k ${{ matrix.backend }} \
-            -rpfE \
-            --capture=no \
-            --log-cli-level=info \
-            --timeout=1200 \
-            --durations=0
-
-      - name: "Running SDXL ROCm pipeline benchmark"
-        if: |
-          contains(matrix.name, 'rocm') &&
-          steps.special_models_sdxl.outcome == 'success'
-        run: |
-          source ${VENV_DIR}/bin/activate
-          pytest iree_tests/benchmarks/sdxl/benchmark_sdxl_rocm.py \
-            --goldentime-rocm-e2e-ms 1450.0 \
-            --goldentime-rocm-unet-ms 370.0 \
-            --goldentime-rocm-clip-ms 18.5 \
-            --goldentime-rocm-vae-ms 315.0 \
-            --goldendispatch-rocm-unet 1714 \
-            --goldendispatch-rocm-clip 1569 \
-            --goldendispatch-rocm-vae 248 \
-            --goldensize-rocm-unet-bytes 2280000  \
-            --goldensize-rocm-clip-bytes 860000 \
-            --goldensize-rocm-vae-bytes 840000 \
-            --gpu-number 6 \
-            --rocm-chip gfx90a \
-            --log-cli-level=info
-          echo "$(<job_summary.md )" >> $GITHUB_STEP_SUMMARY

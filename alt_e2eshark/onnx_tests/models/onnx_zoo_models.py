@@ -9,7 +9,6 @@ from pathlib import Path
 from e2e_testing.registry import register_test
 from e2e_testing.storage import load_test_txt_file
 from ..helper_classes import OnnxModelZooDownloadableModel
-from .azure_models import custom_registry
 
 
 this_file = Path(__file__)
@@ -35,6 +34,22 @@ build_model_to_path_map()
 url_map = lambda name : f'https://github.com/onnx/models/raw/refs/heads/main/{model_path_map[name]}'
 
 meta_constructor = lambda is_validated, name : (lambda *args, **kwargs : OnnxModelZooDownloadableModel(is_validated, url_map(name),*args, **kwargs))
+
+# The custom registry list for ONNX Zoo Models.
+custom_registry = []
+
+no_opset_update = []
+
+# if the model has significant shape issues, consider applying
+# basic optimizations before import by adding to this list.
+basic_opt = []
+
+remove_metadata_props = []
+
+custom_registry += basic_opt
+custom_registry += no_opset_update
+custom_registry += remove_metadata_props
+
 
 for t in set(onnx_zoo_non_validated).difference(custom_registry):
     t_split = t.split("/")[-2]

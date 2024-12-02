@@ -505,6 +505,11 @@ jobs:
           --output ./e2eshark-reports/combined_reports.json \
           --report --report-file ./e2eshark-reports/combined_reports.md
 
+      - uses: actions/upload-artifact@master
+        with:
+          name: ci_reports_${{ matrix.backend }}_combined_reports_onnx_json
+          path: ./e2eshark-reports/combined_reports.json
+
       - name: Push status artifacts
         run: |
           git config user.name "GitHub Actions Bot"

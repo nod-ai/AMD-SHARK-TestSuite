@@ -53,13 +53,13 @@ class OnnxModelZooDownloadableModel(OnnxModelInfo):
 
     def download_model_yaml(self, model_url: str):
         # The cache dir should already have model.onnx
-        if not os.path.exists(self.cache_dir + "/turnkey_stats.yaml"):
+        if not os.path.exists(os.path.join(self.cache_dir, "turnkey_stats.yaml")):
             turnkey_yaml_url = '/'.join(model_url.split('/')[:-1]) + '/turnkey_stats.yaml'
             content = requests.get(turnkey_yaml_url).content
-            with open(self.cache_dir + "/turnkey_stats.yaml", "wb") as out_file:
+            with open(os.path.join(self.cache_dir, "turnkey_stats.yaml"), "wb") as out_file:
                 out_file.write(content)
 
-        shutil.copy(self.cache_dir + "/model.onnx", str(Path(self.model).parent))
+        shutil.copy(os.path.join(self.cache_dir, "model.onnx"), str(Path(self.model).parent))
 
     def contruct_input_name_to_shape_map(self):
         turnkey_dict = {}

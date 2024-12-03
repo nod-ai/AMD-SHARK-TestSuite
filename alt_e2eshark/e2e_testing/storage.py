@@ -204,7 +204,7 @@ class TestTensors:
         tensor_list = []
         pb_input_files = glob.glob("input_?.pb", root_dir=dir_path)
         if len(pb_input_files) > 0:
-            onnx_tensor_list = [onnx.load_tensor(dir_path + '/' + tensor) for tensor in pb_input_files]
+            onnx_tensor_list = [onnx.load_tensor(os.path.join(dir_path, tensor)) for tensor in pb_input_files]
             for tensor in onnx_tensor_list:
                 tensor_list.append(onnx.numpy_helper.to_array(tensor, base_dir=dir_path))
         else:

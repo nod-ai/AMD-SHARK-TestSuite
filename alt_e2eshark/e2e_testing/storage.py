@@ -203,7 +203,9 @@ class TestTensors:
         """loads bin files. dir_path should end in a forward slash and should contain files of the type {name}.0.bin, {name}.1.bin, etc."""
         tensor_list = []
         pb_input_files = glob.glob("input_?.pb", root_dir=dir_path)
-        if len(pb_input_files) > 0:
+
+        # This condition should be only executed for inputs, so add a guard to ensure this.
+        if len(pb_input_files) > 0 and name == "input":
             onnx_tensor_list = [onnx.load_tensor(os.path.join(dir_path, tensor)) for tensor in pb_input_files]
             for tensor in onnx_tensor_list:
                 tensor_list.append(onnx.numpy_helper.to_array(tensor, base_dir=dir_path))

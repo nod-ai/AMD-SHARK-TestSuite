@@ -51,9 +51,59 @@ no_opset_update: List[Tuple[str, bool]] = []
 
 # if the model has significant shape issues, consider applying
 # basic optimizations before import by adding to this list.
+
 basic_opt: List[Tuple[str, bool]] = [
-    ("swin_large_patch4_window12_384_in22k_Opset17_timm", False)
+    ("swin_large_patch4_window12_384_in22k_Opset17_timm", False),
+    ("swin_base_patch4_window12_384_in22k_Opset17_timm", False),
+    ("swin_large_patch4_window7_224_Opset16_timm", False),
+    ("swin_base_patch4_window7_224_in22k_Opset16_timm", False),
+    ("swin_s3_base_224_Opset16_timm", False),
+    ("swin_small_patch4_window7_224_Opset16_timm", False),
+    ("swin_base_patch4_window7_224_in22k_Opset17_timm", False),
+    ("swin_large_patch4_window12_384_in22k_Opset16_timm", False),
+    ("swin_large_patch4_window7_224_in22k_Opset17_timm", False),
+    ("canine_Opset18_transformers", False),
+    ("swin_large_patch4_window7_224_Opset17_timm", False),
+    ("swin_base_patch4_window12_384_Opset16_timm", False),
+    ("swin_small_patch4_window7_224_Opset17_timm", False),
+    ("swin_large_patch4_window12_384_Opset16_timm", False),
+    ("swin_large_patch4_window12_384_Opset17_timm", False),
+    ("swin_s3_small_224_Opset16_timm", False),
+    ("swin_s3_small_224_Opset17_timm", False),
+    ("swin_s3_tiny_224_Opset17_timm", False),
+    ("swin_base_patch4_window7_224_Opset17_timm", False),
+    ("swin_tiny_patch4_window7_224_Opset17_timm", False),
+    ("swin_base_patch4_window7_224_Opset16_timm", False),
+    ("swin_tiny_patch4_window7_224_Opset16_timm", False),
+    ("canine_Opset17_transformers", False),
+    ("swin_large_patch4_window7_224_in22k_Opset16_timm", False),
+    ("swin_base_patch4_window12_384_Opset17_timm", False),
+    ("swin_base_patch4_window12_384_in22k_Opset16_timm", False),
+    ("canine_Opset16_transformers", False),
+    ("swin_s3_tiny_224_Opset16_timm", False),
+    ("swin_s3_base_224_Opset17_timm", False),
+    ("xlnetlmhead_Opset18_transformers", False),
+    ("xlnet_Opset16_transformers", False),
+    ("xlnetlmhead_Opset17_transformers", False),
+    ("xlnet_Opset18_transformers", False),
+    ("xlnetlmhead_Opset16_transformers", False),
+    ("xlnet_Opset17_transformers", False),
+    ("swin_t_Opset17_torch_hub", False),
+    ("swin_t_Opset18_torch_hub", False),
+    ("swin_s_Opset16_torch_hub", False),
+    ("swin_t_Opset16_torch_hub", False),
+    ("swin_s_Opset18_torch_hub", False),
+    ("swin_b_Opset16_torch_hub", False),
+    ("swin_b_Opset18_torch_hub", False),
+    ("swin_s_Opset17_torch_hub", False),
+    ("swin_b_Opset17_torch_hub", False),
+    ("rain-princess-8", False),
+    ("mosaic-8", False),
+    ("udnie-8", False),
+    ("pointilism-8", False),
+    ("candy-8", False)
 ]
+
 
 remove_metadata_props: List[Tuple[str, bool]] = []
 

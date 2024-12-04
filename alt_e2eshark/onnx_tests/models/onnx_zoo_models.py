@@ -101,6 +101,18 @@ basic_opt: List[Tuple[str, bool]] = [
     ("mosaic-8", False),
     ("udnie-8", False),
     ("pointilism-8", False),
+    ("vit_l_16_Opset16_torch_hub", False),
+    ("vit_b_16_Opset18_torch_hub", False),
+    ("vit_b_32_Opset18_torch_hub", False),
+    ("vit_l_32_Opset17_torch_hub", False),
+    ("vit_b_32_Opset17_torch_hub", False),
+    ("vit_b_16_Opset17_torch_hub", False),
+    ("vit_l_16_Opset17_torch_hub", False),
+    ("vit_b_16_Opset16_torch_hub", False),
+    ("vit_l_16_Opset18_torch_hub", False),
+    ("vit_l_32_Opset18_torch_hub", False),
+    ("vit_b_32_Opset16_torch_hub", False),
+    ("vit_l_32_Opset16_torch_hub", False),
     ("candy-8", False)
 ]
 

@@ -8,8 +8,10 @@ import requests
 import tarfile
 import shutil
 import yaml
+import subprocess
 import onnx
 import onnxruntime
+
 from onnx.helper import make_node, make_graph, make_model
 from pathlib import Path
 from e2e_testing import azutils
@@ -21,6 +23,51 @@ from e2e_testing.onnx_utils import (
 )
 
 """This file contains several helpful child classes of OnnxModelInfo."""
+
+
+class HfDownloadableModel(OnnxModelInfo):
+    """This class should be used to download models from Huggingface model hub."""
+
+    def __init__(self, full_model_path, task_name, name, onnx_model_path):
+        opset_version = 21
+        self.model_repo_path = full_model_path.replace("hf_", "")
+        self.task = task_name
+        super().__init__(name, onnx_model_path, opset_version)
+
+    def export_model(self):
+        model_dir = str(Path(self.model).parent)
+        # TODO: Use Python API instead of CLI?
+        opt_cli_command = f"optimum-cli export onnx --model {self.model_repo_path} --task {self.task} --monolith --framework pt {model_dir}"
+
+        cli_output = subprocess.run(opt_cli_command.split(' '), capture_output=True)
+        if cli_output.returncode != 0:
+            raise RuntimeError(f"Failed to run `optimum-cli`:\n{cli_output.stderr.decode()}")
+
+    def construct_model(self):
+        model_dir = str(Path(self.model).parent)
+
+        def find_models(model_dir):
+            found_models = []
+            for root, _, files in os.walk(model_dir):
+                for name in files:
+                    if name[-5:] == ".onnx":
+                        found_models.append(os.path.abspath(os.path.join(root, name)))
+            return found_models
+
+        found_models = find_models(model_dir)
+
+        if len(found_models) == 0:
+            self.export_model()
+            found_models = find_models(model_dir)
+        if len(found_models) == 1:
+            self.model = found_models[0]
+            return
+        if len(found_models) > 1:
+            print(f'Found multiple model.onnx files: {found_models}')
+            print(f'Picking the first model found to use: {found_models[0]}')
+            self.model = found_models[0]
+            return
+        raise OSError(f"No onnx model could be found, downloaded, or extracted to {model_dir}")
 
 
 class OnnxModelZooDownloadableModel(OnnxModelInfo):
@@ -38,7 +85,6 @@ class OnnxModelZooDownloadableModel(OnnxModelInfo):
         self.cache_dir = os.path.join(parent_cache_dir, name)
 
         super().__init__(name, onnx_model_path, opset_version)
-
 
     def unzip_model_archive(self, tar_path):
         model_dir = str(Path(self.model).parent)

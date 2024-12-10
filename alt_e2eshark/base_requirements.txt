@@ -11,4 +11,5 @@ sentencepiece
 accelerate
 auto-gptq
 optimum
+sentence_transformers
 azure-storage-blob

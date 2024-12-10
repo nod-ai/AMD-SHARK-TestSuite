@@ -138,7 +138,7 @@ class TestTensors:
         if len(data) > 0:
             self.type = type(self.data[0])
         if not all([type(d) == self.type for d in data]):
-            self.type == None
+            self.type = None
 
     def __repr__(self):
         return f"TestTensors({self.type}): {self.data.__repr__()}"

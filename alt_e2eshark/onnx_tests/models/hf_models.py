@@ -7,11 +7,12 @@
 import requests
 
 from pathlib import Path
+
 from ..helper_classes import HfDownloadableModel
 from e2e_testing.registry import register_test
 from e2e_testing.storage import TestTensors, load_test_txt_file
 
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, BartTokenizer, BertTokenizer, RobertaTokenizer
 from torchvision import transforms
 from PIL import Image
 
@@ -78,15 +79,73 @@ meta_constructor_cv = lambda m_name: (
     )
 )
 
+# Meta constructor for all multiple choice models.
+meta_constructor_multiple_choice = lambda m_name: (
+    lambda *args, **kwargs: HfModelMultipleChoice(
+        model_repo_map[m_name][0], model_repo_map[m_name][1], *args, **kwargs
+    )
+)
+
 
 class HfModelWithTokenizers(HfDownloadableModel):
     def construct_inputs(self):
         model_dir = str(Path(self.model).parent)
         prompt = ["Deeds will not be less valiant because they are unpraised."]
-        tokenizer = AutoTokenizer.from_pretrained(self.model_repo_path)
-        inputs = tokenizer(prompt, return_tensors="pt").values()
 
-        test_tensors = TestTensors(tuple(inputs))
+        # Bert/Roberta/Bart models require special tokenizers and might not work best
+        # with an AutoTokenizer. Therefore, switch between tokenizers depending
+        # on the model architecture. More branches might be needed for other
+        # architectures that benefit from a specific tokenizer.
+        tokenizer = None
+        if "deberta" in self.name.lower():
+            # Avoid conflicts with tokenizers of "bert" models.
+            pass
+        elif "bart" in self.name.lower():
+            tokenizer = BartTokenizer.from_pretrained(self.model_repo_path, cache_dir=self.cache_dir)
+        elif "roberta" in self.name.lower():
+            tokenizer = RobertaTokenizer.from_pretrained(self.model_repo_path, cache_dir=self.cache_dir)
+        elif "bert" in self.name.lower():
+            tokenizer = BertTokenizer.from_pretrained(self.model_repo_path, cache_dir=self.cache_dir)
+        else:
+            # Exit the branch. For these cases we use AutoTokenizer.
+            pass
+
+        # At this point, tokenized should be false, so a check is redundant.
+        tokenizer = AutoTokenizer.from_pretrained(self.model_repo_path, cache_dir=self.cache_dir)
+
+
+        tokens = tokenizer(prompt, return_tensors="pt")
+        inputs = (*list(tokens.values()),)
+
+        self.input_name_to_shape_map = {k: v.shape for (k, v) in tokens.items()}
+
+        test_tensors = TestTensors(inputs)
+        test_tensors.save_to(model_dir)
+        return test_tensors
+
+class HfModelMultipleChoice(HfDownloadableModel):
+    def construct_inputs(self):
+        model_dir = str(Path(self.model).parent)
+        tokenizer = AutoTokenizer.from_pretrained(self.model_repo_path, cache_dir=self.cache_dir)
+
+        prompt = "France has a bread law, Le Décret Pain, with strict rules on what is allowed in a traditional baguette."
+        candidate1 = "The law does not apply to croissants and brioche."
+        candidate2 = "The law applies to baguettes."
+
+        # For Deberta/Roberta Models, the ONNX export will have a mismatch in the number of inputs.
+        # See https://stackoverflow.com/questions/75948679/deberta-onnx-export-does-not-work-for-token-type-ids.
+        if "deberta" in self.name or "roberta" in self.name:
+            tokenizer.model_input_names = ['input_ids', 'attention_mask']
+
+        tokens = tokenizer([[prompt, candidate1], [prompt, candidate2]], return_tensors="pt", padding=True)
+
+        inputs = (*[
+            input.unsqueeze_(0) for input in tokens.values()
+        ],)
+
+        self.input_name_to_shape_map = {k: v.shape for (k, v) in tokens.items()}
+
+        test_tensors = TestTensors(inputs)
         test_tensors.save_to(model_dir)
         return test_tensors
 
@@ -122,13 +181,15 @@ for t in model_repo_map.keys():
         case (
             "question-answering"
             | "text-generation"
-            | "multiple-choice"
             | "feature-extraction"
             | "fill-mask"
             | "text-classification"
+            | "token-classification"
         ):
             register_test(meta_constructor_tokenizer(t), t)
         case "image-classification" | "object-detection" | "image-segmentation":
             register_test(meta_constructor_cv(t), t)
+        case "multiple-choice":
+            register_test(meta_constructor_multiple_choice(t), t)
         case _:
             register_test(meta_constructor(t), t)

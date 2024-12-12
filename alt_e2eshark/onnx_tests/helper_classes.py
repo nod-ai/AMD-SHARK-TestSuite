@@ -22,6 +22,11 @@ from e2e_testing.onnx_utils import (
     get_sample_inputs_for_onnx_model
 )
 
+try:
+    import optimum.exporters.onnx as opt_onnx
+except ImportError:
+    print("Failed to import ONNX Exporter module from optimum. Please install through `pip install optimum[exporters]`.")
+
 """This file contains several helpful child classes of OnnxModelInfo."""
 
 
@@ -32,16 +37,25 @@ class HfDownloadableModel(OnnxModelInfo):
         opset_version = 21
         self.model_repo_path = full_model_path.replace("hf_", "")
         self.task = task_name
+        parent_cache_dir = os.getenv("CACHE_DIR")
+        if not parent_cache_dir:
+            raise RuntimeError(
+                "Please specify a cache directory path in the CACHE_DIR environment variable for storing large model files."
+            )
+        self.cache_dir = os.path.join(parent_cache_dir, name)
         super().__init__(name, onnx_model_path, opset_version)
 
     def export_model(self):
         model_dir = str(Path(self.model).parent)
-        # TODO: Use Python API instead of CLI?
-        opt_cli_command = f"optimum-cli export onnx --model {self.model_repo_path} --task {self.task} --monolith --framework pt {model_dir}"
-
-        cli_output = subprocess.run(opt_cli_command.split(' '), capture_output=True)
-        if cli_output.returncode != 0:
-            raise RuntimeError(f"Failed to run `optimum-cli`:\n{cli_output.stderr.decode()}")
+        opt_onnx.main_export(
+            self.model_repo_path,
+            output=model_dir,
+            task=self.task,
+            cache_dir=self.cache_dir,
+            local_files_only=False,
+            monolith=True,
+            framework="pt",
+        )
 
     def construct_model(self):
         model_dir = str(Path(self.model).parent)

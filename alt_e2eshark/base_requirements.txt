@@ -14,7 +14,6 @@ optimum
 sentence_transformers
 azure-storage-blob
 compressed_tensors
-custom_st
 fugashi
 tensorflow
 timm

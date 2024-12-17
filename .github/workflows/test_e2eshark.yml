@@ -223,7 +223,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: linux_x86_64_release_packages
-          github-token: ${{ secrets.IREE_ARTIFACTS }} # token with actions:read permissions on target repo
+          github-token: ${{ github.token }} # token with actions:read permissions on target repo
           repository: iree-org/iree
           path: test-suite
           run-id: ${{ github.event.inputs.iree-run-id }}

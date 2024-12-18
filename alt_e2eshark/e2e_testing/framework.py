@@ -8,7 +8,7 @@ import torch
 import abc
 import os
 from pathlib import Path
-from typing import Union, TypeVar, Tuple, NamedTuple, Dict, Optional, Callable
+from typing import Union, TypeVar, Tuple, NamedTuple, Dict, Optional, Callable, List
 from e2e_testing.storage import TestTensors
 from e2e_testing.onnx_utils import *
 
@@ -16,6 +16,31 @@ from e2e_testing.onnx_utils import *
 
 Module = TypeVar("Module")
 
+class ImporterOptions(NamedTuple):
+    opset_version : Optional[int] = None
+    large_model : bool = False
+    externalize_params : bool = False
+    externalize_inputs_threshold : Optional[int] = None
+    num_elements_threshold: int = 100
+    params_scope : str = "model"
+    param_gb_threshold : Optional[float] = None
+
+class CompilerOptions(NamedTuple):
+    """Specify, for specific iree-hal-target-backends, a tuple of extra compiler flags. 
+       Also allows backend-agnostic options to be included."""
+    backend_specific_flags : Dict[str, Tuple[str]] = dict()
+    common_extra_args : Tuple[str] = tuple()
+
+class RuntimeOptions(NamedTuple):
+    """Specify, for specific iree-hal-target-backends, a tuple of extra runtime flags.
+       Also allows backend-agnostic options to be included."""
+    backend_specific_flags : Dict[str, Tuple[str]] = dict()
+    common_extra_args : Tuple[str] = tuple()
+
+class ExtraOptions(NamedTuple):
+    import_model_options : ImporterOptions = ImporterOptions()
+    compilation_options : CompilerOptions = CompilerOptions()
+    compiled_inference_options : RuntimeOptions = RuntimeOptions()
 
 class OnnxModelInfo:
     """Stores information about an onnx test: the filepath to model.onnx, how to construct/download it, and how to construct sample inputs for a test run."""
@@ -29,16 +54,21 @@ class OnnxModelInfo:
         self.name = name
         self.model = os.path.join(onnx_model_path, "model.onnx")
         self.opset_version = opset_version
-        self.sess_options = ort.SessionOptions()
+
         self.dim_param_dict = None
+        self.update_dim_param_dict()
         self.input_name_to_shape_map = None
+        self.update_input_name_to_shape_map()
+        self.sess_options = ort.SessionOptions()
+        self.update_sess_options()
+        self.extra_options = ExtraOptions()
+        self.update_extra_options()
 
     def forward(self, input: Optional[TestTensors] = None) -> TestTensors:
         """Applies self.model to self.input. Only override if necessary for specific models"""
         input = input.to_numpy().data
         if not os.path.exists(self.model):
             self.construct_model()
-        self.update_sess_options()
         session = ort.InferenceSession(self.model, self.sess_options)
         session_inputs = session.get_inputs()
         session_outputs = session.get_outputs()
@@ -50,6 +80,16 @@ class OnnxModelInfo:
 
         return TestTensors(model_output)
 
+    def update_dim_param_dict(self):
+        """Can be overridden to modify a dictionary of dim parameters (self.dim_param_dict) used to 
+        construct inputs for a model with dynamic dims.
+        """
+        pass
+
+    def update_input_name_to_shape_map(self):
+        """Can be overriden to construct an assocation map between the name of the input nodes and their shapes."""
+        pass
+
     def update_sess_options(self):
         """Can be overridden to modify session options (self.sess_options) for gold inference.
         It is sometimes useful to disable all optimizations, which can be done with:
@@ -57,14 +97,8 @@ class OnnxModelInfo:
         """
         pass
 
-    def update_dim_param_dict(self):
-        """Can be overridden to modify a dictionary of dim parameters (self.dim_param_dict) used to 
-        construct inputs for a model with dynamic dims.
-        """
-        pass
-
-    def contruct_input_name_to_shape_map(self):
-        """Can be overriden to construct an assocation map between the name of the input nodes and their shapes."""
+    def update_extra_options(self):
+        """Can be overridden to set self.extra_options = ExtraOptions(**kwargs)"""
         pass
 
     def construct_model(self):
@@ -151,7 +185,7 @@ CompiledOutput = Union[CompiledArtifact, ort.InferenceSession]
 class TestConfig(abc.ABC):
 
     @abc.abstractmethod
-    def import_model(self, program: TestModel, *, save_to: str) -> Tuple[ModelArtifact, str | None]:
+    def import_model(self, program: TestModel, *, save_to: str, extra_options : ImporterOptions) -> Tuple[ModelArtifact, str | None]:
         """imports the test model to model artifact (e.g., loads the onnx model )"""
         pass
 
@@ -161,16 +195,16 @@ class TestConfig(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def compile(self, module: ModelArtifact, *, save_to: str) -> CompiledOutput:
+    def compile(self, module: ModelArtifact, *, save_to: str, extra_options : CompilerOptions) -> CompiledOutput:
         """converts the test program to a compiled artifact"""
         pass
 
     @abc.abstractmethod
-    def run(self, artifact: CompiledOutput, input: TestTensors) -> TestTensors:
+    def run(self, artifact: CompiledOutput, input: TestTensors, extra_options : RuntimeOptions) -> TestTensors:
         """runs the input through the compiled artifact"""
         pass
 
-    def benchmark(self, artifact: CompiledOutput, input: TestTensors, repetitions: int, *, func_name=None) -> float:
+    def benchmark(self, artifact: CompiledOutput, input: TestTensors, repetitions: int, *, func_name=None, extra_options : RuntimeOptions) -> float:
         """returns a float representing inference time in ms"""
         pass
 

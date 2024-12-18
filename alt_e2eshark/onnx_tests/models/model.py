@@ -12,3 +12,4 @@ from .vision_models import *
 from .deeplab import *
 from .migraphx import *
 from .nlp import *
+from .flux import *

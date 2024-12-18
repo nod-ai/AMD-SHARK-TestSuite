@@ -171,20 +171,14 @@ class TestTensors:
         """returns a copy of self with a converted dtype (at a particular index, if specified)"""
         if self.type == numpy.ndarray:
             if index:
-                try:
-                    new_data = self.data
-                    new_data[index] = new_data[index].astype(dtype)
-                except Exception as e:
-                    print("to_dtype failed due to excepton {e}.")
+                new_data = self.data
+                new_data[index] = new_data[index].astype(dtype)
             else:
                 new_data = tuple([d.astype(dtype) for d in self.data])
         if self.type == torch.Tensor:
             if index:
-                try:
-                    new_data = self.data
-                    new_data[index] = new_data[index].to(dtype=dtype)
-                except Exception as e:
-                    print("to_dtype failed due to excepton {e}.")
+                new_data = self.data
+                new_data[index] = new_data[index].to(dtype=dtype)
             else:
                 new_data = tuple([d.to(dtype=dtype) for d in self.data])
         return TestTensors(new_data)

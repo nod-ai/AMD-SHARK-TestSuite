@@ -8,7 +8,7 @@ from torch_mlir.extras import onnx_importer
 from torch_mlir.dialects import torch as torch_d
 from torch_mlir.ir import Context
 from e2e_testing.backends import BackendBase
-from e2e_testing.framework import TestConfig, OnnxModelInfo, Module, CompiledArtifact
+from e2e_testing.framework import TestConfig, OnnxModelInfo, Module, CompiledArtifact, ImporterOptions, CompilerOptions, RuntimeOptions
 from e2e_testing.storage import TestTensors
 from torch_mlir.passmanager import PassManager
 from typing import Tuple, Any
@@ -45,7 +45,7 @@ class OnnxEpTestConfig(TestConfig):
         self.log_dir = log_dir
         self.backend = backend
 
-    def import_model(self, model_info: OnnxModelInfo, *, save_to: str = None) -> Tuple[onnx.ModelProto, None]:
+    def import_model(self, model_info: OnnxModelInfo, *, save_to: str = None, extra_options : ImporterOptions) -> Tuple[onnx.ModelProto, None]:
         model = onnx.load(model_info.model)
         if model_info.opset_version:
             model = onnx.version_converter.convert_version(
@@ -60,13 +60,15 @@ class OnnxEpTestConfig(TestConfig):
             onnx.save(shaped_model, save_to + "inferred_model.onnx")
         return shaped_model
 
-    def compile(self, model: onnx.ModelProto, *, save_to: str = None) -> InferenceSession:
-        return self.backend.compile(model, save_to=save_to)
+    def compile(self, model: onnx.ModelProto, *, save_to: str = None, extra_options : CompilerOptions) -> InferenceSession:
+        return self.backend.compile(model, save_to=save_to, extra_options=extra_options)
 
-    def run(self, session: InferenceSession, inputs: TestTensors, *, func_name=None) -> TestTensors:
-        func = self.backend.load(session)
+    def run(self, session: InferenceSession, inputs: TestTensors, *, func_name=None, extra_options : RuntimeOptions) -> TestTensors:
+        func = self.backend.load(session, extra_options=extra_options)
         return func(inputs)
-
+    
+    def benchmark(self, artifact, input, repetitions, *, func_name=None, extra_options):
+        raise NotImplementedError("benchmarking not yet supported for EP config.")
 
 class OnnxTestConfig(TestConfig):
     '''This is the basic testing configuration for onnx models. This should be initialized with a specific backend, and uses torch-mlir to import the onnx model to torch-onnx MLIR, and apply torch-mlir pre-proccessing passes if desired.'''
@@ -81,7 +83,7 @@ class OnnxTestConfig(TestConfig):
         else:
             self.pass_pipeline = None
 
-    def import_model(self, model_info: OnnxModelInfo, *, save_to: str = None) -> Tuple[Module, str]:
+    def import_model(self, model_info: OnnxModelInfo, *, save_to: str = None, extra_options : ImporterOptions) -> Tuple[Module, str]:
         model = onnx.load(model_info.model)
         if model_info.opset_version:
             model = onnx.version_converter.convert_version(
@@ -124,12 +126,15 @@ class OnnxTestConfig(TestConfig):
                     f.write(str(mlir_module))
         return mlir_module
 
-    def compile(self, mlir_module: Module, *, save_to: str = None) -> CompiledArtifact:
-        return self.backend.compile(mlir_module, save_to=save_to)
+    def compile(self, mlir_module: Module, *, save_to: str = None, extra_options : CompilerOptions) -> CompiledArtifact:
+        return self.backend.compile(mlir_module, save_to=save_to, extra_options=extra_options)
 
-    def run(self, artifact: CompiledArtifact, inputs: TestTensors, *, func_name="main") -> TestTensors:
-        func = self.backend.load(artifact, func_name=func_name)
+    def run(self, artifact: CompiledArtifact, inputs: TestTensors, *, func_name="main", extra_options : RuntimeOptions) -> TestTensors:
+        func = self.backend.load(artifact, func_name=func_name, extra_options=extra_options)
         return func(inputs)
+    
+    def benchmark(self, artifact, input, repetitions, *, func_name=None, extra_options):
+        raise NotImplementedError("benchmarking not yet supported for OnnxTestConfig")
 
 class CLOnnxTestConfig(TestConfig):
     '''This is parallel to OnnxTestConfig, but uses command-line scripts for each stage.'''
@@ -145,7 +150,7 @@ class CLOnnxTestConfig(TestConfig):
         else:
             self.pass_pipeline = None
     
-    def import_model(self, program: OnnxModelInfo, *, save_to: str) -> Tuple[str, str]:
+    def import_model(self, program: OnnxModelInfo, *, save_to: str, extra_options : ImporterOptions) -> Tuple[str, str]:
         if not save_to:
             raise ValueError("CLOnnxTestConfig requires saving artifacts")
         # setup a detail subdirectory
@@ -157,10 +162,15 @@ class CLOnnxTestConfig(TestConfig):
         detail_log = os.path.join(save_to, "detail", "import_model.detail.log")
         commands_log = os.path.join(save_to, "commands", "import_model.commands.log")
         # get a command line script
-        script = "python -m torch_mlir.tools.import_onnx "
+        script = "python -m iree.compiler.tools.import_onnx "
         script += str(program.model)
-        if program.opset_version:
-            script += f" --opset-version={program.opset_version}"
+        for key, value in extra_options._asdict().items():
+            if key == "large_model":
+                script+= f' --large-model' if value else ""
+            elif key == "externalize_params":
+                script+= f' --externalize-params' if value else ""
+            elif value is not None:
+                script += f' --{key.replace("_","-")}={value}'
         script += " -o "
         script = script + mlir_file
         script += f" 1> {detail_log} 2>&1"
@@ -222,15 +232,15 @@ class CLOnnxTestConfig(TestConfig):
             raise FileNotFoundError(error_msg)
         return linalg_ir
 
-    def compile(self, mlir_module: str, *, save_to: str = None) -> str:
-        return self.backend.compile(mlir_module, save_to=save_to)
+    def compile(self, mlir_module: str, *, save_to: str = None, extra_options : CompilerOptions) -> str:
+        return self.backend.compile(mlir_module, save_to=save_to, extra_options=extra_options)
 
-    def run(self, artifact: str, inputs: TestTensors, *, func_name=None) -> TestTensors:
+    def run(self, artifact: str, inputs: TestTensors, *, func_name=None, extra_options : RuntimeOptions) -> TestTensors:
         run_dir = Path(artifact).parent
         test_name = run_dir.name
         detail_log = run_dir.joinpath("detail", "compiled_inference.detail.log")
         commands_log = run_dir.joinpath("commands", "compiled_inference.commands.log")
-        func = self.backend.load(artifact, func_name=func_name)
+        func = self.backend.load(artifact, func_name=func_name, extra_options=extra_options)
         script = func(inputs)
         num_outputs = len(self.tensor_info_dict[test_name][0])
         output_files = []
@@ -252,14 +262,14 @@ class CLOnnxTestConfig(TestConfig):
                 raise FileNotFoundError(error_msg)
         return TestTensors.load_from(self.tensor_info_dict[test_name][0], self.tensor_info_dict[test_name][1], run_dir, "output")
 
-    def benchmark(self, artifact: str, inputs: TestTensors, repetitions: int = 5, *, func_name=None) -> float:
+    def benchmark(self, artifact: str, inputs: TestTensors, repetitions: int = 5, *, func_name=None, extra_options=None) -> float:
         run_dir = Path(artifact).parent
         detail_log = run_dir.joinpath("detail", "benchmark.detail.log")
         commands_log = run_dir.joinpath("commands", "benchmark.commands.log")
         report_json = run_dir.joinpath("detail", "benchmark.json")
-        func = self.backend.load(artifact,func_name=func_name)
+        func = self.backend.load(artifact,func_name=func_name, extra_options=extra_options)
         script = func(inputs)
-        benchmark_script = "iree-benchmark-module " + script[15:]
+        benchmark_script = "iree-benchmark-module " + script[15:] # removes "iree-run-module "
         benchmark_script += f" --benchmark_repetitions={repetitions} --device_allocator=caching --benchmark_out='{report_json}' --benchmark_out_format=json 1> {detail_log} 2>&1"
         with open(commands_log, "w") as file:
             file.write(benchmark_script)

@@ -97,7 +97,8 @@ class OnnxModelZooDownloadableModel(OnnxModelInfo):
         self.is_validated = is_validated
         self.model_url = model_url
         self.cache_dir = os.path.join(parent_cache_dir, name)
-
+        if not os.path.exists(self.cache_dir):
+            os.mkdir(self.cache_dir)
         super().__init__(name, onnx_model_path, opset_version)
 
     def unzip_model_archive(self, tar_path):
@@ -121,10 +122,13 @@ class OnnxModelZooDownloadableModel(OnnxModelInfo):
 
         shutil.copy(os.path.join(self.cache_dir, "model.onnx"), str(Path(self.model).parent))
 
-    def contruct_input_name_to_shape_map(self):
+    def update_input_name_to_shape_map(self):
         turnkey_dict = {}
         self.input_name_to_shape_map = {}
-        with open(os.path.join(self.cache_dir, 'turnkey_stats.yaml'), 'rb') as stream:
+        yaml_path = os.path.join(self.cache_dir, 'turnkey_stats.yaml')
+        if not os.path.isfile(yaml_path):
+            self.download_model_yaml(self.model_url)
+        with open(yaml_path, 'rb') as stream:
             turnkey_dict = yaml.safe_load(stream)
         if 'onnx_input_dimensions' in turnkey_dict.keys():
             for dim_param in turnkey_dict['onnx_input_dimensions']:
@@ -139,7 +143,7 @@ class OnnxModelZooDownloadableModel(OnnxModelInfo):
         if os.path.exists(input_path):
             return self.load_inputs(str(Path(self.model).parent))
 
-        self.contruct_input_name_to_shape_map()
+        self.update_input_name_to_shape_map()
         return get_sample_inputs_for_onnx_model(self.model, self.dim_param_dict, self.input_name_to_shape_map)
 
     def construct_model(self):
@@ -252,14 +256,13 @@ class AzureDownloadableModel(OnnxModelInfo):
 
 class SiblingModel(OnnxModelInfo):
     """convenience class for re-using an onnx model from another 'sibling' test"""
-
-    def __init__(self, og_model_info_class: type, og_name: str, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, og_model_info_class: type, og_name: str, name, onnx_model_path, opset_version = None):
         # additionally store an instance of the sibling test
-        run_dir = Path(self.model).parents[1]
+        run_dir = Path(onnx_model_path).parent
         og_model_path = os.path.join(run_dir, og_name)
         self.sibling_inst = og_model_info_class(og_name, og_model_path)
         self.opset_version = self.sibling_inst.opset_version
+        super().__init__(name, onnx_model_path, opset_version)
 
     def construct_model(self):
         if not os.path.exists(self.sibling_inst.model):

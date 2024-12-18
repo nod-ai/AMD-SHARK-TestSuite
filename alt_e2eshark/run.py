@@ -187,6 +187,7 @@ def run_tests(
                 notify_stage()
                 # build an instance of the test info class
                 inst = t.model_constructor(t.unique_name, log_dir)
+                options = inst.extra_options
                 # this is highly onnx specific. 
                 # TODO: Figure out how to factor this out of run.py
                 if not os.path.exists(inst.model):
@@ -202,7 +203,7 @@ def run_tests(
             if curr_stage in stages:
                 notify_stage()
                 model_artifact, func_name = config.import_model(
-                    inst, save_to=artifact_save_to
+                    inst, save_to=artifact_save_to, extra_options=options.import_model_options
                 )
 
             # apply config-specific preprocessing to the ModelArtifact
@@ -217,7 +218,7 @@ def run_tests(
             curr_stage = "compilation"
             if curr_stage in stages:
                 notify_stage()
-                compiled_artifact = config.compile(model_artifact, save_to=artifact_save_to)
+                compiled_artifact = config.compile(model_artifact, save_to=artifact_save_to, extra_options=options.compilation_options)
 
             # get inputs from inst
             curr_stage = "construct_inputs"
@@ -244,7 +245,7 @@ def run_tests(
             curr_stage = "compiled_inference"
             if curr_stage in stages:
                 notify_stage()
-                outputs_raw = config.run(compiled_artifact, inputs, func_name=func_name)
+                outputs_raw = config.run(compiled_artifact, inputs, func_name=func_name, extra_options=options.compiled_inference_options)
                 outputs_raw.save_to(log_dir + "output")
 
             # apply model-specific post-processing:
@@ -268,7 +269,7 @@ def run_tests(
             notify_stage()
             # TODO: make repetitions configurable from a command line arg
             try:
-                mean_time_ms = config.benchmark(compiled_artifact, inputs, repetitions=3, func_name=func_name)
+                mean_time_ms = config.benchmark(compiled_artifact, inputs, repetitions=3, func_name=func_name, extra_options=options.compiled_inference_options)
             except Exception as e:
                 # don't exit test because of a benchmarking failure
                 mean_time_ms = "ERROR"

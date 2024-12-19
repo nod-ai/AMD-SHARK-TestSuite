@@ -77,7 +77,6 @@ jobs:
         run: |
           source ${VENV_DIR}/bin/activate
           python3 iree_tests/download_remote_files.py --root-dir iree_tests/pytorch/models
-          python3 iree_tests/download_remote_files.py --root-dir iree_tests/sharktank
 
       - name: "Running real weight model tests"
         if: "matrix.models-config-file != '' && !cancelled()"
@@ -85,7 +84,6 @@ jobs:
           source ${VENV_DIR}/bin/activate
           pytest \
             iree_tests/pytorch/models \
-            iree_tests/sharktank \
             -n 4 \
             -rA \
             -k real_weights \

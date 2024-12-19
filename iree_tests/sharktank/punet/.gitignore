@@ -1,4 +1,0 @@
-# Model source files are downloaded from
-# https://huggingface.co/amd-shark/sdxl-quant-models, not stored in Git LFS.
-*.mlirbc
-*.mlir

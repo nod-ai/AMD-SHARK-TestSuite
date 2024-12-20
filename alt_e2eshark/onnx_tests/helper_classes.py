@@ -3,12 +3,11 @@
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-import os
+
 import requests
 import tarfile
 import shutil
 import yaml
-import subprocess
 import onnx
 import onnxruntime
 
@@ -22,8 +21,18 @@ from e2e_testing.onnx_utils import (
     get_sample_inputs_for_onnx_model
 )
 
+# Checking if CACHE_DIR is set here will allow us to redefine
+# HF_HOME and HUGGINGFACE_HUB_CACHE without requiring them to
+# be set at shell level.
+import os
+parent_cache_dir = os.getenv("CACHE_DIR")
+
+os.environ['HF_HOME'] = "" if parent_cache_dir is None else parent_cache_dir
+os.environ['HUGGINGFACE_HUB_CACHE'] = "" if parent_cache_dir is None else parent_cache_dir
+
+
 try:
-    import optimum.exporters.onnx as opt_onnx
+    import optimum.exporters.onnx as exporter
 except ImportError:
     print("Failed to import ONNX Exporter module from optimum. Please install through `pip install optimum[exporters]`.")
 
@@ -42,12 +51,15 @@ class HfDownloadableModel(OnnxModelInfo):
             raise RuntimeError(
                 "Please specify a cache directory path in the CACHE_DIR environment variable for storing large model files."
             )
-        self.cache_dir = os.path.join(parent_cache_dir, name)
+        # Appending the test name just adds one redundant level of nesting to the cache dir.
+        # Use the value of the CACHE_DIR directly, the segregation of distinct models should
+        # be handled by Huggingface itself.
+        self.cache_dir = parent_cache_dir
         super().__init__(name, onnx_model_path, opset_version)
 
     def export_model(self):
         model_dir = str(Path(self.model).parent)
-        opt_onnx.main_export(
+        exporter.main_export(
             self.model_repo_path,
             output=model_dir,
             task=self.task,

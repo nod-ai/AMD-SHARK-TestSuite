@@ -1,0 +1,6 @@
+optimum[exporters]
+compressed_tensors
+sentence_transformers
+fugashi
+timm
+unidic-lite

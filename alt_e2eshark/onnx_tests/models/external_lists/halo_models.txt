@@ -1,0 +1,3 @@
+flux_1_dev_transformer
+flux_1_dev_clip
+flux_1_dev_t5

@@ -14,7 +14,7 @@ import onnxruntime
 from onnx.helper import make_node, make_graph, make_model
 from pathlib import Path
 from e2e_testing import azutils
-from e2e_testing.framework import OnnxModelInfo, TestTensors
+from e2e_testing.framework import ExtraOptions, ImporterOptions, OnnxModelInfo, TestTensors
 from e2e_testing.onnx_utils import (
     modify_model_output,
     find_node,
@@ -112,6 +112,10 @@ class OnnxModelZooDownloadableModel(OnnxModelInfo):
         if not os.path.exists(self.cache_dir):
             os.mkdir(self.cache_dir)
         super().__init__(name, onnx_model_path, opset_version)
+
+    def update_extra_options(self):
+        # Default to using opset version 21 for all ONNX Model Zoo models.
+        self.extra_options = ExtraOptions(import_model_options=ImporterOptions(opset_version=21))
 
     def unzip_model_archive(self, tar_path):
         model_dir = str(Path(self.model).parent)
@@ -228,6 +232,10 @@ class AzureDownloadableModel(OnnxModelInfo):
             raise RuntimeError("Please specify a cache directory path in the CACHE_DIR environment variable for storing large model files.")
         self.cache_dir = os.path.join(parent_cache_dir, name)
         super().__init__(name, onnx_model_path, opset_version)
+
+    def update_extra_options(self):
+        # Default to using opset version 21 for all Azure models.
+        self.extra_options = ExtraOptions(import_model_options=ImporterOptions(opset_version=21))
 
     def update_sess_options(self):
         self.sess_options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL

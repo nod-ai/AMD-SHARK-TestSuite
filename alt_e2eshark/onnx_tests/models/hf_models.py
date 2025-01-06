@@ -154,7 +154,6 @@ meta_constructor_multiple_choice = lambda m_name: (
 
 class HfModelWithTokenizers(HfDownloadableModel):
     def construct_inputs(self):
-        model_dir = str(Path(self.model).parent)
         prompt = ["Deeds will not be less valiant because they are unpraised."]
 
         tokenizer = get_tokenizer_from_model_path(self.model_repo_path, self.cache_dir)
@@ -167,12 +166,10 @@ class HfModelWithTokenizers(HfDownloadableModel):
         self.input_name_to_shape_map = {k: v.shape for (k, v) in tokens.items()}
 
         test_tensors = TestTensors(inputs)
-        test_tensors.save_to(model_dir)
         return test_tensors
 
 class HfModelMultipleChoice(HfDownloadableModel):
     def construct_inputs(self):
-        model_dir = str(Path(self.model).parent)
         tokenizer = get_tokenizer_from_model_path(self.model_repo_path, self.cache_dir)
 
         prompt = "France has a bread law, Le Décret Pain, with strict rules on what is allowed in a traditional baguette."
@@ -193,7 +190,6 @@ class HfModelMultipleChoice(HfDownloadableModel):
         self.input_name_to_shape_map = {k: v.shape for (k, v) in tokens.items()}
 
         test_tensors = TestTensors(inputs)
-        test_tensors.save_to(model_dir)
         return test_tensors
 
 
@@ -216,7 +212,6 @@ class HfModelWithImageSetup(HfDownloadableModel):
             img_ycbcr.unsqueeze_(0)
             return img_ycbcr
 
-        model_dir = str(Path(self.model).parent)
         inputs = setup_test_image()
 
         # TODO: Figure out a way to remove the hardcoded
@@ -225,7 +220,6 @@ class HfModelWithImageSetup(HfDownloadableModel):
         self.input_name_to_shape_map = {'pixel_values': inputs.shape}
 
         test_tensors = TestTensors((inputs,))
-        test_tensors.save_to(model_dir)
         return test_tensors
 
 

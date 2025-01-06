@@ -183,14 +183,15 @@ class TestTensors:
                 new_data = tuple([d.to(dtype=dtype) for d in self.data])
         return TestTensors(new_data)
 
-    def save_to(self, path: str):
-        """path should be of the form /path/to/log/folder/unformattedname"""
+    def save_to(self, path: str, *, base_stem: str = "input"):
+        """path should be to test-run/<test-name>/ (default) or run-directory/<test-name>/ if modified"""
         if self.type == torch.Tensor:
             data = self.data
         else:
             data = self.to_torch().data
         for i in range(len(data)):
-            write_inference_input_bin_file(data[i], path + f".{i}.bin")
+            file_path = Path(path) / f"{base_stem}.{i}.bin"
+            write_inference_input_bin_file(data[i], str(file_path))
 
     @staticmethod
     def load_from(shapes, torch_dtypes, dir_path: str, name: str = "input"):

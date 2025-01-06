@@ -228,7 +228,7 @@ def run_tests(
                     inputs = inst.load_inputs(log_dir)
                 else:
                     inputs = inst.construct_inputs()
-                    inputs.save_to(log_dir + "input")
+                    inputs.save_to(log_dir)
 
             # run native inference
             curr_stage = "native_inference"
@@ -239,14 +239,14 @@ def run_tests(
                 # these shapes are needed to load the outputs from iree-run-module
                 if isinstance(config, CLOnnxTestConfig):
                     config.tensor_info_dict[t.unique_name] = ([list(d.shape) for d in golden_outputs_raw.data], [d.dtype for d in golden_outputs_raw.to_torch().data])
-                golden_outputs_raw.save_to(log_dir + "golden_output")
+                golden_outputs_raw.save_to(log_dir, base_stem="golden_output")
 
             # run inference with the compiled module
             curr_stage = "compiled_inference"
             if curr_stage in stages:
                 notify_stage()
                 outputs_raw = config.run(compiled_artifact, inputs, func_name=func_name, extra_options=options.compiled_inference_options)
-                outputs_raw.save_to(log_dir + "output")
+                outputs_raw.save_to(log_dir, base_stem="output")
 
             # apply model-specific post-processing:
             curr_stage = "postprocessing"

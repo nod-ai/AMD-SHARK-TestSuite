@@ -13,3 +13,4 @@ from .deeplab import *
 from .migraphx import *
 from .nlp import *
 from .flux import *
+from .llama import *

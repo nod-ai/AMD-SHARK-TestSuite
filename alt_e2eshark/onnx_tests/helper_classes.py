@@ -128,7 +128,8 @@ class OnnxModelZooDownloadableModel(OnnxModelInfo):
         self.model_url = model_url
         self.cache_dir = os.path.join(parent_cache_dir, name)
         os.makedirs(self.cache_dir, exist_ok=True)
-        self.yaml_path = self.get_model_yaml()
+        # Validated models do not need a YAML file, we get the inputs directly.
+        self.yaml_path = self.get_model_yaml() if not is_validated else None
         # super().__init__ will also call all update methods
         super().__init__(name, onnx_model_path, opset_version)
 
@@ -163,9 +164,8 @@ class OnnxModelZooDownloadableModel(OnnxModelInfo):
             return
         turnkey_dict = dict()
         self.input_name_to_shape_map = dict()
-        if self.yaml_path:
-            with open(self.yaml_path, "rb") as stream:
-                turnkey_dict = yaml.safe_load(stream)
+        with open(self.yaml_path, "rb") as stream:
+            turnkey_dict = yaml.safe_load(stream)
         if "onnx_input_dimensions" in turnkey_dict.keys():
             for dim_param in turnkey_dict["onnx_input_dimensions"]:
                 self.input_name_to_shape_map[dim_param] = turnkey_dict[

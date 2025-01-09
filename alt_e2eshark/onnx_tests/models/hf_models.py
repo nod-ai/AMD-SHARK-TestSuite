@@ -12,7 +12,15 @@ from ..helper_classes import HfDownloadableModel
 from e2e_testing.registry import register_test
 from e2e_testing.storage import TestTensors, load_test_txt_file
 
-from transformers import AutoTokenizer, BartTokenizer, BertTokenizer, PhobertTokenizer, RobertaTokenizer, XLMRobertaTokenizer
+from transformers import (
+        AutoTokenizer,
+        BartTokenizer,
+        BertTokenizer,
+        PhobertTokenizer,
+        RobertaTokenizer,
+        XLMRobertaTokenizer
+)
+
 from torchvision import transforms
 from PIL import Image
 
@@ -75,7 +83,12 @@ update_tokenizer_input_names = [
     "hf_phobert-base-v2",
     "hf_phobert-base",
     "hf_bertweet-base",
+    "hf_distilbert-base-uncased-finetuned-sst-2-english",
+    "hf_checkpoints_1_16",
 ]
+
+# Add a basic_opt list to apply O1 to the models.
+basic_opt = []
 
 def get_tokenizer_from_model_path(model_repo_path: str, cache_dir: str | Path):
     name = model_repo_path.split('/')[-1]
@@ -153,6 +166,11 @@ meta_constructor_multiple_choice = lambda m_name: (
 
 
 class HfModelWithTokenizers(HfDownloadableModel):
+    def export_model(self, optim_level: str | None = None):
+        # We won't need optim_level.
+        del optim_level
+        super().export_model("O1" if self.name in basic_opt else None)
+
     def construct_inputs(self):
         prompt = ["Deeds will not be less valiant because they are unpraised."]
 
@@ -169,6 +187,11 @@ class HfModelWithTokenizers(HfDownloadableModel):
         return test_tensors
 
 class HfModelMultipleChoice(HfDownloadableModel):
+    def export_model(self, optim_level: str | None = None):
+        # We won't need optim_level.
+        del optim_level
+        super().export_model("O1" if self.name in basic_opt else None)
+
     def construct_inputs(self):
         tokenizer = get_tokenizer_from_model_path(self.model_repo_path, self.cache_dir)
 
@@ -194,6 +217,11 @@ class HfModelMultipleChoice(HfDownloadableModel):
 
 
 class HfModelWithImageSetup(HfDownloadableModel):
+    def export_model(self, optim_level: str | None = None):
+        # We won't need optim_level.
+        del optim_level
+        super().export_model("O1" if self.name in basic_opt else None)
+
     def construct_inputs(self):
         def setup_test_image(height=224, width=224):
             url = "http://images.cocodataset.org/val2017/000000039769.jpg"

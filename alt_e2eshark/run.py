@@ -65,11 +65,11 @@ def get_tests(groups: Literal["all", "combinations", "operators"], test_filter: 
 
     # importing the test generating files will register them to GLOBAL_TEST_LIST
     if combinations:
-        from onnx_tests.combinations import model
+        import onnx_tests.combinations
     if models:
-        from onnx_tests.models import model
+        import onnx_tests.models
     if operators:
-        from onnx_tests.operators import model
+        import onnx_tests.operators
 
     pre_test_list = GLOBAL_TEST_LIST
 
@@ -157,6 +157,7 @@ def run_tests(
     warnings.filterwarnings("ignore")
 
     if verbose:
+        warnings.simplefilter("once", UserWarning)
         print(f"Stages to be run: {stages}")
         print(f'Test list: {[test.unique_name for test in test_list]}')
 
@@ -339,7 +340,7 @@ def _get_argparse():
         help="specifies the target chip (gfx942 for hip)",
     )
     parser.add_argument(
-        "-ica",
+        "-a",
         "--iree-compile-args",
         nargs="*",
         default = None,
@@ -356,8 +357,10 @@ def _get_argparse():
         "-m",
         "--mode",
         choices=["onnx-iree", "cl-onnx-iree", "ort-ep"],
-        default="onnx-iree",
-        help="onnx-iree=onnx->torch-mlir->IREE, ort=onnx->run with custom ORT EP inference session",
+        default="cl-onnx-iree",
+        help="(cl-)onnx-iree : onnx->torch-mlir->IREE, "
+             "cl-onnx-iree runs this through command line tools "
+             "ort : onnx->run with custom ORT EP inference session",
     )
     parser.add_argument(
         "--torchtolinalg",

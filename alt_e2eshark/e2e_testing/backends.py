@@ -4,13 +4,16 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 import abc
-import onnxruntime as ort
-from typing import TypeVar, List
-from e2e_testing.storage import TestTensors, get_shape_string
-from e2e_testing.framework import CompiledOutput, ModelArtifact, CompilerOptions, RuntimeOptions
-from onnx import ModelProto
 import os
 from pathlib import Path
+from typing import TypeVar, List
+
+from onnx import ModelProto
+import onnxruntime as ort
+
+from e2e_testing.framework import CompiledOutput, ModelArtifact, CompilerOptions, RuntimeOptions
+from e2e_testing.logging_utils import run_command_and_log
+from e2e_testing.storage import TestTensors, get_shape_string
 
 Invoker = TypeVar("Invoker")
 
@@ -24,10 +27,6 @@ class BackendBase(abc.ABC):
     @abc.abstractmethod
     def load(self, artifact: CompiledOutput, func_name: str, extra_options : RuntimeOptions) -> Invoker:
         """loads the function with name func_name from compiled artifact. This method should return a function callable from python."""
-
-
-from iree import compiler as ireec
-from iree import runtime as ireert
 
 
 def flag(arg : str) -> str:
@@ -51,6 +50,7 @@ class SimpleIREEBackend(BackendBase):
             ]
 
     def compile(self, module, *, save_to: str = None, extra_options : CompilerOptions):
+        from iree import compiler as ireec
         test_specific_args = list(extra_options.common_extra_args)
         if self.hal_target_backend in extra_options.backend_specific_flags.keys():
             test_specific_args += list(extra_options.backend_specific_flags[self.hal_target_backend])
@@ -68,6 +68,7 @@ class SimpleIREEBackend(BackendBase):
         return b
 
     def load(self, artifact, *, func_name="main", extra_options : RuntimeOptions):
+        from iree import runtime as ireert
         config = ireert.Config(self.device)
         ctx = ireert.SystemContext(config=config)
         vm_module = ireert.VmModule.copy_buffer(ctx.instance, artifact)
@@ -102,25 +103,17 @@ class CLIREEBackend(BackendBase):
             ]
     
     def compile(self, module_path: str, *, save_to : str = None, extra_options : CompilerOptions) -> str:
+        compile_command = ['iree-compile', module_path, f'--iree-hal-target-backends={self.hal_target_backend}']
+        compile_command.extend(self.extra_args)
+        # add test-specific flags
         test_specific_args = list(extra_options.common_extra_args)
         if self.hal_target_backend in extra_options.backend_specific_flags.keys():
             test_specific_args += list(extra_options.backend_specific_flags[self.hal_target_backend])
-        compile_args = self.extra_args + [flag(arg) for arg in test_specific_args]
+        compile_command.extend([flag(arg) for arg in test_specific_args])
+        # set output path
         vmfb_path = os.path.join(save_to, "compiled_model.vmfb")
-        arg_string = f"--iree-hal-target-backends={self.hal_target_backend} "
-        arg_string += ' '.join(compile_args)
-        detail_log = os.path.join(save_to, "detail", "compilation.detail.log")
-        commands_log = os.path.join(save_to, "commands", "compilation.commands.log")
-        script = f"iree-compile {module_path} {arg_string} -o {vmfb_path} 1> {detail_log} 2>&1"
-        with open(commands_log, "w") as file:
-            file.write(script) 
-        # remove old vmfb if it exists
-        Path(vmfb_path).unlink(missing_ok=True)
-        os.system(script)
-        if not os.path.exists(vmfb_path):
-            error_msg = f"failure executing command: \n{script}\n failed to produce a vmfb at {vmfb_path}.\n"
-            error_msg += f"Error detail in '{detail_log}'"
-            raise FileNotFoundError(error_msg)
+        compile_command.extend(['-o', vmfb_path])
+        run_command_and_log(compile_command, save_to, "compilation")
         return vmfb_path
     
     def load(self, vmfb_path: str, *, func_name=None, extra_options : RuntimeOptions):
@@ -129,16 +122,15 @@ class CLIREEBackend(BackendBase):
         if self.hal_target_backend in extra_options.backend_specific_flags.keys():
             test_specific_args += list(extra_options.backend_specific_flags[self.hal_target_backend])
         run_dir = Path(vmfb_path).parent
-        def func(x: TestTensors) -> str:
-            script = f"iree-run-module --module='{vmfb_path}' --device={self.device} "
-            for arg in test_specific_args:
-                script += f'{flag(arg)} '
+        def func(x: TestTensors) -> List[str]:
+            command = ["iree-run-module", f"--module='{vmfb_path}'", f"--device={self.device}"]
+            command.extend([flag(arg) for arg in test_specific_args])
             if func_name:
-                script += f"--function='{func_name}' "
+                command.append(f"--function='{func_name}'")
             torch_inputs = x.to_torch().data
             for index, input in enumerate(torch_inputs):
-                script += f"--input='{get_shape_string(input)}=@{run_dir}/input.{index}.bin' "
-            return script
+                command.append(f"--input='{get_shape_string(input)}=@{run_dir}/input.{index}.bin'")
+            return command
         return func
             
 

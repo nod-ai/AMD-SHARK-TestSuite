@@ -13,12 +13,12 @@ from e2e_testing.registry import register_test
 from e2e_testing.storage import TestTensors, load_test_txt_file
 
 from transformers import (
-        AutoTokenizer,
-        BartTokenizer,
-        BertTokenizer,
-        PhobertTokenizer,
-        RobertaTokenizer,
-        XLMRobertaTokenizer
+    AutoTokenizer,
+    BartTokenizer,
+    BertTokenizer,
+    PhobertTokenizer,
+    RobertaTokenizer,
+    XLMRobertaTokenizer,
 )
 
 from torchvision import transforms
@@ -85,13 +85,70 @@ update_tokenizer_input_names = [
     "hf_bertweet-base",
     "hf_distilbert-base-uncased-finetuned-sst-2-english",
     "hf_checkpoints_1_16",
+    "hf_mdeberta-v3-base-squad2",
+    "hf_Medical-NER",
+    "hf_deberta-v3-base-squad2",
+    "hf_DeBERTa-v3-base-mnli-fever-anli",
+    "hf_Debertalarg_model_multichoice_Version2",
+    "hf_deberta-v3-large-squad2",
+    "hf_output",
+    "hf_piiranha-v1-detect-personal-information",
+    "hf_deberta-v3-base-absa-v1.1",
+    "hf_deberta-large-mnli",
+    "hf_deberta-v3-base-zeroshot-v1.1-all-33",
+    "hf_nli-deberta-v3-base",
+    "hf_deberta-base",
+    "hf_deberta_finetuned_pii",
+    "hf_deberta-v3-large_boolq",
+    "hf_deberta-v3-large",
+    "hf_checkpoints_3_14",
+    "hf_deberta-v3-base_finetuned_ai4privacy_v2",
+    "hf_mxbai-rerank-xsmall-v1",
+    "hf_mDeBERTa-v3-base-mnli-xnli",
+    "hf_mDeBERTa-v3-xnli-ft-bs-multiple-choice",
+    "hf_mxbai-rerank-base-v1",
+    "hf_deberta-v3-base-injection",
+    "hf_content",
+    "hf_deberta-v3-base",
+    "hf_deberta-v3-small",
+    "hf_mdeberta-v3-base",
+    "hf_deberta-v2-base-japanese",
+    "hf_deberta-v2-base-japanese-char-wwm",
+    "hf_deberta-v3-xsmall",
+    "hf_distilbert_distilbert-base-uncased-15-epoch",
+    "hf_distilbert-base-cased-distilled-squad",
+    "hf_multi-qa-MiniLM-L6-cos-v1",
+    "hf_distilbert-base-multilingual-cased-sentiments-student",
+    "hf_distilbert-base-uncased-distilled-squad",
+    "hf_distilbert_multiple_choice",
+    "hf_distilbert-base-uncased",
+    "hf_tiny-distilbert-base-cased-distilled-squad",
+    "hf_keyphrase-extraction-distilbert-inspec",
+    "hf_distilbert-extractive-qa-project",
+    "hf_distilcamembert-base-ner",
+    "hf_msmarco-distilbert-dot-v5",
+    "hf_distilbert-SBD-en-judgements-laws",
+    "hf_camembert-ner",
+    "hf_distilbert-base-nli-stsb-mean-tokens",
+    "hf_msmarco-distilbert-base-v4",
+    "hf_distilbert-base-multilingual-cased-ner-hrl",
+    "hf_distilbert-base-cased-finetuned-conll03-english",
+    "hf_msmarco-distilbert-base-tas-b",
+    "hf_distilbert-NER",
+    "hf_distilbert_science_multiple_choice",
+    "hf_multi-qa-distilbert-cos-v1",
+    "hf_msmarco-distilbert-cos-v5",
+    "hf_distilbert-base-nli-mean-tokens",
+    "hf_distilbert-base-multilingual-cased",
+    "hf_distilbert-base-cased",
 ]
 
 # Add a basic_opt list to apply O1 to the models.
 basic_opt = []
 
+
 def get_tokenizer_from_model_path(model_repo_path: str, cache_dir: str | Path):
-    name = model_repo_path.split('/')[-1]
+    name = model_repo_path.split("/")[-1]
     if "deberta" in name.lower():
         return AutoTokenizer.from_pretrained(model_repo_path, cache_dir=cache_dir)
 
@@ -113,14 +170,15 @@ def get_tokenizer_from_model_path(model_repo_path: str, cache_dir: str | Path):
     return AutoTokenizer.from_pretrained(model_repo_path, cache_dir=cache_dir)
 
 
-
 def build_repo_to_model_map():
     # The elements of the list are 2-tuples,
     # containing the repository path of the model,
     # and its task-type.
     hf_models_list = [
         (
-            load_test_txt_file(lists_dir.joinpath(f"hf-model-paths/hf-{task}-model-list.txt")),
+            load_test_txt_file(
+                lists_dir.joinpath(f"hf-model-paths/hf-{task}-model-list.txt")
+            ),
             task,
         )
         for task in task_list
@@ -176,7 +234,7 @@ class HfModelWithTokenizers(HfDownloadableModel):
 
         tokenizer = get_tokenizer_from_model_path(self.model_repo_path, self.cache_dir)
         if self.name in update_tokenizer_input_names:
-            tokenizer.model_input_names = ['input_ids', 'attention_mask']
+            tokenizer.model_input_names = ["input_ids", "attention_mask"]
 
         tokens = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True)
         inputs = (*list(tokens.values()),)
@@ -185,6 +243,7 @@ class HfModelWithTokenizers(HfDownloadableModel):
 
         test_tensors = TestTensors(inputs)
         return test_tensors
+
 
 class HfModelMultipleChoice(HfDownloadableModel):
     def export_model(self, optim_level: str | None = None):
@@ -201,14 +260,20 @@ class HfModelMultipleChoice(HfDownloadableModel):
 
         # For Deberta/Roberta Models, the ONNX export will have a mismatch in the number of inputs.
         # See https://stackoverflow.com/questions/75948679/deberta-onnx-export-does-not-work-for-token-type-ids.
-        if "deberta" in self.name or "roberta" in self.name or self.name in update_tokenizer_input_names:
-            tokenizer.model_input_names = ['input_ids', 'attention_mask']
+        if (
+            "deberta" in self.name
+            or "roberta" in self.name
+            or self.name in update_tokenizer_input_names
+        ):
+            tokenizer.model_input_names = ["input_ids", "attention_mask"]
 
-        tokens = tokenizer([[prompt, candidate1], [prompt, candidate2]], return_tensors="pt", padding=True)
+        tokens = tokenizer(
+            [[prompt, candidate1], [prompt, candidate2]],
+            return_tensors="pt",
+            padding=True,
+        )
 
-        inputs = (*[
-            input.unsqueeze_(0) for input in tokens.values()
-        ],)
+        inputs = (*[input.unsqueeze_(0) for input in tokens.values()],)
 
         self.input_name_to_shape_map = {k: v.shape for (k, v) in tokens.items()}
 
@@ -245,7 +310,7 @@ class HfModelWithImageSetup(HfDownloadableModel):
         # TODO: Figure out a way to remove the hardcoded
         # input name ('pixel_values') and load from model
         # config/input list.
-        self.input_name_to_shape_map = {'pixel_values': inputs.shape}
+        self.input_name_to_shape_map = {"pixel_values": inputs.shape}
 
         test_tensors = TestTensors((inputs,))
         return test_tensors
@@ -262,7 +327,12 @@ for t in model_repo_map.keys():
             | "token-classification"
         ):
             register_test(meta_constructor_tokenizer(t), t)
-        case "image-classification" | "object-detection" | "image-segmentation" | "semantic-segmentation":
+        case (
+            "image-classification"
+            | "object-detection"
+            | "image-segmentation"
+            | "semantic-segmentation"
+        ):
             register_test(meta_constructor_cv(t), t)
         case "multiple-choice":
             register_test(meta_constructor_multiple_choice(t), t)

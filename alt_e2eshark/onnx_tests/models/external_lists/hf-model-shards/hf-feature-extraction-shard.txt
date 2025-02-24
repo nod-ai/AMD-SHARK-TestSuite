@@ -13,7 +13,6 @@ hf_bge-large-en-v1.5
 hf_mxbai-embed-large-v1
 hf_bge-base-en-v1.5
 hf_bart-base
-hf_distilhubert
 hf_rubert-tiny
 hf_paraphrase-multilingual-mpnet-base-v2
 hf_bge-large-zh-v1.5
@@ -46,7 +45,6 @@ hf_msmarco-distilbert-base-v4
 hf_GIST-Embedding-v0
 hf_msmarco-distilbert-base-tas-b
 hf_paraphrase-mpnet-base-v2
-hf_wavlm-base-plus
 hf_GIST-large-Embedding-v0
 hf_gte-small
 hf_paraphrase-MiniLM-L3-v2

@@ -171,7 +171,7 @@ def get_tokenizer_from_model_path(model_repo_path: str, cache_dir: str | Path):
     if 'kobert' in name.lower():
         trust_remote_code = True
 
-    return AutoTokenizer.from_pretrained(model_repo_path, cache_dir=cache_dir, trust_remote_code=True)
+    return AutoTokenizer.from_pretrained(model_repo_path, cache_dir=cache_dir, trust_remote_code=trust_remote_code)
 
 
 def build_repo_to_model_map():
@@ -245,32 +245,29 @@ class HfModelWithTokenizers(HfDownloadableModel):
 
         tokenizer = get_tokenizer_from_model_path(self.model_repo_path, self.cache_dir)
 
-        tokens = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True)
-        self.input_name_to_shape_map = {k: v.shape for (k, v) in tokens.items()}
-
         if self.name in models_with_input_names_2:
             # Handles 2 inputs
             tokenizer.model_input_names = ["input_ids", "attention_mask"]
-            inputs = (*list(tokens.values()), )
-        else:
+
+        tokens = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True)
+
+        if self.name in models_with_input_names_4:
+            # Handles 4 inputs
+            # Tokenizer is returning tokens dict with key token_type_ids" instead of "bbox".
+            # For now, "token_type_ids" will be reused as bbox in this case
+            # bbox is a bounding box with size [?, ?, 4]
+            #   where each 4 numbers represent x_min, y_min, x_max, y_max
+            print(f'DEBUG: {tokens=}')
+            tokens["token_type_ids"] = tokens["token_type_ids"].unsqueeze(-1).repeat(1, 1, 4)
+
+        self.input_name_to_shape_map = {k: v.shape for (k, v) in tokens.items()}
+        if self.name in models_with_input_names_3 or self.name in models_with_input_names_4:
+            # Handles 3 and 4 inputs
             self.input_name_to_shape_map["position_ids"] = self.input_name_to_shape_map["input_ids"]
-            zeros = torch.zeros(*(self.input_name_to_shape_map["input_ids"]), dtype=int)
-            if self.name in models_with_input_names_3:
-                # Handles 3 inputs
-                tokenizer.model_input_names = ["input_ids", "attention_mask", "position_ids"]
-            elif self.name in models_with_input_names_4:
-                tokenizer.model_input_names = ["input_ids", "bbox", "attention_mask", "position_ids"]
-
-                # Handles 4 inputs
-                # Tokenizer is returning tokens dict with key token_type_ids" instead of "bbox".
-                # For now, "token_type_ids" will be reused as bbox in this case
-                # bbox is a bounding box with size [?, ?, 4]
-                #   where each 4 numbers represent x_min, y_min, x_max, y_max
-                tokens["token_type_ids"] = tokens["token_type_ids"].unsqueeze(-1).repeat(1, 1, 4)
-            else:
-                raise RuntimeError(f"Model: {self.name} not found in any of the registry lists.")
-
+            zeros = torch.zeros(*(self.input_name_to_shape_map["position_ids"]), dtype=int)
             inputs = (*list(tokens.values()), zeros)
+        else:
+            inputs = (*list(tokens.values()), )
 
         test_tensors = TestTensors(inputs)
         return test_tensors

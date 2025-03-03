@@ -18,6 +18,10 @@ this_file = Path(__file__)
 lists_dir = (this_file.parent).joinpath("external_lists")
 onnx_zoo_non_validated = load_test_txt_file(lists_dir.joinpath("onnx_model_zoo_non_validated_paths.txt"))
 onnx_zoo_validated = load_test_txt_file(lists_dir.joinpath("onnx_model_zoo_validated_paths.txt"))
+onnx_zoo_unsupported = load_test_txt_file(lists_dir.joinpath("onnx_model_zoo_unsupported.txt"))
+
+onnx_zoo_non_validated = list(set(onnx_zoo_non_validated).difference(set(onnx_zoo_unsupported)))
+onnx_zoo_validated = list(set(onnx_zoo_validated).difference(set(onnx_zoo_unsupported)))
 
 # Putting this inside the class contructor will
 # call this repeatedly, which is wasteful.
@@ -62,7 +66,6 @@ basic_opt: List[Tuple[str, bool]] = [
     ("swin_base_patch4_window7_224_in22k_Opset17_timm", False),
     ("swin_large_patch4_window12_384_in22k_Opset16_timm", False),
     ("swin_large_patch4_window7_224_in22k_Opset17_timm", False),
-    ("canine_Opset18_transformers", False),
     ("swin_large_patch4_window7_224_Opset17_timm", False),
     ("swin_base_patch4_window12_384_Opset16_timm", False),
     ("swin_small_patch4_window7_224_Opset17_timm", False),
@@ -75,11 +78,9 @@ basic_opt: List[Tuple[str, bool]] = [
     ("swin_tiny_patch4_window7_224_Opset17_timm", False),
     ("swin_base_patch4_window7_224_Opset16_timm", False),
     ("swin_tiny_patch4_window7_224_Opset16_timm", False),
-    ("canine_Opset17_transformers", False),
     ("swin_large_patch4_window7_224_in22k_Opset16_timm", False),
     ("swin_base_patch4_window12_384_Opset17_timm", False),
     ("swin_base_patch4_window12_384_in22k_Opset16_timm", False),
-    ("canine_Opset16_transformers", False),
     ("swin_s3_tiny_224_Opset16_timm", False),
     ("swin_s3_base_224_Opset17_timm", False),
     ("xlnetlmhead_Opset18_transformers", False),
@@ -149,7 +150,6 @@ basic_opt: List[Tuple[str, bool]] = [
     ("resnetv2_50x1_bitm_in21k_Opset17_timm", False),
     ("resnetv2_50x3_bitm_Opset16_timm", False),
     ("resnetv2_50x3_bitm_Opset17_timm", False),
-    ("squeezenet1.0-6", False),
     ("tf_efficientnet_b0_Opset16_timm", False),
     ("tf_efficientnet_b0_Opset17_timm", False),
     ("tf_efficientnet_b0_ap_Opset16_timm", False),
@@ -293,7 +293,8 @@ basic_opt: List[Tuple[str, bool]] = [
     ("rain-princess-8", True),
     ("mosaic-8", True),
     ("udnie-8", True),
-    ("pointilism-8", True)
+    ("pointilism-8", True),
+    ("squeezenet1.0-6", True),
 ]
 
 

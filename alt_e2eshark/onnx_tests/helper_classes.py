@@ -109,7 +109,6 @@ class HfDownloadableModel(OnnxModelInfo):
             try:
                 self.export_model()
             except:
-                #print(self.__repr__())
                 raise RuntimeError("Failed to Export class: ", self)
 
             found_models = find_models(model_dir)

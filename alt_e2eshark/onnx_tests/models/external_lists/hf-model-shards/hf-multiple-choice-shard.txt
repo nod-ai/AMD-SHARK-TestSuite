@@ -12,7 +12,6 @@ hf_distilbert_multiple_choice
 hf_parsbert-base-parsinlu-multiple-choice
 hf_electra_multiple_choice
 hf_checkpoints_28_9_microsoft_deberta_V2
-hf_multiple_choice_model
 hf_checkpoints_26_9_microsoft_deberta_21_9
 hf_checkpoints_29_9_microsoft_deberta_V1
 hf_bert_science_multiple_choice
@@ -45,9 +44,7 @@ hf_finetuned-bert-piqa
 hf_distilbert_science_multiple_choice
 hf_checkpoints_28_9_microsoft_deberta_V5
 hf_phobert-base-finetuned
-hf_Multiple_Choice_EN
 hf_mcQA_model_bert
-hf_Multiple_Choice
 hf_llm-mdeberta-v3-swag
 hf_electra-base-multiple-choice-v2
 hf_deberta-v3-large_test_9e-6
@@ -55,3 +52,5 @@ hf_bert_base_swag_model
 hf_content
 hf_checkpoints_28_9_microsoft_deberta_V4
 hf_LLM
+hf_Multiple_Choice_swag
+hf_Multiple_Choice_swag_lr

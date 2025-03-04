@@ -47,7 +47,6 @@ hf_robbert-v2-dutch-base
 hf_esm2_t6_8M_UR50D
 hf_bert-large-portuguese-cased
 hf_chinese-roberta-wwm-ext
-hf_multi-qa-mpnet-base-cos-v1
 hf_codebert-base-mlm
 hf_phobert-base
 hf_robeczech-base
@@ -66,7 +65,6 @@ hf_albert-japanese-v2
 hf_wangchanberta-base-att-spm-uncased
 hf_bert-base-german-cased
 hf_esm2_t30_150M_UR50D
-hf_all-mpnet-base-v1
 hf_IndicBERTv2-MLM-only
 hf_bert-base-italian-xxl-cased
 hf_bert-base-indonesian-1.5G

@@ -46,6 +46,7 @@ task_list = [
     "image-segmentation",
     "semantic-segmentation",
     "audio-classification",
+    "sentence-similarity",
 ]
 
 large_models = {
@@ -499,6 +500,7 @@ for t in model_repo_map.keys():
             | "text-generation"
             | "feature-extraction"
             | "fill-mask"
+            | "sentence-similarity"
             | "text-classification"
             | "token-classification"
         ):

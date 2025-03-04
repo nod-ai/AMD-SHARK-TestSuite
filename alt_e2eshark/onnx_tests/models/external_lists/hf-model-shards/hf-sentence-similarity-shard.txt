@@ -1,0 +1,2 @@
+hf_all-mpnet-base-v1
+hf_multi-qa-mpnet-base-cos-v1

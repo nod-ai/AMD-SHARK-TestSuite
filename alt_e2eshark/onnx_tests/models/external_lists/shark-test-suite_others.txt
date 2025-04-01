@@ -1,0 +1,2 @@
+resnet50_vaiq_int8
+yolov8n_vaiq_int8

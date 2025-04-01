@@ -1,0 +1,5 @@
+DarkNet53_vaiq
+efficientnet_el.ra_in1k_vaiq
+efficientnet_es.ra_in1k_vaiq
+SqueezeNet_1_1_vaiq
+Yolov8n_vaiq

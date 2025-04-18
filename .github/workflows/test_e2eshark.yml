@@ -7,6 +7,10 @@
 name: E2ESHARK Test Suite
 on:
   workflow_dispatch:
+    inputs:
+      iree-run-id:
+        description: 'IREE Run ID'
+        required: true
   schedule:
   # Runs at 2:30 AM PST
    - cron: '30 9 * * 1-6'
@@ -357,6 +361,14 @@ jobs:
           repository: nod-ai/SHARK-TestSuite
           path: test-suite
       
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux_x86_64_release_packages
+          github-token: ${{ github.token }} # token with actions:read permissions on target repo
+          repository: iree-org/iree
+          path: test-suite
+          run-id: ${{ github.event.inputs.iree-run-id }}
+      
       - name: "Setup alt e2eshark python venv"
         run: |
           rm -rf ${ALT_E2E_VENV_DIR}
@@ -364,9 +376,8 @@ jobs:
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip install --upgrade pip
           pip install -r ./alt_e2eshark/base_requirements.txt
-          pip install -r ./alt_e2eshark/iree_requirements.txt
+          pip install --force-reinstall *.whl
           pip install --no-deps -r ./alt_e2eshark/torch_mlir_requirements.txt
-          pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
         working-directory: ./test-suite
       
       - name: "Setup IREE EP python venv"
@@ -748,7 +759,7 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git pull
-          date=$(date '+%Y-%m-%d')
+          date=$(date '+%Y-%m-%d')-iree-test
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32_unique
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1_unique
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/shark-test-suite_unique
@@ -803,18 +814,13 @@ jobs:
             --report-file ./e2eshark-reports/baseline_comparison.md \
             --perf_tol_regression=0.1 \
             --perf_tol_progression=0.1
-          
-          az storage blob upload --account-name sharkpublic --container-name sharkpublic \
-            --name latest-test-suite/combined_reports_${{ matrix.backend }}.json \
-            --file ./e2eshark-reports/combined_reports_unique.json \
-            --account-key ${AZ_PUBLIC_KEY} --overwrite
 
       - name: Push regression artifacts
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git pull
-          date=$(date '+%Y-%m-%d')
+          date=$(date '+%Y-%m-%d')-iree-test
           cp yesterday_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/yesterday_comparison.md
           cp baseline_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/baseline_comparison.md
           git add $date

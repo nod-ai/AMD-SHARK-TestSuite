@@ -105,7 +105,6 @@ pvt_v2_b5
 regnety_120.sw_in12k
 regnety_160.deit_in1k
 regnety_160.sw_in12k
-regnety_640.seer
 resmlp_big_24_224.fb_in1k
 resnest200e
 resnest269e

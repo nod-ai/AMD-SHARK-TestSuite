@@ -287,6 +287,11 @@ basic_opt: List[Tuple[str, bool]] = [
     ("twins_svt_small_Opset16_timm", False),
     ("twins_svt_small_Opset17_timm", False),
     ("xcit_nano_12_p8_224_Opset16_timm", False),
+    ("funnel_Opset16_transformers", False),
+    ("funnel_Opset17_transformers", False),
+    ("funnel_Opset18_transformers", False),
+    ("funnelbase_Opset16_transformers", False),
+    ("funnelbase_Opset18_transformers", False),    
 
     # Validated models
     ("candy-8", True),

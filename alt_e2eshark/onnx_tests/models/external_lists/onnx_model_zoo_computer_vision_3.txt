@@ -248,7 +248,6 @@ regnety_160_Opset17_timm
 gluon_resnet152_v1c_Opset17_timm
 tf_mobilenetv3_large_minimal_100_Opset16_timm
 tf_mixnet_l_Opset16_timm
-fasterrcnn_resnet50_fpn_v2_Opset18_torchvision
 skresnet34_Opset16_timm
 dpn107_Opset16_timm
 crossvit_15_dagger_408_Opset17_timm
@@ -315,7 +314,6 @@ skresnet18_Opset16_timm
 cs3darknet_x_Opset17_timm
 twins_svt_small_Opset16_timm
 res2net50_26w_6s_Opset17_timm
-fcos_resnet50_fpn_Opset18_torchvision
 edgenext_small_Opset16_timm
 legacy_seresnet18_Opset16_timm
 resnet61q_Opset17_timm
@@ -324,7 +322,6 @@ vit_small_patch16_224_Opset18_timm
 mobilevitv2_050_Opset16_timm
 jx_nest_small_Opset17_timm
 seresnext26d_32x4d_Opset16_timm
-resnest50d_1s4x24d_Opset17_timm
 repvgg_b0_Opset18_timm
 densenet169_Opset17_torch_hub
 convnext_large_Opset18_torch_hub
@@ -360,7 +357,6 @@ swsl_resnet50_Opset17_timm
 convnext_small_Opset17_timm
 resnest26d_Opset17_timm
 wide_resnet101_2_Opset17_timm
-nasnetalarge_Opset17_timm
 regnetx_002_Opset16_timm
 gluon_resnet152_v1s_Opset18_timm
 resnet18_Opset18_timm

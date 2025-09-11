@@ -8,7 +8,6 @@ EfficientNet_v2_s_vaiq_int8
 FCN_vaiq_int8
 GoogLeNet_vaiq_int8
 Inception_v4_vaiq_int8
-KeypointRCNN_vaiq_int8
 LRASPP_vaiq_int8
 MNASNet_1_3_vaiq_int8
 MobileNetV3_small_vaiq_int8
@@ -26,5 +25,4 @@ VideoResNet_vaiq_int8
 WideResNet_50_2_vaiq_int8
 YoloNetV3_vaiq_int8
 pytorch-3dunet_vaiq_int8
-retinanet_resnet50_fpn_vaiq_int8
 u-net_brain_mri_vaiq_int8

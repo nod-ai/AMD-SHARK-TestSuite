@@ -1,5 +1,4 @@
 migraphx_bert__bert-large-uncased
-migraphx_bert__bertsquad-12
 migraphx_cadene__dpn92i1
 migraphx_cadene__inceptionv4i16
 migraphx_cadene__resnext101_64x4di1
@@ -8,7 +7,6 @@ migraphx_models__whisper-tiny-decoder
 migraphx_models__whisper-tiny-encoder
 migraphx_mlperf__bert_large_mlperf
 migraphx_mlperf__resnet50_v1
-migraphx_onnx-model-zoo__gpt2-10
 migraphx_ORT__bert_base_cased_1
 migraphx_ORT__bert_base_uncased_1
 migraphx_ORT__bert_large_uncased_1

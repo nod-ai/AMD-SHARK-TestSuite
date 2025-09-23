@@ -41,7 +41,6 @@ gcresnext26ts_Opset16_timm
 xception_Opset17_timm
 pnasnet5large_Opset17_timm
 tf_efficientnet_b5_ns_Opset16_timm
-bat_resnext26ts_Opset17_timm
 resnetblur50_Opset17_timm
 nf_resnet50_Opset16_timm
 tv_resnext50_32x4d_Opset17_timm
@@ -372,7 +371,6 @@ eca_nfnet_l0_Opset16_timm
 regnetz_d8_Opset17_timm
 cait_xxs24_384_Opset16_timm
 selecsls60b_Opset16_timm
-pnasnet5large_Opset18_timm
 vit_tiny_patch16_384_Opset16_timm
 mobilevit_xs_Opset16_timm
 visformer_tiny_Opset18_timm

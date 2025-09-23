@@ -15,7 +15,8 @@ from site import getsitepackages
 
 ### IMPORTANT: ###
 # These node tests are added primarily to help debugging torch-mlir conversions on a *case-by-case* basis.
-# Please consider looking into SHARK-TestSuite/iree_tests/onnx for a much more robust and efficient alternative to running e2e node tests through iree.
+# Please consider looking into https://github.com/iree-org/iree-test-suites/tree/main/onnx_ops for a
+# much more robust and efficient alternative to running e2e node tests through iree.
 
 
 def get_tensor_from_pb(inputpb):

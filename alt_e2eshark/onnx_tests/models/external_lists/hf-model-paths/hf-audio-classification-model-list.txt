@@ -1,0 +1,2 @@
+ntu-spml/hf_distilhubert
+microsoft/hf_wavlm-base-plus

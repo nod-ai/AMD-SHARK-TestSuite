@@ -1,4 +1,22 @@
--r https://raw.githubusercontent.com/llvm/torch-mlir/main/requirements.txt
+#-r https://raw.githubusercontent.com/llvm/torch-mlir/main/requirements.txt
+-r https://raw.githubusercontent.com/llvm/torch-mlir/main/pytorch-requirements.txt
+#-r https://raw.githubusercontent.com/llvm/torch-mlir/main/build-requirements.txt
+nanobind>=2.4, <3.0
+numpy>=1.19.5, <=2.1.2
+pybind11>=2.10.0, <=2.13.6
+PyYAML>=5.4.0, <=6.0.1
+ml_dtypes>=0.1.0, <=0.6.0; python_version<"3.13"   # provides several NumPy dtype extensions, including the bf16
+ml_dtypes>=0.5.0, <=0.6.0; python_version>="3.13"
+wheel
+setuptools
+cmake
+ninja
+packaging
+# Workaround for what should be a torch dep
+# See discussion in #1174
+pyyaml
+
+-r https://raw.githubusercontent.com/llvm/torch-mlir/main/test-requirements.txt
 -r https://raw.githubusercontent.com/llvm/torch-mlir/main/torchvision-requirements.txt
 tabulate
 simplejson

@@ -1,0 +1,2 @@
+sentence-transformers/hf_all-mpnet-base-v1
+sentence-transformers/hf_multi-qa-mpnet-base-cos-v1

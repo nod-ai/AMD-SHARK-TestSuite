@@ -19,7 +19,6 @@ TheBloke/hf_Mistral-7B-Instruct-v0.2-GPTQ
 unsloth/hf_Meta-Llama-3.1-8B-Instruct-bnb-4bit
 petals-team/hf_StableBeluga2
 OpenAssistant/hf_oasst-sft-4-pythia-12b-epoch-3.5
-wasmdashai/hf_wasmai-7b-v1
 datificate/hf_gpt2-small-spanish
 microsoft/hf_Phi-3.5-mini-instruct
 cecibas/hf_Midnight-Miqu-70B-v1.5-4bit

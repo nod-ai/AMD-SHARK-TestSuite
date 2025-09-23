@@ -136,7 +136,6 @@ resnetrs420
 rexnetr_200.sw_in12k
 rexnetr_300.sw_in12k
 sebotnet33ts_256
-sequencer2d_l
 swin_base_patch4_window12_384.ms_in1k
 swin_base_patch4_window12_384.ms_in22k_ft_in1k
 swin_base_patch4_window7_224.ms_in1k

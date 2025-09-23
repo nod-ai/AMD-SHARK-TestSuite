@@ -1,0 +1,12 @@
+adv_inception_v3_vaiq
+densenet121_vaiq
+efficientnet_el.ra_in1k_vaiq
+efficientnet_es.ra_in1k_vaiq
+gluon_inception_v3_vaiq
+gluon_resnet101_v1b_vaiq
+gluon_resnet152_v1b_vaiq
+gluon_resnet34_v1b_vaiq
+gluon_resnet50_v1b_vaiq
+gluon_resnext50_32x4d_vaiq
+ig_resnext101_32x32d_vaiq
+ig_resnext101_32x8d_vaiq

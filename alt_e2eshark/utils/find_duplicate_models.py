@@ -53,10 +53,9 @@ def get_groupings(metadata_dicts: Dict[str, Dict]) -> Dict:
 def main(args):
     run_dir = ROOT / args.rundirectory
     metadata_dicts = dict()
-    for x in run_dir.glob("*/*.json"):
-        if x.name == "metadata.json":
-            test_name = x.parent.name
-            metadata_dicts[test_name] = load_json_dict(x)
+    for x in run_dir.glob("**/metadata.json"):
+        test_name = x.parent.name
+        metadata_dicts[test_name] = load_json_dict(x)
 
     groupings = get_groupings(metadata_dicts)
     found_redundancies = []

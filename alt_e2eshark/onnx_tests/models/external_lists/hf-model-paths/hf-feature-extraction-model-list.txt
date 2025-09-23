@@ -13,7 +13,6 @@ BAAI/hf_bge-large-en-v1.5
 mixedbread-ai/hf_mxbai-embed-large-v1
 BAAI/hf_bge-base-en-v1.5
 facebook/hf_bart-base
-ntu-spml/hf_distilhubert
 cointegrated/hf_rubert-tiny
 sentence-transformers/hf_paraphrase-multilingual-mpnet-base-v2
 BAAI/hf_bge-large-zh-v1.5
@@ -46,7 +45,6 @@ sentence-transformers/hf_msmarco-distilbert-base-v4
 avsolatorio/hf_GIST-Embedding-v0
 sentence-transformers/hf_msmarco-distilbert-base-tas-b
 sentence-transformers/hf_paraphrase-mpnet-base-v2
-microsoft/hf_wavlm-base-plus
 avsolatorio/hf_GIST-large-Embedding-v0
 Supabase/hf_gte-small
 sentence-transformers/hf_paraphrase-MiniLM-L3-v2

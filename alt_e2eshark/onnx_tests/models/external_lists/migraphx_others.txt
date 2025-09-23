@@ -1,0 +1,4 @@
+migraphx_agentmodel__AgentModel
+migraphx_cadene__resnext101_64x4di16
+migraphx_torchvision__inceptioni32
+migraphx_torchvision__resnet50i64

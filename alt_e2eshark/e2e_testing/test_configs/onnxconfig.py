@@ -3,20 +3,20 @@
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+import json
+import os
+import shutil
+import warnings
+from pathlib import Path
+from typing import Tuple, Any
+
 import onnx
-from torch_mlir.extras import onnx_importer
-from torch_mlir.dialects import torch as torch_d
-from torch_mlir.ir import Context
+from onnxruntime import InferenceSession
+
 from e2e_testing.backends import BackendBase
 from e2e_testing.framework import TestConfig, OnnxModelInfo, Module, CompiledArtifact, ImporterOptions, CompilerOptions, RuntimeOptions
+from e2e_testing.logging_utils import run_command_and_log
 from e2e_testing.storage import TestTensors
-from torch_mlir.passmanager import PassManager
-from typing import Tuple, Any
-from onnxruntime import InferenceSession
-import os
-from pathlib import Path
-import json
-import shutil
 
 BACKEND_LEGAL_OPS = [
     "aten.flatten.using_ints",
@@ -84,6 +84,9 @@ class OnnxTestConfig(TestConfig):
             self.pass_pipeline = None
 
     def import_model(self, model_info: OnnxModelInfo, *, save_to: str = None, extra_options : ImporterOptions) -> Tuple[Module, str]:
+        from torch_mlir.extras import onnx_importer
+        from torch_mlir.dialects import torch as torch_d
+        from torch_mlir.ir import Context
         model = onnx.load(model_info.model)
         if model_info.opset_version:
             model = onnx.version_converter.convert_version(
@@ -106,6 +109,7 @@ class OnnxTestConfig(TestConfig):
         return m, func_name
 
     def preprocess_model(self, mlir_module: Module, *, save_to: str = None) -> Module:
+        from torch_mlir.passmanager import PassManager
         # if the pass pipeline is empty, return the original module
         if not self.pass_pipeline:
             return mlir_module
@@ -153,41 +157,22 @@ class CLOnnxTestConfig(TestConfig):
     def import_model(self, program: OnnxModelInfo, *, save_to: str, extra_options : ImporterOptions) -> Tuple[str, str]:
         if not save_to:
             raise ValueError("CLOnnxTestConfig requires saving artifacts")
-        # setup a detail subdirectory
-        os.makedirs(os.path.join(save_to, "detail"), exist_ok=True)
-        # setup a commands subdirectory
-        os.makedirs(os.path.join(save_to, "commands"), exist_ok=True)
         # set file paths
         mlir_file = os.path.join(save_to, "model.torch_onnx.mlir")
-        detail_log = os.path.join(save_to, "detail", "import_model.detail.log")
-        commands_log = os.path.join(save_to, "commands", "import_model.commands.log")
         # get a command line script
-        script = "python -m iree.compiler.tools.import_onnx "
-        script += str(program.model)
-        for key, value in extra_options._asdict().items():
-            if key == "large_model":
-                script+= f' --large-model' if value else ""
-            elif key == "externalize_params":
-                script+= f' --externalize-params' if value else ""
-            elif value is not None:
-                script += f' --{key.replace("_","-")}={value}'
-        script += " -o "
-        script = script + mlir_file
-        script += f" 1> {detail_log} 2>&1"
-        # log the command
-        with open(commands_log, "w") as file:
-            file.write(script)
-        # remove old mlir_file if present
-        Path(mlir_file).unlink(missing_ok=True)
-        # run the command
-        os.system(script)
-        # check if a new mlir file was generated
-        if not os.path.exists(mlir_file):
-            error_msg = f"failure executing command: \n{script}\n failed to produce mlir file {mlir_file}.\n"
-            error_msg += f"Error detail in '{detail_log}'"
-            raise FileNotFoundError(error_msg)
-        # store output signatures for loading the outputs of iree-run-module
-        self.tensor_info_dict[program.name] = program.get_signature(from_inputs=False)
+        import_command = ["python", "-m", "iree.compiler.tools.import_onnx", str(program.model)]
+        # add extra options to command
+        bool_arg_defaults = {"large-model" : False, "externalize-params" : False}
+        for underscore_key, value in extra_options._asdict().items():
+            if value is None:
+                continue
+            key = underscore_key.replace("_","-")
+            if key not in bool_arg_defaults.keys():
+                import_command.append(f'--{key}={value}')
+            elif value != bool_arg_defaults[key]:
+                import_command.extend([f'--{key}'])
+        import_command.extend(["-o", mlir_file])
+        run_command_and_log(import_command, save_to, "import_model")
         # get the func name
         # TODO put this as an OnnxModelInfo attr?
         model = onnx.load(program.model, load_external_data=False)
@@ -201,35 +186,18 @@ class CLOnnxTestConfig(TestConfig):
         # convert imported torch-onnx ir to torch
         onnx_to_torch_pipeline = "builtin.module("+",".join(ONNX_TO_TORCH_BACKEND_PIPELINE) + ")"
         # get paths
-        detail_log = os.path.join(save_to, "detail", "preprocessing.detail.log")
-        commands_log = os.path.join(save_to, "commands", "preprocessing.commands.log")
         torch_ir = os.path.join(save_to, "model.torch.mlir")
         linalg_ir = os.path.join(save_to, "model.modified.mlir")
         # generate scripts
+        opt_tool = "torch-mlir-opt"
         use_tmopt = shutil.which("torch-mlir-opt")
-        opt_tool = "torch-mlir-opt" if use_tmopt is not None else "iree-opt"
-        script0 = f"{opt_tool} -pass-pipeline='{onnx_to_torch_pipeline}' {mlir_module} -o {torch_ir} 1> {detail_log} 2>&1"
-        script1 = f"{opt_tool} -pass-pipeline='{self.pass_pipeline}' {torch_ir} -o {linalg_ir} 1> {detail_log} 2>&1"
-        # remove old torch_ir
-        Path(torch_ir).unlink(missing_ok=True)
-        with open(commands_log, "w") as file:
-            if use_tmopt is None:
-                file.write('WARNING: using iree-opt since system could not find command torch-mlir-opt\n')
-            file.write(f'{script0}\n{script1}')
-        # run torch-onnx-to-torch
-        os.system(script0)
-        if not os.path.exists(torch_ir):
-            error_msg = f"failure executing command: \n{script0}\n failed to produce mlir file {torch_ir}.\n"
-            error_msg += f"Error detail in '{detail_log}'"
-            raise FileNotFoundError(error_msg)
-        # remove old linalg ir
-        Path(linalg_ir).unlink(missing_ok=True)
-        # run torch-to-linalg pipeline
-        os.system(script1)
-        if not os.path.exists(linalg_ir):
-            error_msg = f"failure executing command: \n{script1}\n failed to produce mlir file {linalg_ir}.\n"
-            error_msg += f"Error detail in '{detail_log}'"
-            raise FileNotFoundError(error_msg)
+        if use_tmopt is None:
+            warnings.warn("\nCould not find command line tool 'torch-mlir-opt'. Defaulting to 'iree-opt'.")
+            opt_tool = "iree-opt"
+        command0 = [opt_tool, f"-pass-pipeline='{onnx_to_torch_pipeline}'", mlir_module, "-o", torch_ir]
+        command1 = [opt_tool, f"-pass-pipeline='{self.pass_pipeline}'", torch_ir, "-o", linalg_ir]
+        run_command_and_log(command0, save_to, "preprocessing_torch_onnx_to_torch") 
+        run_command_and_log(command1, save_to, "preprocessing_torch_to_linalg") 
         return linalg_ir
 
     def compile(self, mlir_module: str, *, save_to: str = None, extra_options : CompilerOptions) -> str:
@@ -238,47 +206,23 @@ class CLOnnxTestConfig(TestConfig):
     def run(self, artifact: str, inputs: TestTensors, *, func_name=None, extra_options : RuntimeOptions) -> TestTensors:
         run_dir = Path(artifact).parent
         test_name = run_dir.name
-        detail_log = run_dir.joinpath("detail", "compiled_inference.detail.log")
-        commands_log = run_dir.joinpath("commands", "compiled_inference.commands.log")
         func = self.backend.load(artifact, func_name=func_name, extra_options=extra_options)
-        script = func(inputs)
+        command = func(inputs)
         num_outputs = len(self.tensor_info_dict[test_name][0])
-        output_files = []
-        for i in range(num_outputs):
-            output_files.append(os.path.join(run_dir, f"output.{i}.bin"))
-            script += f" --output=@'{output_files[i]}'"
-            # remove existing output files if they already exist
-            # we use the existence of these files to check if the inference succeeded.
-            Path(output_files[i]).unlink(missing_ok=True)
-        # dump additional error messaging to the detail log.
-        script += f" 1> {detail_log} 2>&1"
-        with open(commands_log, "w") as file:
-            file.write(script)
-        os.system(script)
-        for file in output_files:
-            if not os.path.exists(file):
-                error_msg = f"failure executing command: \n{script}\n failed to produce output file {file}.\n"
-                error_msg += f"Error detail in '{detail_log}'"
-                raise FileNotFoundError(error_msg)
+        command.extend([f"--output=@'{os.path.join(run_dir, f'output.{i}.bin')}'" for i in range(num_outputs)])
+        run_command_and_log(command, save_to=run_dir, stage_name="compiled_inference")
         return TestTensors.load_from(self.tensor_info_dict[test_name][0], self.tensor_info_dict[test_name][1], run_dir, "output")
 
     def benchmark(self, artifact: str, inputs: TestTensors, repetitions: int = 5, *, func_name=None, extra_options=None) -> float:
         run_dir = Path(artifact).parent
-        detail_log = run_dir.joinpath("detail", "benchmark.detail.log")
-        commands_log = run_dir.joinpath("commands", "benchmark.commands.log")
-        report_json = run_dir.joinpath("detail", "benchmark.json")
+        report_json = run_dir.joinpath("benchmark.json")
         func = self.backend.load(artifact,func_name=func_name, extra_options=extra_options)
-        script = func(inputs)
-        benchmark_script = "iree-benchmark-module " + script[15:] # removes "iree-run-module "
-        benchmark_script += f" --benchmark_repetitions={repetitions} --device_allocator=caching --benchmark_out='{report_json}' --benchmark_out_format=json 1> {detail_log} 2>&1"
-        with open(commands_log, "w") as file:
-            file.write(benchmark_script)
-        Path(report_json).unlink(missing_ok=True)
-        os.system(benchmark_script)
-        if not os.path.exists(report_json):
-            error_msg = f"failure executing command: \n{benchmark_script}\n failed to produce output file {report_json}.\n"
-            error_msg += f"Error detail in '{detail_log}'"
-            raise FileNotFoundError(error_msg)
+        command = func(inputs)
+        # replace "iree-run-module" with "iree-benchmark-module"
+        command[0] = "iree-benchmark-module"
+        command.extend([f"--benchmark_repetitions={repetitions}", "--device_allocator=caching", f"--benchmark_out='{report_json}'", "--benchmark_out_format=json"])
+        run_command_and_log(command, save_to=run_dir, stage_name="benchmark")
+        # load benchmark time from report_json
         with open(report_json) as contents:
             loaded_dict = json.load(contents) 
         mean_stats = loaded_dict["benchmarks"][-4]

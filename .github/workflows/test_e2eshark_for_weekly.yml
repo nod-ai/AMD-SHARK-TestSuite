@@ -338,7 +338,7 @@ jobs:
       CACHE_DIR: ${{ matrix.cache-dir }}
     steps:
       - name: Checkout Test Suite
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: nod-ai/SHARK-TestSuite
           path: test-suite
@@ -473,12 +473,12 @@ jobs:
       AZ_PUBLIC_KEY: ${{ secrets.SHARKPUBLIC_AZ_PUBLIC_KEY }}
     steps:
       - name: Checkout Test Suite
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: nod-ai/SHARK-TestSuite
           path: test-suite
       - name: Checkout repo
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: nod-ai/e2eshark-reports
           ref: main
@@ -493,181 +493,181 @@ jobs:
           pip install -r ./test-suite/alt_e2eshark/iree_requirements.txt
           pip install --no-deps -r ./test-suite/alt_e2eshark/torch_mlir_requirements.txt
           pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_shark-test-suite_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_shark-test-suite_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_shark-test-suite_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_shark-test-suite_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-vision-int8_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_vai-vision-int8_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_migraphx_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_migraphx_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_migraphx_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_migraphx_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard1_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard1_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard1_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard1_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard2_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard2_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard3_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard3_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_others_onnx_json
 
 
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_others_onnx_json
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_others_onnx_md
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_others_onnx_md
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_others_onnx_json
           path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_others_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      # - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
       #   with:
       #     name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_md
       #     path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      # - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
       #   with:
       #     name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
       #     path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json

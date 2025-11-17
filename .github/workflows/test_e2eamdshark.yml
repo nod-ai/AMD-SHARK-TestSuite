@@ -361,7 +361,7 @@ jobs:
       - name: "Setup alt e2eamdshark python venv"
         run: |
           rm -rf ${ALT_E2E_VENV_DIR}
-          python3.11 -m venv ${ALT_E2E_VENV_DIR}
+          python -m venv ${ALT_E2E_VENV_DIR}
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip install --upgrade pip
           pip install -r ./alt_e2eamdshark/base_requirements.txt
@@ -372,7 +372,7 @@ jobs:
       
       - name: "Setup IREE EP python venv"
         run: |
-          python3.11 -m venv ${EP_VENV_DIR}
+          python -m venv ${EP_VENV_DIR}
           source ${EP_VENV_DIR}/bin/activate
           pip install --upgrade pip
           pip install -r ./alt_e2eamdshark/base_requirements.txt
@@ -390,7 +390,7 @@ jobs:
           pip freeze
           cd alt_e2eamdshark
           free -mh
-          python3.11 ./run.py \
+          python ./run.py \
             -r ./test-onnx \
             --report \
             --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
@@ -413,7 +413,7 @@ jobs:
           pip freeze
           cd alt_e2eamdshark
           free -mh
-          python3.11 ./run.py \
+          python ./run.py \
             -r ./test-onnx \
             --report \
             --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
@@ -501,7 +501,7 @@ jobs:
           path: e2eamdshark-reports
       - name: "Setup alt test suite venv"
         run: |
-          python3.11 -m venv report_venv_alt
+          python -m venv report_venv_alt
           source report_venv_alt/bin/activate
           pip install --upgrade pip
           pip install -r ./test-suite/alt_e2eamdshark/base_requirements.txt

@@ -361,6 +361,7 @@ jobs:
       - name: "Setup alt e2eshark python venv"
         run: |
           rm -rf ${ALT_E2E_VENV_DIR}
+          python3.11 --version
           python3.11 -m venv ${ALT_E2E_VENV_DIR}
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip install --upgrade pip

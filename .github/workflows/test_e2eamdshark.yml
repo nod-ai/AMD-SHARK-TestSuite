@@ -394,7 +394,7 @@ jobs:
         run: |
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip freeze
-          mkdir -p $CACHE_DIR
+          sudo mkdir -p $CACHE_DIR
           cd alt_e2eamdshark
           free -mh
           python ./run.py \
@@ -419,7 +419,7 @@ jobs:
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip freeze
           cd alt_e2eamdshark
-          mkdir -p $CACHE_DIR
+          sudo mkdir -p $CACHE_DIR
           free -mh
           python ./run.py \
             -r ./test-onnx \

@@ -23,6 +23,10 @@ jobs:
       matrix:
         include:
           - name: mi300_gpu1_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -30,6 +34,10 @@ jobs:
             test-file: nlp-shard1_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu2_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -37,6 +45,10 @@ jobs:
             test-file: nlp-shard2_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu3_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -44,6 +56,10 @@ jobs:
             test-file: nlp-shard3_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu4_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -51,6 +67,10 @@ jobs:
             test-file: amdshark-test-suite_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu5_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -58,6 +78,10 @@ jobs:
             test-file: vai-hf-cnn-fp32-shard1_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu6_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -65,6 +89,10 @@ jobs:
             test-file: vai-hf-cnn-fp32-shard2_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu7_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -72,6 +100,10 @@ jobs:
             test-file: vai-hf-cnn-fp32-shard3_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu8_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -79,6 +111,10 @@ jobs:
             test-file: vai-int8-p0p1-shard1_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu9_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -86,6 +122,10 @@ jobs:
             test-file: vai-int8-p0p1-shard2_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu10_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -93,6 +133,10 @@ jobs:
             test-file: vai-int8-p0p1-shard3_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu11_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -100,6 +144,10 @@ jobs:
             test-file: vai-vision-int8_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu12_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -107,6 +155,10 @@ jobs:
             test-file: migraphx_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu13_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -114,6 +166,10 @@ jobs:
             test-file: onnx_model_zoo_computer_vision_1_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu14_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -121,6 +177,10 @@ jobs:
             test-file: onnx_model_zoo_computer_vision_2_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu15_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -128,6 +188,10 @@ jobs:
             test-file: onnx_model_zoo_computer_vision_3_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu16_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -135,6 +199,10 @@ jobs:
             test-file: onnx_model_zoo_computer_vision_4_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu17_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -142,6 +210,10 @@ jobs:
             test-file: onnx_model_zoo_computer_vision_5_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu18_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -149,6 +221,10 @@ jobs:
             test-file: onnx_model_zoo_gen_ai_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu19_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -156,6 +232,10 @@ jobs:
             test-file: onnx_model_zoo_graph_ml_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu20_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -163,6 +243,10 @@ jobs:
             test-file: onnx_model_zoo_nlp_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu21_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -170,6 +254,10 @@ jobs:
             test-file: onnx_model_zoo_validated_text_unique
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu22_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
@@ -184,6 +272,10 @@ jobs:
           #   test-file: onnxrt-iree-ep
           #   cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: cpu_shard1_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -191,6 +283,10 @@ jobs:
             test-file: nlp-shard1_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard2_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -198,6 +294,10 @@ jobs:
             test-file: nlp-shard2_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard3_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -205,6 +305,10 @@ jobs:
             test-file: nlp-shard3_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard4_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -212,6 +316,10 @@ jobs:
             test-file: amdshark-test-suite_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard5_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -219,6 +327,10 @@ jobs:
             test-file: vai-hf-cnn-fp32-shard1_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard6_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -226,6 +338,10 @@ jobs:
             test-file: vai-hf-cnn-fp32-shard2_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard7_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -233,6 +349,10 @@ jobs:
             test-file: vai-hf-cnn-fp32-shard3_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard8_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -240,6 +360,10 @@ jobs:
             test-file: vai-int8-p0p1-shard1_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard9_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -247,6 +371,10 @@ jobs:
             test-file: vai-int8-p0p1-shard2_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard10_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -254,6 +382,10 @@ jobs:
             test-file: vai-int8-p0p1-shard3_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard11_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -261,6 +393,10 @@ jobs:
             test-file: vai-vision-int8_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard12_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -268,6 +404,10 @@ jobs:
             test-file: migraphx_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard13_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -275,6 +415,10 @@ jobs:
             test-file: onnx_model_zoo_computer_vision_1_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard14_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -282,6 +426,10 @@ jobs:
             test-file: onnx_model_zoo_computer_vision_2_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard15_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -289,6 +437,10 @@ jobs:
             test-file: onnx_model_zoo_computer_vision_3_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard16_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -296,6 +448,10 @@ jobs:
             test-file: onnx_model_zoo_computer_vision_4_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard17_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -303,6 +459,10 @@ jobs:
             test-file: onnx_model_zoo_computer_vision_5_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard18_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -310,6 +470,10 @@ jobs:
             test-file: onnx_model_zoo_gen_ai_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard19_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -317,6 +481,10 @@ jobs:
             test-file: onnx_model_zoo_graph_ml_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard20_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -324,6 +492,10 @@ jobs:
             test-file: onnx_model_zoo_nlp_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard21_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
@@ -331,6 +503,10 @@ jobs:
             test-file: onnx_model_zoo_validated_text_unique
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard22_test
+            strategy:
+              matrix:
+                version: [ 3.11 ]
+              fail-fast: false
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task

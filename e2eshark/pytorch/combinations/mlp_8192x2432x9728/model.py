@@ -7,13 +7,13 @@
 import torch, sys
 import torch.nn as nn
 
-# import from e2eshark/tools to allow running in current dir, for run through
+# import from e2eamdshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
 sys.path.insert(0, "../../../tools/stubs")
-from commonutils import E2ESHARK_CHECK_DEF
+from commonutils import E2Eamdshark_CHECK_DEF
 
 # Create an instance of it for this test
-E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
+E2Eamdshark_CHECK = dict(E2Eamdshark_CHECK_DEF)
 
 
 class mlp_8192x2432x9728(nn.Module):
@@ -29,7 +29,7 @@ class mlp_8192x2432x9728(nn.Module):
 
 
 model = mlp_8192x2432x9728()
-E2ESHARK_CHECK["input"] = torch.randn(8192, 2432)
-E2ESHARK_CHECK["output"] = model(E2ESHARK_CHECK["input"]).detach()
-print("Input:", E2ESHARK_CHECK["input"])
-print("Output:", E2ESHARK_CHECK["output"])
+E2Eamdshark_CHECK["input"] = torch.randn(8192, 2432)
+E2Eamdshark_CHECK["output"] = model(E2Eamdshark_CHECK["input"]).detach()
+print("Input:", E2Eamdshark_CHECK["input"])
+print("Output:", E2Eamdshark_CHECK["output"])

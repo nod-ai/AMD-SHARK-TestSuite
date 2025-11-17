@@ -12,7 +12,7 @@ import requests
 # These are pickle-saved and used by tools/stubs python and run.pl.
 # If adding new fields, make sure the field has default value and have updated
 # tools/stubs and run.pl to handle the new fields
-E2ESHARK_CHECK_DEF = {
+E2Eamdshark_CHECK_DEF = {
     # this is input applied to the model
     "input": None,
     # this is output gotten from the model
@@ -66,16 +66,16 @@ def applyPostProcessPipeline(item, functionPipeLine):
 
 
 # Apply post processing functions on output
-def postProcess(e2esharkDict):
-    if e2esharkDict.get("output_for_validation") is not None:
-        test_output = e2esharkDict["output_for_validation"]
+def postProcess(e2eamdsharkDict):
+    if e2eamdsharkDict.get("output_for_validation") is not None:
+        test_output = e2eamdsharkDict["output_for_validation"]
     else:
-        test_output = e2esharkDict["output"]
-    functionPipeLine = e2esharkDict["postprocess"]
+        test_output = e2eamdsharkDict["output"]
+    functionPipeLine = e2eamdsharkDict["postprocess"]
     print(f"{functionPipeLine}")
     postprocess_output = []
     # Call chain of post processing -- run.pl will do same on backend inference output
-    if e2esharkDict.get("postprocess"):
+    if e2eamdsharkDict.get("postprocess"):
         for item in test_output:
             inp = item.clone()
             processed_item = applyPostProcessPipeline(inp, functionPipeLine)

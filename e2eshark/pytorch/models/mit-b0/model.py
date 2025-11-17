@@ -10,13 +10,13 @@ from transformers import SegformerImageProcessor, SegformerForImageClassificatio
 from PIL import Image
 import requests
 
-# import from e2eshark/tools to allow running in current dir, for run through
+# import from e2eamdshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
 sys.path.insert(0, "../../../tools/stubs")
-from commonutils import E2ESHARK_CHECK_DEF
+from commonutils import E2Eamdshark_CHECK_DEF
 
 # Create an instance of it for this test
-E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
+E2Eamdshark_CHECK = dict(E2Eamdshark_CHECK_DEF)
 
 # model origin: https://huggingface.co/nvidia/mit-b0
 test_modelname = "nvidia/mit-b0"
@@ -31,15 +31,15 @@ model.eval()
 
 encoding = processor(images=image, return_tensors="pt")
 
-E2ESHARK_CHECK["input"] = encoding["pixel_values"].cpu()
-E2ESHARK_CHECK["output"] = model(E2ESHARK_CHECK["input"]).logits
-predicted_class_idx = E2ESHARK_CHECK["output"].argmax(-1).item()
+E2Eamdshark_CHECK["input"] = encoding["pixel_values"].cpu()
+E2Eamdshark_CHECK["output"] = model(E2Eamdshark_CHECK["input"]).logits
+predicted_class_idx = E2Eamdshark_CHECK["output"].argmax(-1).item()
 print("Predicted class:", model.config.id2label[predicted_class_idx])
-print("Input:", E2ESHARK_CHECK["input"])
-print("Output:", E2ESHARK_CHECK["output"])
+print("Input:", E2Eamdshark_CHECK["input"])
+print("Output:", E2Eamdshark_CHECK["output"])
 # For geneartive AI models, input is int and should be kept that way for
 # casted models as well
-E2ESHARK_CHECK["inputtodtype"] = False
+E2Eamdshark_CHECK["inputtodtype"] = False
 
 # Post process output to do:
 # output shape: [1000]
@@ -48,7 +48,7 @@ E2ESHARK_CHECK["inputtodtype"] = False
 # (batch size, num labels)
 # This way we create a probability distribution for each possible label
 # when classifying sentence and pick the top one.
-E2ESHARK_CHECK["postprocess"] = [
+E2Eamdshark_CHECK["postprocess"] = [
     (torch.nn.functional.softmax, [-1], False, 0),
     (torch.topk, [1, 1], True, 1),
 ]

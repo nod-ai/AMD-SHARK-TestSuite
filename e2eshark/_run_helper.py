@@ -49,18 +49,18 @@ def changeToTestDir(run_dir):
         return 1
 
 
-def loadE2eSharkCheckDictionary():
-    e2esharkDict = None
-    pklfilename = "E2ESHARK_CHECK.pkl"
+def loadE2eamdsharkCheckDictionary():
+    e2eamdsharkDict = None
+    pklfilename = "E2Eamdshark_CHECK.pkl"
     if os.path.exists(pklfilename):
         with open(pklfilename, "rb") as pkf:
-            e2esharkDict = pickle.load(pkf)
-    return e2esharkDict
+            e2eamdsharkDict = pickle.load(pkf)
+    return e2eamdsharkDict
 
 
 def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
     connection_string = os.getenv("AZURE_CONNECTION_STRING")
-    container_name = "e2esharkuserartifacts"
+    container_name = "e2eamdsharkuserartifacts"
 
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     blob_client = blob_service_client.get_blob_client(
@@ -75,7 +75,7 @@ def uploadToBlobStorage(file_path, file_name, testName, uploadDict):
     if blob.exists():
         print(f"model artifacts have already been uploaded for this blob name")
         return
-    # upload to azure storage container e2esharkuserartifacts
+    # upload to azure storage container e2eamdsharkuserartifacts
     with open(file_path, "rb") as data:
         blob_client.upload_blob(data)
     dict_value = uploadDict.get(testName)

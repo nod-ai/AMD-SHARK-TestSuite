@@ -12,7 +12,7 @@ hf_gender-classification
 hf_vit-face-expression
 hf_efficientnet_b0.ra_in1k
 hf_vgg16.tv_in1k
-hf_rorshark-vit-base
+hf_roramdshark-vit-base
 hf_resnet34.a1_in1k
 hf_mobilevit-small
 hf_tf_mobilenetv3_large_minimal_100.in1k

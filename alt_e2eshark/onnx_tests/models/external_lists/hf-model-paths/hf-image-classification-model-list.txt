@@ -12,7 +12,7 @@ rizvandwiki/hf_gender-classification
 trpakov/hf_vit-face-expression
 timm/hf_efficientnet_b0.ra_in1k
 timm/hf_vgg16.tv_in1k
-amunchet/hf_rorshark-vit-base
+amunchet/hf_roramdshark-vit-base
 timm/hf_resnet34.a1_in1k
 apple/hf_mobilevit-small
 timm/hf_tf_mobilenetv3_large_minimal_100.in1k

@@ -5,13 +5,13 @@ import torch.nn as nn
 from torch.fx.experimental.proxy_tensor import make_fx
 from torch_mlir.dynamo import _get_decomposition_table
 
-# import from e2eshark/tools to allow running in current dir, for run through
+# import from e2eamdshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
 sys.path.insert(0, "../../../tools/stubs")
-from commonutils import E2ESHARK_CHECK_DEF
+from commonutils import E2Eamdshark_CHECK_DEF
 
 # Create an instance of it for this test
-E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
+E2Eamdshark_CHECK = dict(E2Eamdshark_CHECK_DEF)
 
 
 class DLRM_Net(nn.Module):
@@ -524,7 +524,7 @@ for i in range(ln_emb.size):
 
 # Run the model with the sample query and profiler
 dlrm_ref.eval()
-E2ESHARK_CHECK["input"] = [batch_dense_X, batch_lS_o, batch_lS_i]
+E2Eamdshark_CHECK["input"] = [batch_dense_X, batch_lS_o, batch_lS_i]
 # Flag to prevent casting of input to a different dtype
 keep_input_dtype = True
 
@@ -537,8 +537,8 @@ model = torch.jit.trace(dlrm_ref, (batch_dense_X, batch_lS_o, batch_lS_i))
 model.eval()
 
 print(f"INFO: Running inference using fx graph to generate reference data...")
-E2ESHARK_CHECK["output"] = model(batch_dense_X, batch_lS_o, batch_lS_i)
-sorted, indices = torch.sort(E2ESHARK_CHECK["output"], dim=0, descending=True)
+E2Eamdshark_CHECK["output"] = model(batch_dense_X, batch_lS_o, batch_lS_i)
+sorted, indices = torch.sort(E2Eamdshark_CHECK["output"], dim=0, descending=True)
 top_n = batch_size if batch_size < 5 else 5
 print(f"INFO: Clickthrough probability of top {top_n} ads:")
 header_format = "{0:4s}|{1:20s}"
@@ -549,6 +549,6 @@ print(header_format.format(4 * "-", 20 * "-"))
 for i in range(top_n):
     print(cell_format.format(indices[i][0].item(), sorted[i][0] * 100))
 
-print("Input:", E2ESHARK_CHECK["input"])
-print("Output:", E2ESHARK_CHECK["output"])
-E2ESHARK_CHECK["torchmlirimport"] = "compile"
+print("Input:", E2Eamdshark_CHECK["input"])
+print("Output:", E2Eamdshark_CHECK["output"])
+E2Eamdshark_CHECK["torchmlirimport"] = "compile"

@@ -1,4 +1,4 @@
- # e2eshark framework-to-iree-to-inference tests
+ # e2eamdshark framework-to-iree-to-inference tests
 
  This test suite enables developers to add small (operator level) to large (full model)
  end-2-end tests that compare output of running a model in a Framework 
@@ -100,7 +100,7 @@ export PYTHONPATH="${TORCH_MLIR_BUILD_DIR}/tools/torch-mlir/python_packages/torc
 
 ## Adding a test
 
-For onnx framework tests, you add a test in one of the model.py files contained in `/e2eshark/onnx_tests/`.
+For onnx framework tests, you add a test in one of the model.py files contained in `/e2eamdshark/onnx_tests/`.
 
 The OnnxModelInfo class simply requires that you define a function called "construct_model", which should define how to build the model.onnx file (be sure that the model.onnx file gets saved to your class' self.model, which should store the filepath to the model). 
 
@@ -112,7 +112,7 @@ Once a test class is generated, register the test with the test suite with:
 register_test(YourTestClassName,"name_of_test")
 ```
 
-For more information, see `alt_e2eshark/docs/adding_tests.md`.
+For more information, see `alt_e2eamdshark/docs/adding_tests.md`.
 
 ## Running a test
 

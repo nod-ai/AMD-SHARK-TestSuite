@@ -106,7 +106,7 @@ class Opt125MGPTQModelInfo(OnnxModelInfo):
         return TestTensors((response,))
 
         # model_response = model.generate(
-        #     E2ESHARK_CHECK["input"],
+        #     E2Eamdshark_CHECK["input"],
         #     do_sample=True,
         #     top_k=50,
         #     max_length=100,

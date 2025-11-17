@@ -1,13 +1,13 @@
 import numpy, torch, sys
 import onnxruntime
 
-# import from e2eshark/tools to allow running in current dir, for run through
+# import from e2eamdshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
 sys.path.insert(0, "../../../tools/stubs")
-from commonutils import E2ESHARK_CHECK_DEF, to_numpy, setup_test_image
+from commonutils import E2Eamdshark_CHECK_DEF, to_numpy, setup_test_image
 
 # Create an instance of it for this test
-E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
+E2Eamdshark_CHECK = dict(E2Eamdshark_CHECK_DEF)
 
 
 # The generated or checked in onnx file must always be called model.onnx
@@ -36,10 +36,10 @@ model_output = session.run(
     [outputs[0].name],
     {inputs[0].name: model_input_X},
 )[0]
-E2ESHARK_CHECK["input"] = [torch.from_numpy(model_input_X)]
-E2ESHARK_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
+E2Eamdshark_CHECK["input"] = [torch.from_numpy(model_input_X)]
+E2Eamdshark_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
 
-print("Input:", E2ESHARK_CHECK["input"])
-print("Output:", E2ESHARK_CHECK["output"])
+print("Input:", E2Eamdshark_CHECK["input"])
+print("Output:", E2Eamdshark_CHECK["output"])
 
 # Post process not possible for this model (takes low resolution image and makes it high resolution)

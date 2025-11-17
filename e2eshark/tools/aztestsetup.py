@@ -29,10 +29,10 @@ def ziponnxmodel(onnxfile, targetmodelzip):
         zipf.write(onnxfile)
 
 
-def cleanup_e2eshark_test(testList, e2eshark_test_dir):
+def cleanup_e2eamdshark_test(testList, e2eamdshark_test_dir):
     for model in testList:
-        onnxmodel = e2eshark_test_dir + "/" + model + "/model.onnx"
-        onnxmodelzip = e2eshark_test_dir + "/" + model + "/model.onnx.zip"
+        onnxmodel = e2eamdshark_test_dir + "/" + model + "/model.onnx"
+        onnxmodelzip = e2eamdshark_test_dir + "/" + model + "/model.onnx.zip"
         if os.path.exists(onnxmodel):
             print(f"Removing {onnxmodel}")
             os.remove(onnxmodel)
@@ -84,7 +84,7 @@ def download_and_setup_onnxmodels(cache_dir, testList):
     priv_container_name = "onnxprivatestorage"
 
     for model in testList:
-        blob_dir =  "e2eshark/" + model
+        blob_dir =  "e2eamdshark/" + model
         blob_name = blob_dir + "/model.onnx.zip"
         dest_file = cache_dir + "/" + blob_name
         if os.path.exists(dest_file):
@@ -119,7 +119,7 @@ def download_and_setup_onnxmodels(cache_dir, testList):
 
 
 def pre_test_onnx_models_azure_download(testsList, cache_path, script_dir):
-    # This util helps setting up the e2eshark/onnx/models tests by ensuring
+    # This util helps setting up the e2eamdshark/onnx/models tests by ensuring
     # all the models-tests in the testsList have the required model.onnx file
     # testsList: expected to contain only onnx tests
 
@@ -131,7 +131,7 @@ def pre_test_onnx_models_azure_download(testsList, cache_path, script_dir):
     # if it doesn't exist in the test directory but exists in cache dir, simply unzip cached model
     for test_name in model_tests_list:
         model_file_path_test = script_dir + '/' + test_name + '/model.onnx'
-        model_file_path_cache = cache_path + '/e2eshark/' + test_name + '/model.onnx.zip'
+        model_file_path_cache = cache_path + '/e2eamdshark/' + test_name + '/model.onnx.zip'
         if not os.path.exists(model_file_path_test):
             print(f"Unzipping - {model_file_path_cache}")
             # model_file_path_cache may not exist for models which were not correctly downloaded,
@@ -143,7 +143,7 @@ def pre_test_onnx_models_azure_download(testsList, cache_path, script_dir):
                     zf.extract(test_name + '/model.onnx', path=script_dir)
 
 
-def setup_e2eshark_test(modelpy, testList, sourcedir, model_root_dir):
+def setup_e2eamdshark_test(modelpy, testList, sourcedir, model_root_dir):
     for model in testList:
         onnxmodel = sourcedir + "/" + model + ".onnx"
         if not os.path.exists(onnxmodel):
@@ -178,11 +178,11 @@ def setup_e2eshark_test(modelpy, testList, sourcedir, model_root_dir):
 
 
 def upload_test_to_azure_storage(
-    testList, model_root_dir, e2eshark_test_dir, azure_storage_url
+    testList, model_root_dir, e2eamdshark_test_dir, azure_storage_url
 ):
     for model in testList:
         sourcemodelzip = model_root_dir + "/" + model + "/model.onnx.zip"
-        targetmodelzip = e2eshark_test_dir + "/" + model + "/model.onnx.zip"
+        targetmodelzip = e2eamdshark_test_dir + "/" + model + "/model.onnx.zip"
         command = "az storage blob upload --overwrite --account-name onnxstorage --container-name onnxstorage"
         command += " --name " + targetmodelzip
         command += " --file " + sourcemodelzip + " --auth-mode key"
@@ -192,7 +192,7 @@ def upload_test_to_azure_storage(
 
 
 if __name__ == "__main__":
-    msg = "The script to setup, upload and download e2eshark onnx model tests to/from Azure Storage"
+    msg = "The script to setup, upload and download e2eamdshark onnx model tests to/from Azure Storage"
     parser = argparse.ArgumentParser(description=msg, epilog="")
     parser.add_argument(
         "testlistfile",
@@ -215,7 +215,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--setup",
-        help="Copy source <modelname>.onnx from argument of --sourcedir and setup a e2eshark onnx model test",
+        help="Copy source <modelname>.onnx from argument of --sourcedir and setup a e2eamdshark onnx model test",
         action="store_true",
         default=False,
     )
@@ -241,13 +241,13 @@ if __name__ == "__main__":
     container_name = "onnxstorage"
     azure_storage_url = account_url + "/" + container_name
     model_root_dir = "onnx/models"
-    e2eshark_test_dir = "e2eshark/" + model_root_dir
+    e2eamdshark_test_dir = "e2eamdshark/" + model_root_dir
 
     args = parser.parse_args()
     testList = getTestsListFromFile(args.testlistfile)
 
     if args.cleanup:
-        cleanup_e2eshark_test(testList, model_root_dir)
+        cleanup_e2eamdshark_test(testList, model_root_dir)
 
     if args.setup:
         if not args.sourcedir:
@@ -269,11 +269,11 @@ if __name__ == "__main__":
         if not os.path.exists(args.modelpy):
             print(f"The template model.py {args.modelpy} does not exist")
             sys.exit(1)
-        setup_e2eshark_test(args.modelpy, testList, sourcedir, model_root_dir)
+        setup_e2eamdshark_test(args.modelpy, testList, sourcedir, model_root_dir)
 
     if args.upload:
         upload_test_to_azure_storage(
-            testList, model_root_dir, e2eshark_test_dir, azure_storage_url
+            testList, model_root_dir, e2eamdshark_test_dir, azure_storage_url
         )
 
     if args.download:

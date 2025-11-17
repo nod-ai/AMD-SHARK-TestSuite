@@ -11,7 +11,7 @@ import numpy
 import onnxruntime
 import sys, argparse, warnings
 import torch, pickle
-from commonutils import getOutputTensorList, E2ESHARK_CHECK_DEF, postProcess
+from commonutils import getOutputTensorList, E2Eamdshark_CHECK_DEF, postProcess
 
 msg = "The script to run an ONNX model test"
 parser = argparse.ArgumentParser(description=msg, epilog="")
@@ -68,11 +68,11 @@ except NameError as e:
             f"Caught exception: {e}\nmodel.py does not support run_as_static option."
         )
 
-E2ESHARK_CHECK["postprocessed_output"] = postProcess(E2ESHARK_CHECK)
+E2Eamdshark_CHECK["postprocessed_output"] = postProcess(E2Eamdshark_CHECK)
 # TBD, remobe torch.save and use the .pkl instead
-torch.save(E2ESHARK_CHECK["input"], inputsavefilename)
-torch.save(E2ESHARK_CHECK["output"], outputsavefilename)
+torch.save(E2Eamdshark_CHECK["input"], inputsavefilename)
+torch.save(E2Eamdshark_CHECK["output"], outputsavefilename)
 
-# Save the E2ESHARK_CHECK
-with open("E2ESHARK_CHECK.pkl", "wb") as f:
-    pickle.dump(E2ESHARK_CHECK, f)
+# Save the E2Eamdshark_CHECK
+with open("E2Eamdshark_CHECK.pkl", "wb") as f:
+    pickle.dump(E2Eamdshark_CHECK, f)

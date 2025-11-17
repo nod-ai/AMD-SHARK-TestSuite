@@ -3,13 +3,13 @@ import onnxruntime
 import onnx
 from onnxruntime.tools.onnx_model_utils import make_dim_param_fixed, fix_output_shapes
 
-# import from e2eshark/tools to allow running in current dir, for run through
+# import from e2eamdshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
 sys.path.insert(0, "../../../tools/stubs")
-from commonutils import E2ESHARK_CHECK_DEF
+from commonutils import E2Eamdshark_CHECK_DEF
 
 # Create an instance of it for this test
-E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
+E2Eamdshark_CHECK = dict(E2Eamdshark_CHECK_DEF)
 
 import logging
 
@@ -103,8 +103,8 @@ def run(run_as_static: bool, logfile: str, verbose: bool):
         {inputs[i].name: model_inputs[i] for i in range(len(inputs))},
     )
 
-    E2ESHARK_CHECK["input"] = [torch.from_numpy(arr) for arr in model_inputs]
-    E2ESHARK_CHECK["output"] = [torch.from_numpy(arr) for arr in model_outputs]
+    E2Eamdshark_CHECK["input"] = [torch.from_numpy(arr) for arr in model_inputs]
+    E2Eamdshark_CHECK["output"] = [torch.from_numpy(arr) for arr in model_outputs]
 
-    print("Input:", E2ESHARK_CHECK["input"])
-    print("Output:", E2ESHARK_CHECK["output"])
+    print("Input:", E2Eamdshark_CHECK["input"])
+    print("Output:", E2Eamdshark_CHECK["output"])

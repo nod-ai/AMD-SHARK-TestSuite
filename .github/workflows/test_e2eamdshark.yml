@@ -4,7 +4,7 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-name: E2ESHARK Test Suite unique models
+name: E2Eamdshark Test Suite unique models
 on:
   workflow_dispatch:
   schedule:
@@ -13,7 +13,7 @@ on:
 
 
 jobs: 
-  e2eshark:
+  e2eamdshark:
     timeout-minutes: 600
     name: "Models :: ${{ matrix.backend }} :: ${{ matrix.test-file }}"
     runs-on: ${{ matrix.runs-on }}
@@ -27,322 +27,322 @@ jobs:
             device: hip
             target-chip: gfx942
             test-file: nlp-shard1_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu2_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: nlp-shard2_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu3_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: nlp-shard3_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu4_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
-            test-file: shark-test-suite_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            test-file: amdshark-test-suite_unique
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu5_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard1_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu6_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard2_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu7_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard3_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu8_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard1_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu9_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard2_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu10_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard3_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu11_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-vision-int8_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu12_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: migraphx_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu13_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_1_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu14_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_2_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu15_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_3_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu16_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_4_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu17_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_5_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu18_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_gen_ai_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu19_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_graph_ml_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu20_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_nlp_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu21_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_validated_text_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu22_test
             runs-on: nodai-amdgpu-mi300-x86-64
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_validated_vision_unique
-            cache-dir: /data/e2eshark/shark-test-suite-models-cache
+            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           # - name: mi300_gpu13_test
           #   runs-on: nodai-amdgpu-mi300-x86-64
           #   backend: hip
           #   device: hip
           #   target-chip: gfx942
           #   test-file: onnxrt-iree-ep
-          #   cache-dir: /data/e2eshark/shark-test-suite-models-cache
+          #   cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: cpu_shard1_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: nlp-shard1_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard2_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: nlp-shard2_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard3_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: nlp-shard3_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard4_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
-            test-file: shark-test-suite_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            test-file: amdshark-test-suite_unique
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard5_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard1_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard6_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard2_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard7_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard3_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard8_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-int8-p0p1-shard1_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard9_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-int8-p0p1-shard2_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard10_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-int8-p0p1-shard3_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard11_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-vision-int8_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard12_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: migraphx_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard13_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_1_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard14_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_2_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard15_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_3_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard16_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_4_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard17_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_5_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard18_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_gen_ai_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard19_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_graph_ml_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard20_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_nlp_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard21_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_validated_text_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard22_test
             runs-on: nodai-amdgpu-mi250-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_validated_vision_unique
-            cache-dir: /groups/aig_sharks/test-suite-ci-cache
+            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           # - name: cpu_shard13_test
           #   runs-on: nodai-amdgpu-mi250-x86-64
           #   backend: llvm-cpu
           #   device: local-task
           #   target-chip: x86_64-linux-gnu
           #   test-file: onnxrt-iree-ep
-          #   cache-dir: /groups/aig_sharks/test-suite-ci-cache
+          #   cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
       EP_VENV_DIR: ${{ github.workspace }}/ep_venv
@@ -354,18 +354,18 @@ jobs:
       - name: Checkout Test Suite
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          repository: nod-ai/SHARK-TestSuite
+          repository: nod-ai/amdshark-TestSuite
           path: test-suite
       
-      - name: "Setup alt e2eshark python venv"
+      - name: "Setup alt e2eamdshark python venv"
         run: |
           rm -rf ${ALT_E2E_VENV_DIR}
           python3.11 -m venv ${ALT_E2E_VENV_DIR}
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip install --upgrade pip
-          pip install -r ./alt_e2eshark/base_requirements.txt
-          pip install -r ./alt_e2eshark/iree_requirements.txt
-          pip install --no-deps -r ./alt_e2eshark/torch_mlir_requirements.txt
+          pip install -r ./alt_e2eamdshark/base_requirements.txt
+          pip install -r ./alt_e2eamdshark/iree_requirements.txt
+          pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
           pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
         working-directory: ./test-suite
       
@@ -374,11 +374,11 @@ jobs:
           python3.11 -m venv ${EP_VENV_DIR}
           source ${EP_VENV_DIR}/bin/activate
           pip install --upgrade pip
-          pip install -r ./alt_e2eshark/base_requirements.txt
-          pip install -r ./alt_e2eshark/iree_requirements.txt
-          pip install --no-deps -r ./alt_e2eshark/torch_mlir_requirements.txt
+          pip install -r ./alt_e2eamdshark/base_requirements.txt
+          pip install -r ./alt_e2eamdshark/iree_requirements.txt
+          pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
           pip uninstall -y onnxruntime
-          wget https://sharkpublic.blob.core.windows.net/sharkpublic/onnxruntime/pip_whl/onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
+          wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/onnxruntime/pip_whl/onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
           pip install ./onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
         working-directory: ./test-suite
 
@@ -387,7 +387,7 @@ jobs:
         run: |
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip freeze
-          cd alt_e2eshark
+          cd alt_e2eamdshark
           free -mh
           python3.11 ./run.py \
             -r ./test-onnx \
@@ -410,7 +410,7 @@ jobs:
         run: |
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip freeze
-          cd alt_e2eshark
+          cd alt_e2eamdshark
           free -mh
           python3.11 ./run.py \
             -r ./test-onnx \
@@ -436,7 +436,7 @@ jobs:
           echo "COMPILER_PATH=$COMPILER_PATH" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
           pip freeze
-          cd alt_e2eshark
+          cd alt_e2eamdshark
           free -mh
           python ./run.py -m ort-ep \
             -r ./test-onnx \
@@ -455,20 +455,20 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_onnx_md
-          path: ./test-suite/alt_e2eshark/reports/${{ matrix.test-file }}.md
+          path: ./test-suite/alt_e2eamdshark/reports/${{ matrix.test-file }}.md
       
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_onnx_json
-          path: ./test-suite/alt_e2eshark/reports/${{ matrix.test-file }}.json
+          path: ./test-suite/alt_e2eamdshark/reports/${{ matrix.test-file }}.json
       
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_duplicates_json
-          path: ./test-suite/alt_e2eshark/duplicates.json
+          path: ./test-suite/alt_e2eamdshark/duplicates.json
 
   push_artifacts:
-    needs: [e2eshark]
+    needs: [e2eamdshark]
     runs-on: ${{ matrix.runs-on }}
     strategy:
       fail-fast: false
@@ -484,264 +484,264 @@ jobs:
             backend: llvm-cpu
             regression-blob: cpu
     env:
-      AZ_PUBLIC_KEY: ${{ secrets.SHARKPUBLIC_AZ_PUBLIC_KEY }}
+      AZ_PUBLIC_KEY: ${{ secrets.amdsharkPUBLIC_AZ_PUBLIC_KEY }}
     steps:
       - name: Checkout Test Suite
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          repository: nod-ai/SHARK-TestSuite
+          repository: nod-ai/amdshark-TestSuite
           path: test-suite
       - name: Checkout repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          repository: nod-ai/e2eshark-reports
+          repository: nod-ai/e2eamdshark-reports
           ref: main
-          token: ${{ secrets.E2ESHARK_GITHUB_TOKEN }}
-          path: e2eshark-reports
+          token: ${{ secrets.E2Eamdshark_GITHUB_TOKEN }}
+          path: e2eamdshark-reports
       - name: "Setup alt test suite venv"
         run: |
           python3.11 -m venv report_venv_alt
           source report_venv_alt/bin/activate
           pip install --upgrade pip
-          pip install -r ./test-suite/alt_e2eshark/base_requirements.txt
-          pip install -r ./test-suite/alt_e2eshark/iree_requirements.txt
-          pip install --no-deps -r ./test-suite/alt_e2eshark/torch_mlir_requirements.txt
+          pip install -r ./test-suite/alt_e2eamdshark/base_requirements.txt
+          pip install -r ./test-suite/alt_e2eamdshark/iree_requirements.txt
+          pip install --no-deps -r ./test-suite/alt_e2eamdshark/torch_mlir_requirements.txt
           pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
-          name: ci_reports_${{ matrix.backend }}_shark-test-suite_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_shark-test-suite_unique_onnx_md
+          name: ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
-          name: ci_reports_${{ matrix.backend }}_shark-test-suite_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_shark-test-suite_unique_onnx_json
+          name: ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json
 
 
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_md
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_json
-          path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_json
       # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
       #   with:
       #     name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_md
-      #     path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_md
+      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_md
       # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
       #   with:
       #     name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
-      #     path: ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
+      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
       - name: Merge Reports
         run: |
           source report_venv_alt/bin/activate
 
-          python ./test-suite/alt_e2eshark/utils/merge_dicts.py \
-          --sources ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_json/vai-hf-cnn-fp32-shard1_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_json/vai-hf-cnn-fp32-shard2_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_json/vai-hf-cnn-fp32-shard3_unique.json \
-          --output ./e2eshark-reports/vai-hf-cnn-fp32_unique.json \
-          --report --report-file ./e2eshark-reports/vai-hf-cnn-fp32_unique.md
+          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
+          --sources ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_json/vai-hf-cnn-fp32-shard1_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_json/vai-hf-cnn-fp32-shard2_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_json/vai-hf-cnn-fp32-shard3_unique.json \
+          --output ./e2eamdshark-reports/vai-hf-cnn-fp32_unique.json \
+          --report --report-file ./e2eamdshark-reports/vai-hf-cnn-fp32_unique.md
 
-          python ./test-suite/alt_e2eshark/utils/merge_dicts.py \
-          --sources ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_json/vai-int8-p0p1-shard1_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_json/vai-int8-p0p1-shard2_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_json/vai-int8-p0p1-shard3_unique.json \
-          --output ./e2eshark-reports/vai-int8-p0p1_unique.json \
-          --report --report-file ./e2eshark-reports/vai-int8-p0p1_unique.md
+          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
+          --sources ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_json/vai-int8-p0p1-shard1_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_json/vai-int8-p0p1-shard2_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_json/vai-int8-p0p1-shard3_unique.json \
+          --output ./e2eamdshark-reports/vai-int8-p0p1_unique.json \
+          --report --report-file ./e2eamdshark-reports/vai-int8-p0p1_unique.md
 
-          python ./test-suite/alt_e2eshark/utils/merge_dicts.py \
-          --sources ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_json/nlp-shard1_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_json/nlp-shard2_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json/nlp-shard3_unique.json \
-          --output ./e2eshark-reports/nlp_unique.json \
-          --report --report-file ./e2eshark-reports/nlp_unique.md
+          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
+          --sources ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_json/nlp-shard1_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_json/nlp-shard2_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json/nlp-shard3_unique.json \
+          --output ./e2eamdshark-reports/nlp_unique.json \
+          --report --report-file ./e2eamdshark-reports/nlp_unique.md
 
-          python ./test-suite/alt_e2eshark/utils/merge_dicts.py \
-          --sources ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_json/onnx_model_zoo_computer_vision_1_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_json/onnx_model_zoo_computer_vision_2_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_json/onnx_model_zoo_computer_vision_3_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_json/onnx_model_zoo_computer_vision_4_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_json/onnx_model_zoo_computer_vision_5_unique.json \
-          --output ./e2eshark-reports/onnx_model_zoo_computer_vision_unique.json \
-          --report --report-file ./e2eshark-reports/onnx_model_zoo_computer_vision_unique.md
+          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
+          --sources ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_json/onnx_model_zoo_computer_vision_1_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_json/onnx_model_zoo_computer_vision_2_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_json/onnx_model_zoo_computer_vision_3_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_json/onnx_model_zoo_computer_vision_4_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_json/onnx_model_zoo_computer_vision_5_unique.json \
+          --output ./e2eamdshark-reports/onnx_model_zoo_computer_vision_unique.json \
+          --report --report-file ./e2eamdshark-reports/onnx_model_zoo_computer_vision_unique.md
 
-          python ./test-suite/alt_e2eshark/utils/merge_dicts.py \
-          --sources ./e2eshark-reports/vai-int8-p0p1_unique.json \
-          ./e2eshark-reports/vai-hf-cnn-fp32_unique.json \
-          ./e2eshark-reports/nlp_unique.json \
-          ./e2eshark-reports/onnx_model_zoo_computer_vision_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_shark-test-suite_unique_onnx_json/shark-test-suite_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_json/vai-vision-int8_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_json/migraphx_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_json/onnx_model_zoo_gen_ai_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_json/onnx_model_zoo_graph_ml_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_json/onnx_model_zoo_nlp_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_json/onnx_model_zoo_validated_text_unique.json \
-          ./e2eshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_json/onnx_model_zoo_validated_vision_unique.json \
-          --output ./e2eshark-reports/combined_reports_unique.json \
-          --report --report-file ./e2eshark-reports/combined_reports_unique.md
+          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
+          --sources ./e2eamdshark-reports/vai-int8-p0p1_unique.json \
+          ./e2eamdshark-reports/vai-hf-cnn-fp32_unique.json \
+          ./e2eamdshark-reports/nlp_unique.json \
+          ./e2eamdshark-reports/onnx_model_zoo_computer_vision_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_json/amdshark-test-suite_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_json/vai-vision-int8_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_json/migraphx_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_json/onnx_model_zoo_gen_ai_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_json/onnx_model_zoo_graph_ml_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_json/onnx_model_zoo_nlp_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_json/onnx_model_zoo_validated_text_unique.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_json/onnx_model_zoo_validated_vision_unique.json \
+          --output ./e2eamdshark-reports/combined_reports_unique.json \
+          --report --report-file ./e2eamdshark-reports/combined_reports_unique.md
 
       - name: Push status artifacts
         run: |
@@ -751,7 +751,7 @@ jobs:
           date=$(date '+%Y-%m-%d')
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32_unique
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/shark-test-suite_unique
+          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/amdshark-test-suite_unique
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8_unique
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/migraphx_unique
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/nlp_unique
@@ -766,7 +766,7 @@ jobs:
           cp vai-int8-p0p1_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1_unique/summary.md
           cp nlp_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/nlp_unique/summary.md
           cp onnx_model_zoo_computer_vision_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_computer_vision_unique/summary.md
-          cp ci_reports_${{ matrix.backend }}_shark-test-suite_unique_onnx_md/shark-test-suite_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/shark-test-suite_unique/summary.md
+          cp ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_md/amdshark-test-suite_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/amdshark-test-suite_unique/summary.md
           cp ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_md/vai-vision-int8_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8_unique/summary.md
           cp ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_md/migraphx_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/migraphx_unique/summary.md
           cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_md/onnx_model_zoo_gen_ai_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_gen_ai_unique/summary.md
@@ -776,9 +776,9 @@ jobs:
           cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_md/onnx_model_zoo_validated_vision_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_validated_vision_unique/summary.md
           cp combined_reports_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/summary.md
           git add $date
-          git commit -m "add CI status reports for e2eshark for ${{ matrix.backend }}"
+          git commit -m "add CI status reports for e2eamdshark for ${{ matrix.backend }}"
           git push origin main
-        working-directory: ./e2eshark-reports
+        working-directory: ./e2eamdshark-reports
       
       - name: Regression Reports
         run: |
@@ -786,27 +786,27 @@ jobs:
           cd test-suite
           mkdir latest
           mkdir baseline
-          wget https://sharkpublic.blob.core.windows.net/sharkpublic/latest-test-suite/combined_reports_${{ matrix.backend }}.json -O latest/combined_reports_${{ matrix.backend }}.json
-          wget https://sharkpublic.blob.core.windows.net/sharkpublic/baseline-test-suite/combined_reports_${{ matrix.regression-blob }}.json -O baseline/combined_reports_${{ matrix.backend }}.json
+          wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/latest-test-suite/combined_reports_${{ matrix.backend }}.json -O latest/combined_reports_${{ matrix.backend }}.json
+          wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/baseline-test-suite/combined_reports_${{ matrix.regression-blob }}.json -O baseline/combined_reports_${{ matrix.backend }}.json
           cd ..
 
-          python ./test-suite/alt_e2eshark/utils/check_regressions.py \
-            --new ./e2eshark-reports/combined_reports_unique.json \
+          python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
+            --new ./e2eamdshark-reports/combined_reports_unique.json \
             --old ./test-suite/latest/combined_reports_${{ matrix.backend }}.json \
-            --report-file ./e2eshark-reports/yesterday_comparison.md \
+            --report-file ./e2eamdshark-reports/yesterday_comparison.md \
             --perf_tol_regression=0.05 \
             --perf_tol_progression=0.05
           
-          python ./test-suite/alt_e2eshark/utils/check_regressions.py \
-            --new ./e2eshark-reports/combined_reports_unique.json \
+          python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
+            --new ./e2eamdshark-reports/combined_reports_unique.json \
             --old ./test-suite/baseline/combined_reports_${{ matrix.backend }}.json \
-            --report-file ./e2eshark-reports/baseline_comparison.md \
+            --report-file ./e2eamdshark-reports/baseline_comparison.md \
             --perf_tol_regression=0.1 \
             --perf_tol_progression=0.1
           
-          az storage blob upload --account-name sharkpublic --container-name sharkpublic \
+          az storage blob upload --account-name amdsharkpublic --container-name amdsharkpublic \
             --name latest-test-suite/combined_reports_${{ matrix.backend }}.json \
-            --file ./e2eshark-reports/combined_reports_unique.json \
+            --file ./e2eamdshark-reports/combined_reports_unique.json \
             --account-key ${AZ_PUBLIC_KEY} --overwrite
 
       - name: Push regression artifacts
@@ -818,6 +818,6 @@ jobs:
           cp yesterday_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/yesterday_comparison.md
           cp baseline_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/baseline_comparison.md
           git add $date
-          git commit -m "add CI regression reports for e2eshark for ${{ matrix.backend }}"
+          git commit -m "add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
           git push origin main
-        working-directory: ./e2eshark-reports
+        working-directory: ./e2eamdshark-reports

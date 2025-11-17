@@ -15,7 +15,7 @@ priv_container_name = "onnxprivatestorage"
 
 
 def pre_test_onnx_model_azure_download(name, cache_dir, model_path):
-    # This util helps setting up the e2eshark/onnx/models tests by ensuring
+    # This util helps setting up the e2eamdshark/onnx/models tests by ensuring
     # all the models-tests in the testsList have the required model.onnx file
     # testsList: expected to contain only onnx tests
 
@@ -57,7 +57,7 @@ def download_and_setup_onnxmodel(cache_dir, name):
     priv_account_url = "https://onnxprivatestorage.blob.core.windows.net"
     priv_container_name = "onnxprivatestorage"
 
-    blob_dir = os.path.join("e2eshark/onnx/models/", name)
+    blob_dir = os.path.join("e2eamdshark/onnx/models/", name)
     blob_name = os.path.join(blob_dir, "model.onnx.zip")
     dest_file = os.path.join(cache_dir, "model.onnx.zip")
     if os.path.exists(dest_file):

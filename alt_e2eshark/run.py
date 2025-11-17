@@ -12,7 +12,7 @@ import argparse
 import re
 from typing import List, Literal, Optional
 
-# append alt_e2eshark dir to path to allow importing without explicit pythonpath management
+# append alt_e2eamdshark dir to path to allow importing without explicit pythonpath management
 TEST_DIR = str(Path(__file__).parent)
 sys.path.append(TEST_DIR)
 
@@ -316,7 +316,7 @@ def run_tests(
     return status_dict
 
 def _get_argparse():
-    msg = "The run.py script to run e2e shark tests"
+    msg = "The run.py script to run e2e amdshark tests"
     parser = argparse.ArgumentParser(prog="run.py", description=msg, epilog="")
 
     # test config related arguments:

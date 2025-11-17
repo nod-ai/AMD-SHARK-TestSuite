@@ -13,7 +13,7 @@ import onnxruntime
 this_file = Path(__file__)
 lists_dir = (this_file.parent).joinpath("external_lists")
 
-model_names = load_test_txt_file(lists_dir.joinpath("shark-test-suite.txt"))
+model_names = load_test_txt_file(lists_dir.joinpath("amdshark-test-suite.txt"))
 for i in range(1, 4):
     model_names += load_test_txt_file(
         lists_dir.joinpath(f"vai-hf-cnn-fp32-shard{i}.txt")

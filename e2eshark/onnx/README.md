@@ -8,7 +8,7 @@ Making a model.py for an unknown model.onnx file can be done in a few steps:
 1. Figure out what the inputs look like.
 2. Make some randomized model inputs.
 3. Start an inference session and run it.
-4. Use E2ESHARK_CHECK to record inputs and outputs and apply post-processing if desired.
+4. Use E2Eamdshark_CHECK to record inputs and outputs and apply post-processing if desired.
 
 Let's go into more depth into each step. 
 
@@ -20,13 +20,13 @@ In addition to whatever additional python packages you choose to use, the boiler
 import numpy, torch, sys
 import onnxruntime
 
-# import from e2eshark/tools to allow running in current dir, for run through
+# import from e2eamdshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
 sys.path.insert(0, "../../../tools/stubs")
-from commonutils import E2ESHARK_CHECK_DEF
+from commonutils import E2Eamdshark_CHECK_DEF
 
 # Create an instance of it for this test
-E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
+E2Eamdshark_CHECK = dict(E2Eamdshark_CHECK_DEF)
 ```
 
 ### 1. Figure out what the inputs look like
@@ -104,16 +104,16 @@ model_outputs = session.run(
 )
 ```
 
-### 4. Use E2ESHARK_CHECK to record inputs and outputs and apply post-processing if desired
+### 4. Use E2Eamdshark_CHECK to record inputs and outputs and apply post-processing if desired
 
 At the very least, include:
 
 ```python
-E2ESHARK_CHECK["input"] = [torch.from_numpy(arr) for arr in model_inputs]
-E2ESHARK_CHECK["output"] = [torch.from_numpy(arr) for arr in model_outputs]
+E2Eamdshark_CHECK["input"] = [torch.from_numpy(arr) for arr in model_inputs]
+E2Eamdshark_CHECK["output"] = [torch.from_numpy(arr) for arr in model_outputs]
 
-print("Input:", E2ESHARK_CHECK["input"])
-print("Output:", E2ESHARK_CHECK["output"])
+print("Input:", E2Eamdshark_CHECK["input"])
+print("Output:", E2Eamdshark_CHECK["output"])
 ```
 
 For some models, it may be fun to apply some post-processing. Here is an example contained in many model.py files for vision models:
@@ -122,7 +122,7 @@ For some models, it may be fun to apply some post-processing. Here is an example
 # Post process output to do:
 # sort(topk(torch.nn.functional.softmax(output, 0), 2)[1])[0]
 # Top most probability
-E2ESHARK_CHECK["postprocess"] = [
+E2Eamdshark_CHECK["postprocess"] = [
     (torch.nn.functional.softmax, [0], False, 0),
     (torch.topk, [2], True, 1),
     (torch.sort, [], True, 0),

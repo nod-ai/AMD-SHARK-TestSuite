@@ -1,4 +1,4 @@
- # e2eshark framework-to-iree-to-inference tests
+ # e2eamdshark framework-to-iree-to-inference tests
 
  This test suite enables developers to add small (operator level) to large (full model)
  end-2-end tests that compare output of running a model in a Framework
@@ -56,7 +56,7 @@
     `model.py` in test directory to form a `runmodel.py` for the tests of framework 'pytorch'
  - [`tools/stubs/commonutils.py`](./tools/stubs/commonutils.py): Utilities common to other
     tools/stubs files as well as model.py. This also defines a dictionary named as
-    `E2ESHARK_CHECK_DEF`, an instance of which is created for each test. This allows serializing
+    `E2Eamdshark_CHECK_DEF`, an instance of which is created for each test. This allows serializing
     input, output, any special controls, post processing recipe to be passed from `model.py` to
     `run.py`
  - [`tools/onnxutil.py`](./tools/onnxutil.py) : Allows examining an ONNX (protobuf) file
@@ -162,8 +162,8 @@ https://github.com/nod-ai/iree-amd-aie
 To get this test repo:
 
 ```bash
-git clone https://github.com/nod-ai/SHARK-TestSuite.git
-cd SHARK-TestSuite/e2eshark
+git clone https://github.com/nod-ai/amdshark-TestSuite.git
+cd amdshark-TestSuite/e2eamdshark
 
 ```
 Set up python environment, you can use venv or conda.
@@ -192,10 +192,10 @@ pip install 'your local torch MLIR repo'/torch-mlir-wheel/torch_mlir-0.0.1-cp310
 
 ## Turbine Mode
 
-If you are also interested in running through SHARK-Turbine follow these instructions as well:
+If you are also interested in running through amdshark-Turbine follow these instructions as well:
 
 ```bash
-git clone https://github.com/nod-ai/SHARK-Turbine
+git clone https://github.com/nod-ai/amdshark-Turbine
 ```
 
 ```bash
@@ -207,7 +207,7 @@ Now, go back to the TestSuite Repo, and make sure you are using same venv from a
 ```bash
 pip install -f https://iree.dev/pip-release-links.html --upgrade -r 'your local iree turbine repo'/iree-requirements.txt
 pip install -e 'your local iree turbine repo'[testing]
-pip install -e 'your local SHARK Turbine repo'/models
+pip install -e 'your local amdshark Turbine repo'/models
 ```
 
 Once setup, in any new shell you can activate the same env everytime you want to use it
@@ -383,22 +383,22 @@ The -1 under inference indicates, one test regressed in inference
 If you are interested in running tests, but want to upload the mlir files generated to Azure
 to share with others or for yourself, first you will have to set the `AZURE_CONNECTION_STRING` environment
 variable. You can find this connection string here:
-https://portal.azure.com/#@amdcloud.onmicrosoft.com/resource/subscriptions/8c190d1b-eb91-48d5-bec5-3e7cb7412e6c/resourceGroups/pdue-nod-ai-rg/providers/Microsoft.Storage/storageAccounts/e2esharkuserartifacts/keys.
+https://portal.azure.com/#@amdcloud.onmicrosoft.com/resource/subscriptions/8c190d1b-eb91-48d5-bec5-3e7cb7412e6c/resourceGroups/pdue-nod-ai-rg/providers/Microsoft.Storage/storageAccounts/e2eamdsharkuserartifacts/keys.
 If you don't have access to link above, you can ask Sai Enduri for the connection string.
 
 Then, setup an upload_list.txt file with the names of the models you want to upload on. There is already one
-setup at [`e2eshark/gold/upload_list.txt`](./gold/upload_list.txt). You can just modify that one.
+setup at [`e2eamdshark/gold/upload_list.txt`](./gold/upload_list.txt). You can just modify that one.
 
-Optional: If you want to change what type of files are being uploaded, simply tweak `upload_list = ["mlir"]` in e2eshark/run.py to change or add more file types you want to upload (`upload_list = ["mlir", "log"]` for example).
+Optional: If you want to change what type of files are being uploaded, simply tweak `upload_list = ["mlir"]` in e2eamdshark/run.py to change or add more file types you want to upload (`upload_list = ["mlir", "log"]` for example).
 
 
 With this connection string and upload list file, you can now run command like this:
 
 ```bash
-python ./run.py -c ../../torch-mlir/build -i ../../iree-build --report --cachedir ~/.cache/huggingface --mode direct --tests pytorch/models/beit-base-patch16-224-pt22k-ft22k pytorch/models/bge-base-en-v1.5 pytorch/models/mit-b0 pytorch/models/bert-large-uncased pytorch/models/deit-small-distilled-patch16-224 --uploadtestsfile /home/sai/SHARK-TestSuite-fork/e2eshark/gold/upload_list.txt --cleanup
+python ./run.py -c ../../torch-mlir/build -i ../../iree-build --report --cachedir ~/.cache/huggingface --mode direct --tests pytorch/models/beit-base-patch16-224-pt22k-ft22k pytorch/models/bge-base-en-v1.5 pytorch/models/mit-b0 pytorch/models/bert-large-uncased pytorch/models/deit-small-distilled-patch16-224 --uploadtestsfile /home/sai/amdshark-TestSuite-fork/e2eamdshark/gold/upload_list.txt --cleanup
 ```
 
-You can then find a json file (`upload_urls.json` in e2eshark directory) with the model names and links to the files uploaded for each model. You can just wget these links to download as it is public, so should be easy to share with others.
+You can then find a json file (`upload_urls.json` in e2eamdshark directory) with the model names and links to the files uploaded for each model. You can just wget these links to download as it is public, so should be easy to share with others.
 
 ### Adding new tests
 
@@ -421,7 +421,7 @@ Now take following steps:
 5. modify model.py
 6. You can run 'python ./model.py' to see input and output values
 
-Once your model.py is ready, you can go to root of the e2eshark test directory and run test as below
+Once your model.py is ready, you can go to root of the e2eamdshark test directory and run test as below
 
 ```bash
 python ./run.py --cachedir 'path_to_your_cache_dir' -c "your torch mlir build dir" --tests pytorch/operators/maxpool_2d_large --mode direct --runupto torch-mlir --torchtolinalg

@@ -8,13 +8,13 @@ import sys
 import torch
 from transformers import T5Model, AutoTokenizer
 
-# import from e2eshark/tools to allow running in current dir, for run through
+# import from e2eamdshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
 sys.path.insert(0, "../../../tools/stubs")
-from commonutils import E2ESHARK_CHECK_DEF
+from commonutils import E2Eamdshark_CHECK_DEF
 
 # Create an instance of it for this test
-E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
+E2Eamdshark_CHECK = dict(E2Eamdshark_CHECK_DEF)
 
 # model origin: https://huggingface.co/t5-base
 test_modelname = "t5-base"
@@ -43,16 +43,16 @@ decoder_input_ids = tokenizer(
 ).input_ids.cpu()
 decoder_input_ids = model._shift_right(decoder_input_ids)
 attention_mask = torch.ones(1, 512).to("cpu")
-E2ESHARK_CHECK["input"] = [encoded_input_ids, attention_mask, decoder_input_ids]
-E2ESHARK_CHECK["output"] = model(input_ids=encoded_input_ids, attention_mask=attention_mask, decoder_input_ids=decoder_input_ids)
+E2Eamdshark_CHECK["input"] = [encoded_input_ids, attention_mask, decoder_input_ids]
+E2Eamdshark_CHECK["output"] = model(input_ids=encoded_input_ids, attention_mask=attention_mask, decoder_input_ids=decoder_input_ids)
 # last hidden state (contextual info, sequence of hidden-states at the output of the last layer of the decoder of the model.)
-E2ESHARK_CHECK["output_for_validation"] = [E2ESHARK_CHECK["output"][0]]
+E2Eamdshark_CHECK["output_for_validation"] = [E2Eamdshark_CHECK["output"][0]]
 
-print("Input:", E2ESHARK_CHECK["input"])
-print("Output:", E2ESHARK_CHECK["output"])
+print("Input:", E2Eamdshark_CHECK["input"])
+print("Output:", E2Eamdshark_CHECK["output"])
 # For geneartive AI models, input is int and should be kept that way for
 # casted models as well
-E2ESHARK_CHECK["inputtodtype"] = False
+E2Eamdshark_CHECK["inputtodtype"] = False
 
 # not possible to postprocess output here (model outputs text, not probability distribution/logits)
 # example use of this model input: "translate this sentence to spanish: Hi" -> output: "Hola"

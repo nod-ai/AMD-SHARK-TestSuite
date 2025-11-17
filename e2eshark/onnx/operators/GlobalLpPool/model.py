@@ -9,7 +9,7 @@
 # Description: testing GlobalLpPool
 # See https://onnx.ai/onnx/intro/python.html for intro on creating
 # onnx model using python onnx API
-from commonutils import E2ESHARK_CHECK_DEF
+from commonutils import E2Eamdshark_CHECK_DEF
 import numpy
 import torch
 import sys
@@ -22,12 +22,12 @@ from onnx.helper import (
     make_tensor_value_info,
 )
 
-# import from e2eshark/tools to allow running in current dir, for run through
+# import from e2eamdshark/tools to allow running in current dir, for run through
 # run.pl, commutils is symbolically linked to allow any rundir to work
 sys.path.insert(0, "../../../tools/stubs")
 
 # Create an instance of it for this test
-E2ESHARK_CHECK = dict(E2ESHARK_CHECK_DEF)
+E2Eamdshark_CHECK = dict(E2Eamdshark_CHECK_DEF)
 
 # TEST(1) : default p value 2D Case
 # Create an input (ValueInfoProto)
@@ -74,11 +74,11 @@ print("Input shape:", model_input_X.shape)
 print("Output shape:", numpy.array(model_output[0]).shape)
 
 # Moving to torch to handle bfloat16 as numpy does not support bfloat16
-E2ESHARK_CHECK["input"] = [torch.from_numpy(model_input_X)]
-E2ESHARK_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
+E2Eamdshark_CHECK["input"] = [torch.from_numpy(model_input_X)]
+E2Eamdshark_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
 
-print("Input:", E2ESHARK_CHECK["input"])
-print("Output:", E2ESHARK_CHECK["output"])
+print("Input:", E2Eamdshark_CHECK["input"])
+print("Output:", E2Eamdshark_CHECK["output"])
 
 # TEST(2) : Non-Default p value 2D case
 # Create an input (ValueInfoProto)
@@ -126,11 +126,11 @@ print("Input shape:", model_input_X.shape)
 print("Output shape:", numpy.array(model_output[0]).shape)
 
 # Moving to torch to handle bfloat16 as numpy does not support bfloat16
-E2ESHARK_CHECK["input"] = [torch.from_numpy(model_input_X)]
-E2ESHARK_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
+E2Eamdshark_CHECK["input"] = [torch.from_numpy(model_input_X)]
+E2Eamdshark_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
 
-print("Input:", E2ESHARK_CHECK["input"])
-print("Output:", E2ESHARK_CHECK["output"])
+print("Input:", E2Eamdshark_CHECK["input"])
+print("Output:", E2Eamdshark_CHECK["output"])
 
 # TEST(3) : 1D Case, Non default p value
 # Create an input (ValueInfoProto)
@@ -178,8 +178,8 @@ print("Input shape:", model_input_X.shape)
 print("Output shape:", numpy.array(model_output[0]).shape)
 
 # Moving to torch to handle bfloat16 as numpy does not support bfloat16
-E2ESHARK_CHECK["input"] = [torch.from_numpy(model_input_X)]
-E2ESHARK_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
+E2Eamdshark_CHECK["input"] = [torch.from_numpy(model_input_X)]
+E2Eamdshark_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
 
-print("Input:", E2ESHARK_CHECK["input"])
-print("Output:", E2ESHARK_CHECK["output"])
+print("Input:", E2Eamdshark_CHECK["input"])
+print("Output:", E2Eamdshark_CHECK["output"])

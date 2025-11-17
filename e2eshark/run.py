@@ -24,7 +24,7 @@ from _run_helper import (
     getTestKind,
     changeToTestDir,
     concatenateFiles,
-    loadE2eSharkCheckDictionary,
+    loadE2eamdsharkCheckDictionary,
     uploadToBlobStorage,
     unzipONNXFile,
     loadTorchSave,
@@ -505,10 +505,10 @@ def runInference(
         )
     end = time.time()
 
-    # Load the E2ESHARK_CHECK.pkl file saved by model run
-    e2esharkDict = loadE2eSharkCheckDictionary()
+    # Load the E2Eamdshark_CHECK.pkl file saved by model run
+    e2eamdsharkDict = loadE2eamdsharkCheckDictionary()
     # get gold postprocessed output list
-    goldpostoutputlist = e2esharkDict["postprocessed_output"]
+    goldpostoutputlist = e2eamdsharkDict["postprocessed_output"]
 
     for i in range(0, len(goldoutputlist)):
         goldoutput = goldoutputlist[i]
@@ -537,12 +537,12 @@ def runInference(
             args, goldoutput_flat, infoutput_flat, torchdtype
         )
 
-        if not inferencematched or e2esharkDict.get("output_for_validation"):
+        if not inferencematched or e2eamdsharkDict.get("output_for_validation"):
             if i >= len(goldpostoutputlist):
                 resultdict[curphase] = ["passed", end - start]
                 return
-            if args.postprocess and (e2esharkDict.get("postprocess")):
-                functionPipeLine = e2esharkDict["postprocess"]
+            if args.postprocess and (e2eamdsharkDict.get("postprocess")):
+                functionPipeLine = e2eamdsharkDict["postprocess"]
                 goldpostoutput = goldpostoutputlist[i]
                 infpostoutput = applyPostProcessPipeline(infoutput, functionPipeLine)
                 # now compare the two
@@ -1136,7 +1136,7 @@ def checkBuild(run_dir, args):
 
 def main():
     global TORCH_MLIR_BUILD, IREE_BUILD
-    msg = "The run.py script to run e2e shark tests"
+    msg = "The run.py script to run e2e amdshark tests"
     parser = argparse.ArgumentParser(prog="run.py", description=msg, epilog="")
     parser.add_argument(
         "-b",
@@ -1351,7 +1351,7 @@ def main():
     TORCH_MLIR_BUILD, IREE_BUILD = checkBuild(run_dir, args)
     # assert
 
-    print("Starting e2eshark tests. Using", args.jobs, "processes")
+    print("Starting e2eamdshark tests. Using", args.jobs, "processes")
     print("Cache Directory: " + cache_dir)
     if args.tolerance:
         print(
@@ -1470,7 +1470,7 @@ def main():
         shutil.move(run_dir + "/timereport.md", mode_path + "/timereport.md")
 
     # When all processes are done, print
-    print("\nCompleted run of e2e shark tests")
+    print("\nCompleted run of e2e amdshark tests")
     if args.uploadtestsfile:
         print(
             "\nIf using the upload feature, you can find a map of the test name "

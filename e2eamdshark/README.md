@@ -162,7 +162,7 @@ https://github.com/nod-ai/iree-amd-aie
 To get this test repo:
 
 ```bash
-git clone https://github.com/nod-ai/AMDSHARK-TestSuite.git
+git clone https://github.com/nod-ai/AMD-SHARK-TestSuite.git
 cd AMDSHARK-TestSuite/e2eamdshark
 
 ```
@@ -192,10 +192,10 @@ pip install 'your local torch MLIR repo'/torch-mlir-wheel/torch_mlir-0.0.1-cp310
 
 ## Turbine Mode
 
-If you are also interested in running through AMDSHARK-Turbine follow these instructions as well:
+If you are also interested in running through AMD-SHARK-Turbine follow these instructions as well:
 
 ```bash
-git clone https://github.com/nod-ai/AMDSHARK-Turbine
+git clone https://github.com/nod-ai/AMD-SHARK-ModelDev
 ```
 
 ```bash

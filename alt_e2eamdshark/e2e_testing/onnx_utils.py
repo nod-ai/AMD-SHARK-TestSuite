@@ -49,7 +49,7 @@ def get_node_shape_from_dim_param_dict(node: onnxruntime.capi.onnxruntime_pybind
                 continue
         if not isinstance(dim, int):
             raise TypeError(
-                f"input node '{node.name}' has dims={node.shape}. Node dim '{dim}' has invalid type: {type(dim)}\nexpected type: int.\nIf your model has dim_params, consider setting a self.dim_param_dict for this test. See: https://github.com/nod-ai/AMDSHARK-TestSuite/blob/63f848a42a3e5e01d6c73de142ff182fb6f6e2d2/alt_e2eamdshark/onnx_tests/models/migraphx.py#L136"
+                f"input node '{node.name}' has dims={node.shape}. Node dim '{dim}' has invalid type: {type(dim)}\nexpected type: int.\nIf your model has dim_params, consider setting a self.dim_param_dict for this test. See: https://github.com/nod-ai/AMD-SHARK-TestSuite/blob/63f848a42a3e5e01d6c73de142ff182fb6f6e2d2/alt_e2eamdshark/onnx_tests/models/migraphx.py#L136"
             )
         if dim <= 0:
             raise ValueError(

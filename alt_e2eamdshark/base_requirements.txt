@@ -28,5 +28,4 @@ diffusers
 huggingface-hub
 sentencepiece
 accelerate
-auto-gptq
 azure-storage-blob

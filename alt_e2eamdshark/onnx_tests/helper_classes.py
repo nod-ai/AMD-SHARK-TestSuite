@@ -30,7 +30,99 @@ from e2e_testing.onnx_utils import (
     get_sample_inputs_for_onnx_model,
 )
 
+from huggingface_hub import snapshot_download
+
 """This file contains several helpful child classes of OnnxModelInfo."""
+
+import logging
+
+logger = logging.Logger(__name__)
+
+
+class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
+    def __init__(self, model_name: str, name, onnx_model_path: str):
+        parent_cache_dir = os.getenv("CACHE_DIR")
+        if parent_cache_dir is None:
+            raise RuntimeError(
+                "Please specify a cache directory path in the CACHE_DIR environment variable "
+                "for storing large model files."
+            )
+
+        self.opset_version = 21
+        self.model_name = model_name
+        self.hf_model_repository = "onnxmodelzoo/" + self.model_name
+        self.cache_dir = parent_cache_dir
+        super().__init__(name, onnx_model_path, self.opset_version)
+
+    def update_extra_options(self):
+        self.extra_options = ExtraOptions(
+            ImporterOptions(opset_version=self.opset_version)
+        )
+
+    def update_input_name_to_shape_map(self):
+        yaml_path = os.path.join(self.cache_dir, "/turnkey_stats.yaml")
+        if not os.path.exists(yaml_path):
+            raise RuntimeError(
+                "turnkey YAML file not found. "
+                + "Please call `download_model_artifacts()` to download model artifacts before proceeding."
+            )
+
+        turnkey_dict = {}
+        self.input_name_to_shape_map = dict()
+        with open(yaml_path, "rb") as stream:
+            turnkey_dict = yaml.safe_load(stream)
+        if "onnx_input_dimensions" in turnkey_dict.keys():
+            for dim_param in turnkey_dict["onnx_input_dimensions"]:
+                self.input_name_to_shape_map[dim_param] = turnkey_dict[
+                    "onnx_input_dimensions"
+                ][dim_param]
+
+    def download_model_artifacts(self):
+        # set HF cache explicitly to match provided CACHE_DIR
+        os.environ["HF_HOME"] = self.cache_dir
+        os.environ["HUGGINGFACE_HUB_CACHE"] = self.cache_dir
+        print(f"Begin download for {self.model_name}")
+        try:
+            snapshot_download(
+                repo_id=self.hf_model_repository,
+                allow_patterns=["turnkey_stats.yaml", f"{self.model_name}.onnx"],
+                revision="main",
+            )
+        except Exception as e:
+            logger.error(f"{e}")
+            raise
+
+    def construct_model(self):
+        model_dir = str(Path(self.model).parent)
+
+        def find_models(model_dir):
+            found_models = []
+            for root, _, files in os.walk(model_dir):
+                for name in files:
+                    if name[-5:] == ".onnx":
+                        found_models.append(os.path.abspath(os.path.join(root, name)))
+            return found_models
+
+        found_models = find_models(model_dir)
+
+        if len(found_models) == 0:
+            try:
+                self.download_model_artifacts()
+            except Exception:
+                raise
+            found_models = find_models(model_dir)
+
+        if len(found_models) == 1:
+            self.model = found_models[0]
+            return
+        if len(found_models) > 1:
+            logger.warning(f"Found multiple model.onnx files: {found_models}")
+            logger.warning(f"Picking the first model found to use: {found_models[0]}")
+            self.model = found_models[0]
+            return
+        raise OSError(
+            f"No onnx model could be found, downloaded, or extracted to {model_dir}"
+        )
 
 
 class HfDownloadableModel(OnnxModelInfo):
@@ -88,8 +180,8 @@ class HfDownloadableModel(OnnxModelInfo):
 
     def __repr__(self):
         cls = self.__class__.__name__
-        model_details = self.model_repo_path.split('/')
-        model_path = '/hf_'.join(model_details)
+        model_details = self.model_repo_path.split("/")
+        model_path = "/hf_".join(model_details)
         return f"{cls} (full_model_path={model_path}, task_name={self.task}, name={self.name}, onnx_model_path={os.path.dirname(self.model)})"
 
     def construct_model(self):

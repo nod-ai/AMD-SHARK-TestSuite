@@ -311,13 +311,13 @@ custom_registry += remove_metadata_props
 
 
 custom_registry_model_names = list(map(lambda x: model_path_map[x[0]], custom_registry))
-for t in set(onnx_zoo_non_validated).difference(custom_registry_model_names):
-    t_split = t.split("/")[-2]
-    register_test(meta_constructor(False, t_split), t_split)
+# for t in set(onnx_zoo_non_validated).difference(custom_registry_model_names):
+#     t_split = t.split("/")[-2]
+#     register_test(meta_constructor(False, t_split), t_split)
 
-for t in set(onnx_zoo_validated).difference(custom_registry_model_names):
-    t_split = ".".join((t.split("/")[-1]).split(".")[:-2])
-    register_test(meta_constructor(True, t_split), t_split)
+# for t in set(onnx_zoo_validated).difference(custom_registry_model_names):
+#     t_split = ".".join((t.split("/")[-1]).split(".")[:-2])
+#     register_test(meta_constructor(True, t_split), t_split)
 
 
 class OnnxModelZooWithOpt(OnnxModelZooDownloadableModel):
@@ -337,8 +337,8 @@ class OnnxModelZooWithOpt(OnnxModelZooDownloadableModel):
         self.apply_ort_basic_optimizations()
 
 
-for t in basic_opt:
-    register_test(meta_constructor_opt(t[1], t[0]), t[0])
+# for t in basic_opt:
+#     register_test(meta_constructor_opt(t[1], t[0]), t[0])
 
 
 class OnnxModelZooWithOptAndNoOpsetVersion(OnnxModelZooWithOpt):
@@ -352,8 +352,8 @@ class OnnxModelZooWithOptAndNoOpsetVersion(OnnxModelZooWithOpt):
         self.opset_version = None
 
 
-for t in no_opset_update:
-    register_test(meta_constructor_opt_no_opset(t[1], t[0]), t[0])
+# for t in no_opset_update:
+#     register_test(meta_constructor_opt_no_opset(t[1], t[0]), t[0])
 
 
 class OnnxModelZooRemoveMetadataProps(OnnxModelZooDownloadableModel):
@@ -378,5 +378,5 @@ class OnnxModelZooRemoveMetadataProps(OnnxModelZooDownloadableModel):
         self.model = mod_model_path
 
 
-for t in remove_metadata_props:
-    register_test(meta_constructor_remove_metadata(t[1], t[0]), t[0])
+# for t in remove_metadata_props:
+#     register_test(meta_constructor_remove_metadata(t[1], t[0]), t[0])

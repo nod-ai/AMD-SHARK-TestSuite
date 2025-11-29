@@ -31,6 +31,7 @@ from e2e_testing.onnx_utils import (
 )
 
 from huggingface_hub import snapshot_download
+from huggingface_hub import hf_hub_download
 
 """This file contains several helpful child classes of OnnxModelInfo."""
 
@@ -41,6 +42,7 @@ logger = logging.Logger(__name__)
 
 class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
     def __init__(self, model_name: str, name, onnx_model_path: str):
+
         parent_cache_dir = os.getenv("CACHE_DIR")
         if parent_cache_dir is None:
             raise RuntimeError(
@@ -50,8 +52,17 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
 
         self.opset_version = 21
         self.model_name = model_name
+
+        # HF repository
         self.hf_model_repository = "onnxmodelzoo/" + self.model_name
-        self.cache_dir = parent_cache_dir
+
+        # Prepare cache dir
+        # self.cache_dir = parent_cache_dir
+        self.cache_dir = os.path.join(parent_cache_dir, name)
+        os.makedirs(self.cache_dir, exist_ok=True)
+
+        self.download_model_artifacts()
+
         super().__init__(name, onnx_model_path, self.opset_version)
 
     def update_extra_options(self):
@@ -60,7 +71,9 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
         )
 
     def update_input_name_to_shape_map(self):
-        yaml_path = os.path.join(self.cache_dir, "/turnkey_stats.yaml")
+        # print(f"update_input_name_to_shape_map : cache-dir : {self.cache_dir}")
+
+        yaml_path = self.yml_path
         if not os.path.exists(yaml_path):
             raise RuntimeError(
                 "turnkey YAML file not found. "
@@ -79,22 +92,31 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
 
     def download_model_artifacts(self):
         # set HF cache explicitly to match provided CACHE_DIR
-        os.environ["HF_HOME"] = self.cache_dir
-        os.environ["HUGGINGFACE_HUB_CACHE"] = self.cache_dir
-        print(f"Begin download for {self.model_name}")
+        # os.environ["HF_HOME"] = self.cache_dir
+        # os.environ["HUGGINGFACE_HUB_CACHE"] = self.cache_dir
         try:
-            snapshot_download(
+
+            self.yml_path = hf_hub_download(
                 repo_id=self.hf_model_repository,
-                allow_patterns=["turnkey_stats.yaml", f"{self.model_name}.onnx"],
-                revision="main",
+                filename="turnkey_stats.yaml",
+                cache_dir=self.cache_dir,
+            )
+            self.model_path = hf_hub_download(
+                repo_id=self.hf_model_repository,
+                filename=f"{self.model_name}.onnx",
+                cache_dir=self.cache_dir,
             )
         except Exception as e:
             logger.error(f"{e}")
             raise
 
+    def get_model_files_from_cache(self):
+
+        shutil.copy(self.yml_path, Path(self.model).parent)
+        shutil.copy(self.model_path, Path(self.model).parent)
+
     def construct_model(self):
         model_dir = str(Path(self.model).parent)
-
         def find_models(model_dir):
             found_models = []
             for root, _, files in os.walk(model_dir):
@@ -107,7 +129,7 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
 
         if len(found_models) == 0:
             try:
-                self.download_model_artifacts()
+                self.get_model_files_from_cache()
             except Exception:
                 raise
             found_models = find_models(model_dir)

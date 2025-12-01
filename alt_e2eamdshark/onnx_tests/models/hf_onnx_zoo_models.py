@@ -11,8 +11,12 @@ from ..helper_classes import HfOnnxModelZooNonLegacyModel
 
 this_file = Path(__file__)
 lists_dir = (this_file.parent).joinpath("external_lists")
-hf_onnx_zoo_models_non_legacy = load_test_txt_file(lists_dir.joinpath("hf_onnx_model_zoo_non_legacy.txt"))
 
+hf_onnx_zoo_models_non_legacy = []
+for hf_onnx_model_file in lists_dir.glob("hf_onnx_model_zoo_non_legacy_*.txt"):
+    # print(f"Adding file : {hf_onnx_model_file}")
+    hf_onnx_zoo_models_non_legacy.extend(load_test_txt_file(hf_onnx_model_file))
+# print(f"Added {len(hf_onnx_zoo_models_non_legacy)} models")
 meta_constructor = lambda model_name:  (lambda *args, **kwargs : HfOnnxModelZooNonLegacyModel(model_name, *args, **kwargs))
 
 for model_name in hf_onnx_zoo_models_non_legacy:

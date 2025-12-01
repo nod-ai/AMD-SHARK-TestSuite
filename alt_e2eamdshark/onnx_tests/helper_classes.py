@@ -30,7 +30,6 @@ from e2e_testing.onnx_utils import (
     get_sample_inputs_for_onnx_model,
 )
 
-from huggingface_hub import snapshot_download
 from huggingface_hub import hf_hub_download
 
 """This file contains several helpful child classes of OnnxModelInfo."""
@@ -57,7 +56,6 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
         self.hf_model_repository = "onnxmodelzoo/" + self.model_name
 
         # Prepare cache dir
-        # self.cache_dir = parent_cache_dir
         self.cache_dir = os.path.join(parent_cache_dir, name)
         os.makedirs(self.cache_dir, exist_ok=True)
 
@@ -71,8 +69,6 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
         )
 
     def update_input_name_to_shape_map(self):
-        # print(f"update_input_name_to_shape_map : cache-dir : {self.cache_dir}")
-
         yaml_path = self.yml_path
         if not os.path.exists(yaml_path):
             raise RuntimeError(
@@ -91,11 +87,7 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
                 ][dim_param]
 
     def download_model_artifacts(self):
-        # set HF cache explicitly to match provided CACHE_DIR
-        # os.environ["HF_HOME"] = self.cache_dir
-        # os.environ["HUGGINGFACE_HUB_CACHE"] = self.cache_dir
         try:
-
             self.yml_path = hf_hub_download(
                 repo_id=self.hf_model_repository,
                 filename="turnkey_stats.yaml",
@@ -111,7 +103,6 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
             raise
 
     def get_model_files_from_cache(self):
-
         shutil.copy(self.yml_path, Path(self.model).parent)
         shutil.copy(self.model_path, Path(self.model).parent)
 

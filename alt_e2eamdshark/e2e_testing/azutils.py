@@ -21,7 +21,7 @@ def pre_test_onnx_model_azure_download(name, cache_dir, model_path):
 
     # if cache directory doesn't exist, then make it
     if not os.path.exists(cache_dir):
-        os.mkdir(cache_dir)
+        os.makedirs(cache_dir)
 
     # for the testList download all the onnx/models in cache_path
     download_and_setup_onnxmodel(cache_dir, name)
@@ -58,6 +58,10 @@ def download_and_setup_onnxmodel(cache_dir, name):
     priv_container_name = "onnxprivatestorage"
 
     blob_dir = os.path.join("e2eamdshark/onnx/models/", name)
+
+    # FIXME: Once we rename the Azure blobs, this line should be removed.
+    blob_dir = blob_dir.replace("amd", "")
+
     blob_name = os.path.join(blob_dir, "model.onnx.zip")
     dest_file = os.path.join(cache_dir, "model.onnx.zip")
     if os.path.exists(dest_file):

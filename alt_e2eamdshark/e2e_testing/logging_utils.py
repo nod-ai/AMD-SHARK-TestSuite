@@ -25,7 +25,7 @@ def run_command_and_log(command: List[str], save_to: str, stage_name: str) -> No
     commands_log = commands_dir / f"{stage_name}.commands.log"
     commands_log.write_text(script)
     # run the command
-    ret = subprocess.run(script, shell=True, capture_output=True)
+    ret = subprocess.run(script, shell=True, capture_output=True, timeout=100)
     # if an error occured, log stderr and raise exception
     if ret.returncode != 0:
         detail_dir = Path(save_to) / "detail"

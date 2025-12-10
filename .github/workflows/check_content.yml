@@ -45,6 +45,5 @@ jobs:
 
     - name: Checking content
       run: |
-        which python
-        python --version
         touch /data/e2eamdshark/amdshark-test-suite-models-cache/test
+        python --version

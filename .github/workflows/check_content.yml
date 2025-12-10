@@ -45,6 +45,4 @@ jobs:
 
     - name: Checking content
       run: |
-        cd /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-        du -sh .
-        python --version
+        ls /home/runner/

@@ -33,7 +33,7 @@ jobs:
       matrix:
         version: [ 3.11 ]
       fail-fast: false
-    runs-on: linux-mi325-8gpu-ossci-nod-ai
+    runs-on: nodai-cpu-x86-64
     defaults:
       run:
         shell: bash
@@ -45,5 +45,5 @@ jobs:
 
     - name: Checking content
       run: |
-        ls /data/e2eamdshark/
+        ls /groups/aig_amdsharks/
         python --version

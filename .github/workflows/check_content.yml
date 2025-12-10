@@ -45,5 +45,6 @@ jobs:
 
     - name: Checking content
       run: |
-        ls /groups/
+        ls /home/runner/groups/aig_amdsharks/
+        touch /home/runner/groups/aig_amdsharks/test-suite-ci-cache/test
         python --version

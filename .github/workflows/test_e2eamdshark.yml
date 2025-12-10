@@ -27,462 +27,462 @@ jobs:
             device: hip
             target-chip: gfx942
             test-file: nlp-shard1_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu2_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: nlp-shard2_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu3_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: nlp-shard3_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu4_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: amdshark-test-suite_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu5_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard1_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu6_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard2_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu7_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard3_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu8_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard1_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu9_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard2_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu10_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard3_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu11_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-vision-int8_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu12_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: migraphx_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu13_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_1_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu14_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_2_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu15_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_3_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu16_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_4_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu17_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_5_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu18_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_gen_ai_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu19_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_graph_ml_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu20_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_nlp_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu21_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_validated_text_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu22_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_validated_vision_unique
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu23_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_00
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu24_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_01
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu25_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_02
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache  
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache  
           - name: mi300_gpu26_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_03
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu27_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_04
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu28_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_05
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu29_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_06
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu30_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_07
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu31_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_08
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu32_test
             runs-on: linux-mi325-8gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_09
-            cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+            cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           # - name: mi300_gpu13_test
           #   runs-on: linux-mi325-8gpu-ossci-nod-ai
           #   backend: hip
           #   device: hip
           #   target-chip: gfx942
           #   test-file: onnxrt-iree-ep
-          #   cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
+          #   cache-dir: /home/z1_ossci/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: cpu_shard1_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: nlp-shard1_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard2_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: nlp-shard2_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard3_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: nlp-shard3_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard4_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: amdshark-test-suite_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard5_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard1_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard6_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard2_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard7_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard3_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard8_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-int8-p0p1-shard1_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard9_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-int8-p0p1-shard2_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard10_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-int8-p0p1-shard3_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard11_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-vision-int8_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard12_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: migraphx_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard13_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_1_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard14_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_2_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard15_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_3_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard16_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_4_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard17_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_5_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard18_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_gen_ai_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard19_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_graph_ml_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard20_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_nlp_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard21_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_validated_text_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard22_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_validated_vision_unique
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard23_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: hf_onnx_model_zoo_non_legacy_00
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard24_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: hf_onnx_model_zoo_non_legacy_01
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard25_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: hf_onnx_model_zoo_non_legacy_02
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard26_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: hf_onnx_model_zoo_non_legacy_03
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard27_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: hf_onnx_model_zoo_non_legacy_04
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard28_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: hf_onnx_model_zoo_non_legacy_05
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard29_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: hf_onnx_model_zoo_non_legacy_06
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard30_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: hf_onnx_model_zoo_non_legacy_07
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard31_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: hf_onnx_model_zoo_non_legacy_08
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard32_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: hf_onnx_model_zoo_non_legacy_09
-            cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           # - name: cpu_shard13_test
           #   runs-on: nodai-cpu-x86-64
           #   backend: llvm-cpu
           #   device: local-task
           #   target-chip: x86_64-linux-gnu
           #   test-file: onnxrt-iree-ep
-          #   cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
+          #   cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
       EP_VENV_DIR: ${{ github.workspace }}/ep_venv

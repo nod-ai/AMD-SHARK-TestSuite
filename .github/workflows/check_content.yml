@@ -48,6 +48,7 @@ jobs:
         ls /home/runner/groups/aig_amdsharks/test-suite-ci-cache
         cd /home/runner/groups/aig_amdsharks/test-suite-ci-cache
         ls -l
+        du -sh *
         du -sh .
 
         

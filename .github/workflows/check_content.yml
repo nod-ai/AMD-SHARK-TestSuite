@@ -47,8 +47,6 @@ jobs:
       run: |
         ls /home/runner/groups/aig_amdsharks/test-suite-ci-cache
         cd /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-        du -sh .
-        sudo rm -rf ./*
-        du -sh .
+        df -h .
 
         

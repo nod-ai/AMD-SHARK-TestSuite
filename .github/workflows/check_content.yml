@@ -45,5 +45,5 @@ jobs:
 
     - name: Checking content
       run: |
-        ls /groups/aig_amdsharks/
+        ls /groups/
         python --version

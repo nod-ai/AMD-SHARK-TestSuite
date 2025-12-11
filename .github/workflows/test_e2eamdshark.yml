@@ -748,6 +748,46 @@ jobs:
           name: ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json
 
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_md
 
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
@@ -863,6 +903,20 @@ jobs:
           --report --report-file ./e2eamdshark-reports/nlp_unique.md
 
           python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
+          --sources ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_json/hf_onnx_model_zoo_non_legacy_00.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_json/hf_onnx_model_zoo_non_legacy_01.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_json/hf_onnx_model_zoo_non_legacy_02.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_json/hf_onnx_model_zoo_non_legacy_03.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_json/hf_onnx_model_zoo_non_legacy_04.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_json/hf_onnx_model_zoo_non_legacy_05.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_json/hf_onnx_model_zoo_non_legacy_06.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_json/hf_onnx_model_zoo_non_legacy_07.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_json/hf_onnx_model_zoo_non_legacy_08.json \
+          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_json/hf_onnx_model_zoo_non_legacy_09.json \
+          --output ./e2eamdshark-reports/hf_onnx_model_zoo_non_legacy.json \
+          --report --report-file ./e2eamdshark-reports/hf_onnx_model_zoo_non_legacy.md
+
+          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
           --sources ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_json/onnx_model_zoo_computer_vision_1_unique.json \
           ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_json/onnx_model_zoo_computer_vision_2_unique.json \
           ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_json/onnx_model_zoo_computer_vision_3_unique.json \
@@ -876,6 +930,7 @@ jobs:
           ./e2eamdshark-reports/vai-hf-cnn-fp32_unique.json \
           ./e2eamdshark-reports/nlp_unique.json \
           ./e2eamdshark-reports/onnx_model_zoo_computer_vision_unique.json \
+          ./e2eamdshark-reports/hf_onnx_model_zoo_non_legacy.json \
           ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_json/amdshark-test-suite_unique.json \
           ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_json/vai-vision-int8_unique.json \
           ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_json/migraphx_unique.json \
@@ -899,6 +954,7 @@ jobs:
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8_unique
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/migraphx_unique
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/nlp_unique
+          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/hf_onnx_model_zoo_non_legacy
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_computer_vision_unique
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_gen_ai_unique
           mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_graph_ml_unique
@@ -909,6 +965,7 @@ jobs:
           cp vai-hf-cnn-fp32_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32_unique/summary.md
           cp vai-int8-p0p1_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1_unique/summary.md
           cp nlp_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/nlp_unique/summary.md
+          cp hf_onnx_model_zoo_non_legacy.md ${date}/ci_reports_onnx/${{ matrix.backend }}/hf_onnx_model_zoo_non_legacy/summary.md
           cp onnx_model_zoo_computer_vision_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_computer_vision_unique/summary.md
           cp ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_md/amdshark-test-suite_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/amdshark-test-suite_unique/summary.md
           cp ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_md/vai-vision-int8_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8_unique/summary.md

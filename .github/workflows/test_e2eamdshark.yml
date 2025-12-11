@@ -22,224 +22,224 @@ jobs:
       matrix:
         include:
           - name: mi300_gpu1_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: nlp-shard1_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu2_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: nlp-shard2_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu3_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: nlp-shard3_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu4_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: amdshark-test-suite_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu5_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard1_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu6_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard2_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu7_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard3_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu8_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard1_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu9_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard2_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu10_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard3_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu11_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-vision-int8_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu12_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: migraphx_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu13_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_1_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu14_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_2_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu15_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_3_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu16_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_4_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu17_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_5_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu18_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_gen_ai_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu19_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_graph_ml_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu20_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_nlp_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu21_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_validated_text_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu22_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_validated_vision_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu23_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_00
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu24_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_01
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu25_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_02
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache  
           - name: mi300_gpu26_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_03
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu27_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_04
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu28_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_05
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu29_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_06
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu30_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_07
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu31_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_08
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu32_test
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
@@ -615,11 +615,11 @@ jobs:
       matrix:
         include:
           - name: merge_rocm_reports
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             regression-blob: rocm
           - name: merge_cpu_reports
-            runs-on: linux-mi325-8gpu-ossci-nod-ai
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: llvm-cpu
             regression-blob: cpu
     env:

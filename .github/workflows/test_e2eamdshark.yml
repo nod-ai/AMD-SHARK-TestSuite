@@ -794,7 +794,7 @@ jobs:
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
-          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_json
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_json
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:

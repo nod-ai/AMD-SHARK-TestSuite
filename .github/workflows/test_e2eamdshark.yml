@@ -754,40 +754,80 @@ jobs:
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
           name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_md
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_md
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
           name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_md
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_md
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
           name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_md
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_md
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
           name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_md
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_md
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_md
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
           name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_md
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_json
 
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:

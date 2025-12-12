@@ -33,7 +33,7 @@ jobs:
       matrix:
         version: [ 3.11 ]
       fail-fast: false
-    runs-on: nodai-cpu-x86-64
+    runs-on: linux-mi325-1gpu-ossci-nod-ai
     defaults:
       run:
         shell: bash
@@ -45,15 +45,7 @@ jobs:
 
     - name: Checking content
       run: |
-        sudo apt update
-        sudo apt install wget
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-        which ls
-        echo "Checking curl"
-        which curl
-        echo "Checking wget"
-        which wget
-        echo "Checking az"
-        which az
-        az --version
+        cd /home/runner/data/e2eamdshark/
+        du -sh amdshark-test-suite-models-cache
+       
 

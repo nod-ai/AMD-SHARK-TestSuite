@@ -47,5 +47,8 @@ jobs:
       run: |
         cd /home/runner/data/e2eamdshark/
         du -sh amdshark-test-suite-models-cache
+        ls -l
+        sudo chmod +777 -R amdshark-test-suite-models-cache
+        ls -l
        
 

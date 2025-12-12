@@ -46,9 +46,12 @@ jobs:
     - name: Checking content
       run: |
         cd /home/runner/data/e2eamdshark/
-        du -sh amdshark-test-suite-models-cache
-        cd amdshark-test-suite-models-cache
-        df -h .
+        ls -l
+        du -sh *
+        cd /home/runner/data/
+        ls -l
+        du -sh *
+        cd /home/runner/
         ls -l
         du -sh *
        

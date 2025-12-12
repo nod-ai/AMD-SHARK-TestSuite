@@ -45,10 +45,11 @@ jobs:
 
     - name: Checking content
       run: |
-        echo "Checking az"
-        which az
-        echo "Checking wget"
-        which wget
+        which ls
         echo "Checking curl"
         which curl
+        echo "Checking wget"
+        which wget
+        echo "Checking az"
+        which az
 

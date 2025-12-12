@@ -47,5 +47,6 @@ jobs:
       run: |
         cd /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
         df -h .
+        df -h 
         ls -l
         du -sh *

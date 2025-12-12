@@ -45,7 +45,10 @@ jobs:
 
     - name: Checking content
       run: |
-        ls -l /home/runner/groups/aig_amdsharks/
-        cd /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-        touch tt
-        rm -rf tt
+        echo "Checking az"
+        which az
+        echo "Checking wget"
+        which wget
+        echo "Checking curl"
+        which curl
+

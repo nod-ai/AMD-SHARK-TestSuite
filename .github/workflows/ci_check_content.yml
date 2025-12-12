@@ -49,5 +49,7 @@ jobs:
         du -sh amdshark-test-suite-models-cache
         cd amdshark-test-suite-models-cache
         df -h .
+        ls -l
+        du -sh *
        
 

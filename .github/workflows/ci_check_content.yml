@@ -56,6 +56,6 @@ jobs:
         du -sh *
         cd /home/
         ls -l
-        du -sh *
+        sudo du -sh *
        
 

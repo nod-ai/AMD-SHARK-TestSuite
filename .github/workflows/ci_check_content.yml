@@ -45,6 +45,9 @@ jobs:
 
     - name: Checking content
       run: |
+        sudo apt update
+        sudo apt install wget
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
         which ls
         echo "Checking curl"
         which curl
@@ -52,4 +55,5 @@ jobs:
         which wget
         echo "Checking az"
         which az
+        az --version
 

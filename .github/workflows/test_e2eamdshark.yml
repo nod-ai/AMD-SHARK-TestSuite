@@ -564,6 +564,7 @@ jobs:
             --cleanup=3 \
             --get-metadata \
             -v
+          cat `find test-onnx -name "*.log"`
           python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
         working-directory: ./test-suite
       

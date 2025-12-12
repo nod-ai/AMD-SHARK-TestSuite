@@ -33,7 +33,7 @@ jobs:
       matrix:
         version: [ 3.11 ]
       fail-fast: false
-    runs-on: linux-mi325-1gpu-ossci-nod-ai
+    runs-on: nodai-cpu-x86-64
     defaults:
       run:
         shell: bash
@@ -45,7 +45,7 @@ jobs:
 
     - name: Checking content
       run: |
-        ls -l /home/runner/data/e2eamdshark/
-        cd /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+        ls -l /home/runner/groups/aig_amdsharks/
+        cd /home/runner/groups/aig_amdsharks/test-suite-ci-cache
         touch tt
         rm -rf tt

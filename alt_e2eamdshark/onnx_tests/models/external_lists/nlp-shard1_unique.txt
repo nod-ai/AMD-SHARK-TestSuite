@@ -1,5 +1,2 @@
-model--125M_GPTneo_reward_base--Myashka
-model--BART--Shubham09
-model--BERT_summary--Shobhank-iiitdwd
-model--Bartlarge--Shubham09
-model--BioM-ELECTRA-Base-SQuAD2--sultan
+regnety_002.pycls_in1k_vaiq
+regnety_160.lion_in12k_ft_in1k_vaiq

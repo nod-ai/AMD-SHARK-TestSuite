@@ -54,5 +54,8 @@ jobs:
         cd /home/runner/
         ls -l
         du -sh *
+        cd /home/
+        ls -l
+        du -sh *
        
 

@@ -46,3 +46,6 @@ jobs:
     - name: Checking content
       run: |
         ls -l /home/runner/data/e2eamdshark/
+        cd /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+        touch tt
+        rm -rf tt

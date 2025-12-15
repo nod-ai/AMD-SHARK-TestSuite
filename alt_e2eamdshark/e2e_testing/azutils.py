@@ -59,9 +59,6 @@ def download_and_setup_onnxmodel(cache_dir, name):
 
     blob_dir = os.path.join("e2eamdshark/onnx/models/", name)
 
-    # FIXME: Once we rename the Azure blobs, this line should be removed.
-    #blob_dir = blob_dir.replace("amd", "")
-
     blob_name = os.path.join(blob_dir, "model.onnx.zip")
     dest_file = os.path.join(cache_dir, "model.onnx.zip")
     if os.path.exists(dest_file):

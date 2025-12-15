@@ -364,7 +364,7 @@ jobs:
           pip install -r ./alt_e2eamdshark/iree_requirements.txt
           pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
           pip uninstall -y onnxruntime
-          wget https://sharkpublic.blob.core.windows.net/sharkpublic/onnxruntime/pip_whl/onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
+          wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/onnxruntime/pip_whl/onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
           pip install ./onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
         working-directory: ./test-suite
 
@@ -470,7 +470,7 @@ jobs:
             backend: llvm-cpu
             regression-blob: cpu
     env:
-      AZ_PUBLIC_KEY: ${{ secrets.SHARKPUBLIC_AZ_PUBLIC_KEY }}
+      AZ_PUBLIC_KEY: ${{ secrets.AMD_SHARKPUBLIC_AZ_KEY }}
     steps:
       - name: Checkout Test Suite
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -482,7 +482,7 @@ jobs:
         with:
           repository: nod-ai/e2eamdshark-reports
           ref: main
-          token: ${{ secrets.E2ESHARK_GITHUB_TOKEN }}
+          token: ${{ secrets.E2EAMDSHARK_GITHUB_TOKEN }}
           path: e2eamdshark-reports
       - name: "Setup alt test suite venv"
         run: |
@@ -761,8 +761,8 @@ jobs:
           cd test-suite
           mkdir latest
           mkdir baseline
-          wget https://sharkpublic.blob.core.windows.net/sharkpublic/latest-test-suite/combined_reports_${{ matrix.backend }}.json -O latest/combined_reports_${{ matrix.backend }}.json
-          wget https://sharkpublic.blob.core.windows.net/sharkpublic/baseline-test-suite/combined_reports_${{ matrix.regression-blob }}.json -O baseline/combined_reports_${{ matrix.backend }}.json
+          wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/latest-test-suite/combined_reports_${{ matrix.backend }}.json -O latest/combined_reports_${{ matrix.backend }}.json
+          wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/baseline-test-suite/combined_reports_${{ matrix.regression-blob }}.json -O baseline/combined_reports_${{ matrix.backend }}.json
           cd ..
 
           python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
@@ -779,7 +779,7 @@ jobs:
             --perf_tol_regression=0.1 \
             --perf_tol_progression=0.1
           
-          az storage blob upload --account-name sharkpublic --container-name sharkpublic \
+          az storage blob upload --account-name amdsharkpublic --container-name amdsharkpublic \
             --name latest-test-suite/combined_reports_${{ matrix.backend }}.json \
             --file ./e2eamdshark-reports/combined_reports_others.json \
             --account-key ${AZ_PUBLIC_KEY} --overwrite

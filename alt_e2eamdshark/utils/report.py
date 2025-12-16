@@ -6,6 +6,7 @@
 import json
 import io
 from typing import List, Dict
+from e2e_testing.stage_handler import generate_stage_error_summary
 
 SUMMARY_STAGES = [
     "Setup",
@@ -108,90 +109,6 @@ def get_detail_string(status_dict: Dict[str, Dict]) -> str:
         report_string += f"| {key} | {value['exit_status']} | {value['time_ms']} | |\n"
     return report_string
 
-def generate_error_report(status_dict: Dict[str, Dict], report_file: str):
-    """Generate detailed error report for compilation failures, appending to existing report."""
-    
-    error_report_file = report_file.replace('.md', '_compilation_errors.md')
-    # Filter for compilation failures only
-    compilation_failures = {
-        name: data for name, data in status_dict.items()
-        if data.get('exit_status') == 'compilation' and 'compilation_status' in data
-    }
-    
-    if not compilation_failures:
-        return
-    
-    # Count by compilation status
-    timeout_count = sum(1 for data in compilation_failures.values() if data.get('compilation_status') == 'timeout')
-    error_count = sum(1 for data in compilation_failures.values() if data.get('compilation_status') == 'error')
-    no_log_count = sum(1 for data in compilation_failures.values() if data.get('compilation_status') == 'no_log')
-    
-    with open(error_report_file, 'a', encoding='utf-8') as f:
-        # Write compilation error summary
-        f.write("\n# COMPILATION ERROR ANALYSIS\n\n")
-        f.write(f"**Total compilation failures: {len(compilation_failures)}**\n\n")
-        f.write("| Status | Count |\n")
-        f.write("|---|---|\n")
-        f.write(f"| Timeouts | {timeout_count} |\n")
-        f.write(f"| Errors | {error_count} |\n")
-        f.write(f"| No log | {no_log_count} |\n\n")
-        
-        # ERROR TESTS (grouped by error)
-        if error_count > 0:
-            f.write("## ERRORS (grouped by error)\n\n")
-            # Group tests by error signature
-            error_groups: Dict[str, List] = {}
-            for name, data in compilation_failures.items():
-                if data.get('compilation_status') == 'error':
-                    error_key = data.get('error_signature', '') or "(no error details)"
-                    if error_key not in error_groups:
-                        error_groups[error_key] = []
-                    error_groups[error_key].append((name, data))
-            
-            # Summary table sorted by count
-            f.write("| Error | Count |\n")
-            f.write("|---|---|\n")
-            for error_signature, tests in sorted(error_groups.items(), key=lambda x: len(x[1]), reverse=True):
-                error_escaped = error_signature.replace('|', '\\|').replace('\n', ' ')
-                f.write(f"| {error_escaped} | {len(tests)} |\n")
-            f.write("\n")
-            
-            f.write("## ERROR TESTS (grouped by error)\n\n")
-            
-            # Detailed tables grouped by error
-            for error_signature, tests in sorted(error_groups.items(), key=lambda x: len(x[1]), reverse=True):
-                error_escaped = error_signature.replace('|', '\\|').replace('\n', ' ')
-                f.write(f"### Error: {error_escaped}\n\n")
-                f.write(f"**Count: {len(tests)}**\n\n")
-                f.write("| test_name | command | error |\n")
-                f.write("|---|---|---|\n")
-                for name, data in tests:
-                    command = data.get('command', '').replace('|', '\\|').replace('\n', ' ')
-                    error = data.get('error', '').replace('|', '\\|').replace('\n', ' ')
-                    f.write(f"| {name} | {command} | {error} |\n")
-                f.write("\n")
-        
-        # TIMEOUT TESTS
-        if timeout_count > 0:
-            f.write("## TIMEOUT TESTS\n\n")
-            f.write("| test_name | command |\n")
-            f.write("|---|---|\n")
-            for name, data in compilation_failures.items():
-                if data.get('compilation_status') == 'timeout':
-                    command = data.get('command', '').replace('|', '\\|').replace('\n', ' ')
-                    f.write(f"| {name} | {command} |\n")
-            f.write("\n")
-        
-        # NO LOG FILE
-        if no_log_count > 0:
-            f.write("## NO LOG FILE\n\n")
-            f.write("| test_name |\n")
-            f.write("|---|\n")
-            for name, data in compilation_failures.items():
-                if data.get('compilation_status') == 'no_log':
-                    f.write(f"| {name} |\n")
-            f.write("\n")
-
 
 def generate_report(
     args, og_stages: List, status_dict: Dict[str, Dict], *, simplify: bool = True
@@ -226,4 +143,7 @@ def generate_report(
         file.write(args_string)
         file.write(detail_string)
 
-    generate_error_report(status_dict, args.report_file) 
+    # We can enable the following code when we want to get all the data
+    # for stage in stages:
+    #    generate_stage_error_summary(status_dict, stage, args.report_file) 
+    generate_stage_error_summary(status_dict, "compilation", args.report_file)

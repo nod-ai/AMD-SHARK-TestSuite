@@ -11,7 +11,8 @@ import shutil
 import subprocess
 from e2e_testing.framework import result_comparison
 
-from typing import List
+from typing import List, Dict
+import re
 
 
 def run_command_and_log(command: List[str], save_to: str, stage_name: str) -> None:
@@ -52,6 +53,77 @@ def log_result(result, log_dir, tol):
         )
         f.write(f"Test Result:\n{result}")
     return num_match == num_total
+
+def _is_time_out(log_path: Path) -> bool:
+    """Check if the compilation log indicates a timeout."""
+    try:
+        with open(log_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+    except Exception:
+        return False
+    return 'subprocess.TimeoutExpired' in content
+
+
+def _find_first_error(detail_log_path: Path) -> tuple:
+    """Extract error signature and error message from detail log."""
+    try:
+        with open(detail_log_path, 'r', encoding='utf-8') as f:
+            for line in f.readlines():
+                if "error:" in line:
+                    error = (
+                        line.split("error:")[-1]
+                        .split(":")[0]
+                        .strip()
+                    )
+                    error = error.split(";")[0]
+                    error_signature = re.sub(r"'[^']*'", "'OP'", error)
+                    return error_signature, error
+    except Exception:
+        pass
+    return "", ""
+
+
+def log_error(status_dict: Dict[str, Dict], log_dir: str, stage: str, name: str):
+    """
+    Populate status_dict with error information for a given test.
+    
+    Args:
+        status_dict: Dictionary to populate with error info
+        log_dir: Base directory containing the test logs
+        stage: The stage of the test (e.g., 'compilation', 'inference')
+        name: The test name
+    """
+    if stage == "compilation":
+        log_path = Path(log_dir)
+        
+        compilation_log = log_path / 'compilation.log'
+        detail_log_path = log_path / 'detail' / 'compilation.detail.log'
+        command_log_path = log_path / 'commands' / 'compilation.commands.log'
+        
+        # Read the command
+        command = ""
+        if command_log_path.exists():
+            command = command_log_path.read_text().strip()
+        
+        # Determine status (timeout or error)
+        if compilation_log.exists():
+            status = 'timeout' if _is_time_out(compilation_log) else 'error'
+        else:
+            status = 'no_log'
+        
+        # Get error details
+        error_signature, error = "", ""
+        if detail_log_path.exists():
+            error_signature, error = _find_first_error(detail_log_path)
+        
+        # Add fields to existing status_dict entry (or create if not exists)
+        if name not in status_dict:
+            status_dict[name] = {}
+        status_dict[name]['compilation_status'] = status
+        status_dict[name]['command'] = command
+        status_dict[name]['error_signature'] = error_signature
+        status_dict[name]['error'] = error
+
 
 
 def log_exception(e: Exception, path: str, stage: str, name: str, verbose: bool):

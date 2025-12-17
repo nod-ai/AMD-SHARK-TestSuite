@@ -10,6 +10,15 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - uses: actions/setup-python@v5
-    - uses: pre-commit/action@v3.0.0
+    - name: Install pre-commit
+      run: |
+        pip install pre-commit
+    - name: Run pre-commit on changed files
+      # Use the base and head SHAs from the pull request event context
+      run: |
+        pre-commit run --from-ref ${{ github.event.pull_request.base.sha }} --to-ref ${{ github.event.pull_request.head.sha }} --color=always

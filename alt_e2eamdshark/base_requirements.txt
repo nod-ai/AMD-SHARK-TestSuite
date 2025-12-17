@@ -15,6 +15,8 @@ packaging
 # Workaround for what should be a torch dep
 # See discussion in #1174
 pyyaml
+# For formatting code
+pre-commit
 
 -r https://raw.githubusercontent.com/llvm/torch-mlir/main/test-requirements.txt
 -r https://raw.githubusercontent.com/llvm/torch-mlir/main/torchvision-requirements.txt

@@ -920,123 +920,14 @@ jobs:
       #   with:
       #     name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
       #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
-      - name: Merge Reports
+      - name: Merge and Push Reports
         run: |
           source report_venv_alt/bin/activate
-
-          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
-          --sources ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_json/vai-hf-cnn-fp32-shard1_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_json/vai-hf-cnn-fp32-shard2_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_json/vai-hf-cnn-fp32-shard3_unique.json \
-          --output ./e2eamdshark-reports/vai-hf-cnn-fp32_unique.json \
-          --report --report-file ./e2eamdshark-reports/vai-hf-cnn-fp32_unique.md
-
-          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
-          --sources ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_json/vai-int8-p0p1-shard1_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_json/vai-int8-p0p1-shard2_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_json/vai-int8-p0p1-shard3_unique.json \
-          --output ./e2eamdshark-reports/vai-int8-p0p1_unique.json \
-          --report --report-file ./e2eamdshark-reports/vai-int8-p0p1_unique.md
-
-          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
-          --sources ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_json/nlp-shard1_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_json/nlp-shard2_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json/nlp-shard3_unique.json \
-          --output ./e2eamdshark-reports/nlp_unique.json \
-          --report --report-file ./e2eamdshark-reports/nlp_unique.md
-
-          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
-          --sources ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_json/hf_onnx_model_zoo_non_legacy_00.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_json/hf_onnx_model_zoo_non_legacy_01.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_json/hf_onnx_model_zoo_non_legacy_02.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_json/hf_onnx_model_zoo_non_legacy_03.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_json/hf_onnx_model_zoo_non_legacy_04.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_json/hf_onnx_model_zoo_non_legacy_05.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_json/hf_onnx_model_zoo_non_legacy_06.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_json/hf_onnx_model_zoo_non_legacy_07.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_json/hf_onnx_model_zoo_non_legacy_08.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_json/hf_onnx_model_zoo_non_legacy_09.json \
-          --output ./e2eamdshark-reports/hf_onnx_model_zoo_non_legacy.json \
-          --report --report-file ./e2eamdshark-reports/hf_onnx_model_zoo_non_legacy.md
-
-          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
-          --sources ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_json/onnx_model_zoo_computer_vision_1_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_json/onnx_model_zoo_computer_vision_2_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_json/onnx_model_zoo_computer_vision_3_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_json/onnx_model_zoo_computer_vision_4_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_json/onnx_model_zoo_computer_vision_5_unique.json \
-          --output ./e2eamdshark-reports/onnx_model_zoo_computer_vision_unique.json \
-          --report --report-file ./e2eamdshark-reports/onnx_model_zoo_computer_vision_unique.md
-
-          python ./test-suite/alt_e2eamdshark/utils/merge_dicts.py \
-          --sources ./e2eamdshark-reports/vai-int8-p0p1_unique.json \
-          ./e2eamdshark-reports/vai-hf-cnn-fp32_unique.json \
-          ./e2eamdshark-reports/nlp_unique.json \
-          ./e2eamdshark-reports/onnx_model_zoo_computer_vision_unique.json \
-          ./e2eamdshark-reports/hf_onnx_model_zoo_non_legacy.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_json/amdshark-test-suite_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_json/vai-vision-int8_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_json/migraphx_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_json/onnx_model_zoo_gen_ai_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_json/onnx_model_zoo_graph_ml_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_json/onnx_model_zoo_nlp_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_json/onnx_model_zoo_validated_text_unique.json \
-          ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_json/onnx_model_zoo_validated_vision_unique.json \
-          --output ./e2eamdshark-reports/combined_reports_unique.json \
-          --report --report-file ./e2eamdshark-reports/combined_reports_unique.md
-
-      - name: Push status artifacts
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git pull
-          date=$(date '+%Y-%m-%d')
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/amdshark-test-suite_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/migraphx_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/nlp_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/hf_onnx_model_zoo_non_legacy
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_computer_vision_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_gen_ai_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_graph_ml_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_nlp_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_validated_text_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_validated_vision_unique
-          mkdir -p ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique
-          cp vai-hf-cnn-fp32_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32_unique/summary.md
-          cp vai-hf-cnn-fp32_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-hf-cnn-fp32_unique/
-          cp vai-int8-p0p1_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1_unique/summary.md
-          cp vai-int8-p0p1_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-int8-p0p1_unique/
-          cp nlp_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/nlp_unique/summary.md
-          cp nlp_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/nlp_unique/
-          cp hf_onnx_model_zoo_non_legacy.md ${date}/ci_reports_onnx/${{ matrix.backend }}/hf_onnx_model_zoo_non_legacy/summary.md
-          cp hf_onnx_model_zoo_non_legacy_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/hf_onnx_model_zoo_non_legacy/
-          cp onnx_model_zoo_computer_vision_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_computer_vision_unique/summary.md
-          cp onnx_model_zoo_computer_vision_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_computer_vision_unique/
-          cp ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_md/amdshark-test-suite_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/amdshark-test-suite_unique/summary.md
-          cp ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_md/amdshark-test-suite_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/amdshark-test-suite_unique/
-          cp ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_md/vai-vision-int8_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8_unique/summary.md
-          cp ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_md/vai-vision-int8_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/vai-vision-int8_unique/
-          cp ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_md/migraphx_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/migraphx_unique/summary.md
-          cp ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_md/migraphx_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/migraphx_unique/
-          cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_md/onnx_model_zoo_gen_ai_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_gen_ai_unique/summary.md
-          cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_md/onnx_model_zoo_gen_ai_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_gen_ai_unique/
-          cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_md/onnx_model_zoo_graph_ml_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_graph_ml_unique/summary.md
-          cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_md/onnx_model_zoo_graph_ml_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_graph_ml_unique/
-          cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_md/onnx_model_zoo_nlp_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_nlp_unique/summary.md
-          cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_md/onnx_model_zoo_nlp_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_nlp
-          cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_md/onnx_model_zoo_validated_text_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_validated_text_unique/summary.md
-          cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_md/onnx_model_zoo_validated_text_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_validated_text_unique/
-          cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_md/onnx_model_zoo_validated_vision_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_validated_vision_unique/summary.md
-          cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_md/onnx_model_zoo_validated_vision_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/onnx_model_zoo_validated_vision_unique/
-          cp combined_reports_unique.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/summary.md
-          cp combined_reports_unique_*.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/
-          git add $date
-          git commit -m "add CI status reports for e2eamdshark for ${{ matrix.backend }}"
-          git push origin main
-        working-directory: ./e2eamdshark-reports
+          ./test-suite/alt_e2eamdshark/scripts/merge_and_push_reports.sh \
+            --backend ${{ matrix.backend }} \
+            --reports-dir ./e2eamdshark-reports \
+            --test-suite-dir ./test-suite \
+            --venv-dir ./report_venv_alt
       
       - name: Regression Reports
         run: |

@@ -11,7 +11,8 @@ import shutil
 import subprocess
 from e2e_testing.framework import result_comparison
 
-from typing import List
+from typing import List, Dict
+from e2e_testing.stage_handler import CompilationErrorHandler
 
 
 def run_command_and_log(command: List[str], save_to: str, stage_name: str) -> None:
@@ -52,6 +53,23 @@ def log_result(result, log_dir, tol):
         )
         f.write(f"Test Result:\n{result}")
     return num_match == num_total
+
+
+
+def log_error(status_dict: Dict[str, Dict], log_dir: str, stage: str, name: str):
+    """
+    Populate status_dict with error information for a given test.
+    
+    Args:
+        status_dict: Dictionary to populate with error info
+        log_dir: Base directory containing the test logs
+        stage: The stage of the test (e.g., 'compilation', 'inference')
+        name: The test name
+    """
+    if stage == "compilation":
+        handler = CompilationErrorHandler(log_dir, stage)
+        handler.populate_status_dict(status_dict, name)
+
 
 
 def log_exception(e: Exception, path: str, stage: str, name: str, verbose: bool):

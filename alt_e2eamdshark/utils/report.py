@@ -6,6 +6,7 @@
 import json
 import io
 from typing import List, Dict
+from e2e_testing.stage_handler import generate_stage_error_summary
 
 SUMMARY_STAGES = [
     "Setup",
@@ -141,3 +142,8 @@ def generate_report(
         file.write(exit_status_str)
         file.write(args_string)
         file.write(detail_string)
+
+    # We can enable the following code when we want to get all the data
+    # for stage in stages:
+    #    generate_stage_error_summary(status_dict, stage, args.report_file) 
+    generate_stage_error_summary(status_dict, "compilation", args.report_file)

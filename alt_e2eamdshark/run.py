@@ -260,8 +260,8 @@ def run_tests(
 
         except Exception as e:
             status_dict[t.unique_name] = {"exit_status" : curr_stage, "time_ms" : mean_time_ms}
-            log_error(status_dict, log_dir, curr_stage, t.unique_name)
             log_exception(e, log_dir, curr_stage, t.unique_name, verbose)
+            log_error(status_dict, log_dir, curr_stage, t.unique_name)
             post_test_clean(log_dir, cleanup, verbose)
             continue
 

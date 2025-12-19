@@ -121,7 +121,7 @@ def main(args):
         stages = args.stages
     if args.skip_stages:
         stages = [s for s in stages if s not in args.skip_stages]
-    
+
     parent_log_dir = os.path.join(TEST_DIR, args.rundirectory)
 
     status_dict = run_tests(
@@ -172,7 +172,7 @@ def run_tests(
         log_dir = os.path.join(parent_log_dir, t.unique_name) + "/"
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
-        
+
         # setup stage notifications
         ws = lambda curr_stage : " "*(max([len(s) for s in stages]) - len(curr_stage))
         notify_stage = lambda : print(f"\tRunning stage '{curr_stage}'..." + ws(curr_stage), end="\r")
@@ -189,7 +189,7 @@ def run_tests(
                 # build an instance of the test info class
                 inst = t.model_constructor(t.unique_name, log_dir)
                 options = inst.extra_options
-                # this is highly onnx specific. 
+                # this is highly onnx specific.
                 # TODO: Figure out how to factor this out of run.py
                 if not os.path.exists(inst.model):
                     inst.construct_model()
@@ -197,7 +197,7 @@ def run_tests(
                     metadata = inst.get_metadata()
                     metadata_file = Path(log_dir) / "metadata.json"
                     save_dict(metadata, metadata_file)
-            
+
             artifact_save_to = None if no_artifacts else log_dir
             # generate mlir from the instance using the config
             curr_stage = "import_model"
@@ -295,7 +295,7 @@ def run_tests(
             except Exception as e:
                 status_dict[inst.name] = {"exit_status" : "results-summary", "time_ms" : mean_time_ms}
                 log_exception(e, log_dir, "results-summary", t.unique_name, verbose)
-        
+
         if verbose:
             # "PASS" is only recorded if a results-summary is generated
             # if running a subset of ALL_STAGES, manually indicate "PASS".
@@ -305,7 +305,7 @@ def run_tests(
                 print(f"\tPASSED" + " "*30)
             else:
                 print(f"\tFAILED ({status_dict[t.unique_name]['exit_status']})" + " "*20)
-        
+
         # test is complete, perform cleanup
         post_test_clean(log_dir,  cleanup, verbose)
 

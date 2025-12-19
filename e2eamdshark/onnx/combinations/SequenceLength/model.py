@@ -12,7 +12,15 @@
 import numpy, torch, sys
 import onnxruntime
 from onnx import numpy_helper, TensorProto, save_model
-from onnx.helper import make_model, make_node, make_graph, make_tensor_value_info, make_value_info, make_tensor_sequence_value_info, make_tensor_type_proto
+from onnx.helper import (
+    make_model,
+    make_node,
+    make_graph,
+    make_tensor_value_info,
+    make_value_info,
+    make_tensor_sequence_value_info,
+    make_tensor_type_proto,
+)
 from onnx.checker import check_model
 
 # import from e2eamdshark/tools to allow running in current dir, for run through
@@ -35,7 +43,10 @@ Z = make_value_info("Z", make_tensor_type_proto(TensorProto.INT64, []))
 
 # Create a node (NodeProto)
 sequence_construct_node = make_node(
-    "SequenceConstruct", ["X", "Y"], ["X2"], "sequence_construct_node"  # node name  # inputs  # outputs
+    "SequenceConstruct",
+    ["X", "Y"],
+    ["X2"],
+    "sequence_construct_node",  # node name  # inputs  # outputs
 )
 
 sequence_length_node = make_node(

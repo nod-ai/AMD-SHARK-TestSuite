@@ -29,7 +29,7 @@ class LlamaModelInfo(OnnxModelInfo):
         # these are customizable:
         self.dynamic = False
         self.dynamo = False
-        self.batch_size  = 1
+        self.batch_size = 1
         self.max_seq_len = 512
         self.torch_dtype = torch.float32
         self.update_customizable_vals()
@@ -74,7 +74,7 @@ class LlamaModelInfo(OnnxModelInfo):
         shapes, dtypes = self.get_signature()
         # TODO: Allow passing in position_ids, attn_mask, and past_key_value pairs.
         # Currently, a 0 tensor needs to be passed as the third input for the onnx model.
-        # This is possibly due to a lack of position_ids provided for the export. 
+        # This is possibly due to a lack of position_ids provided for the export.
         return TestTensors(
             (
                 torch.ones(*(shapes[0]), dtype=dtypes[0]),
@@ -157,12 +157,14 @@ class LlamaModelInfo(OnnxModelInfo):
             # outputs = (logits, (k0, v0), ..., (k63, v63))
             # the following flattens the output tuples to a list
             output_list = []
+
             def recursively_unpack(item):
                 if isinstance(item, tuple):
                     for t in item:
                         recursively_unpack(t)
                 if isinstance(item, torch.Tensor):
                     output_list.append(item)
+
             recursively_unpack(output)
             return TestTensors(tuple(output_list))
 
@@ -190,10 +192,11 @@ class LlamaModelInfo(OnnxModelInfo):
             # output:
             shapes = [[B, L, 128256]]
             dtypes = [torch.float32]
-            for _ in range(0,64):
-                shapes.append([B,8,L,128])
+            for _ in range(0, 64):
+                shapes.append([B, 8, L, 128])
                 dtypes.append(torch.float32)
 
         return shapes, dtypes
+
 
 register_test(LlamaModelInfo, "llama3_1_8b")

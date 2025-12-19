@@ -12,7 +12,13 @@
 import numpy, torch, sys
 import onnxruntime
 from onnx import numpy_helper, TensorProto, save_model
-from onnx.helper import make_model, make_node, make_graph, make_tensor_value_info, make_attribute
+from onnx.helper import (
+    make_model,
+    make_node,
+    make_graph,
+    make_tensor_value_info,
+    make_attribute,
+)
 from onnx.checker import check_model
 
 # import from e2eamdshark/tools to allow running in current dir, for run through
@@ -25,11 +31,11 @@ E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 
 # Create an input (ValueInfoProto)
 # X = make_tensor_value_info("X", TensorProto.FLOAT, [32, 384, 25, 25])
-X = make_tensor_value_info("X", TensorProto.FLOAT, [1,1,4,4])
+X = make_tensor_value_info("X", TensorProto.FLOAT, [1, 1, 4, 4])
 
 # Create an output
 # Z = make_tensor_value_info("Z", TensorProto.FLOAT, [32, 384, 25, 25])
-Z = make_tensor_value_info("Z", TensorProto.FLOAT, [1,1,2,2])
+Z = make_tensor_value_info("Z", TensorProto.FLOAT, [1, 1, 2, 2])
 
 # Create a node (NodeProto)
 AveragePoolNode = make_node(
@@ -40,8 +46,8 @@ AveragePoolNode.attribute.append(make_attribute("ceil_mode", 1))
 AveragePoolNode.attribute.append(make_attribute("count_include_pad", 0))
 # AveragePoolNode.attribute.append(make_attribute("pads", [1,1,1,1]))
 AveragePoolNode.attribute.append(make_attribute("kernel_shape", [2, 2]))
-AveragePoolNode.attribute.append(make_attribute("strides", [1,1]))
-AveragePoolNode.attribute.append(make_attribute("dilations", [2,2]))
+AveragePoolNode.attribute.append(make_attribute("strides", [1, 1]))
+AveragePoolNode.attribute.append(make_attribute("dilations", [2, 2]))
 
 # Create the graph (GraphProto)
 graph = make_graph(
@@ -62,7 +68,7 @@ with open("model.onnx", "wb") as f:
 
 session = onnxruntime.InferenceSession("model.onnx", None)
 # model_input_X = numpy.random.randn(32, 384, 25, 25).astype(numpy.float32)
-model_input_X = numpy.random.randn(1,1,4,4).astype(numpy.float32)
+model_input_X = numpy.random.randn(1, 1, 4, 4).astype(numpy.float32)
 # gets X in inputs[0]
 inputs = session.get_inputs()
 # gets Z in outputs[0]

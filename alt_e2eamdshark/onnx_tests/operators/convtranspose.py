@@ -9,6 +9,7 @@ from onnx.helper import make_tensor_value_info, make_tensor
 from ..helper_classes import BuildAModel
 from e2e_testing.registry import register_with_name, register_test
 
+
 class ConvTransposePads(BuildAModel):
     def construct_i_o_value_info(self):
         self.input_vi = [
@@ -28,7 +29,9 @@ class ConvTransposePads(BuildAModel):
             pads=[1, 2, 1, 2],
         )
 
+
 register_test(ConvTransposePads, "convtranspose_pads_test")
+
 
 class ConvTransposeAutoPadSameUpper(BuildAModel):
     def construct_i_o_value_info(self):
@@ -50,7 +53,9 @@ class ConvTransposeAutoPadSameUpper(BuildAModel):
             strides=[2, 2],
         )
 
+
 register_test(ConvTransposeAutoPadSameUpper, "convtranspose_autopad_same_upper_test")
+
 
 class ConvTransposeAutoPadSameLower(BuildAModel):
     def construct_i_o_value_info(self):
@@ -72,7 +77,9 @@ class ConvTransposeAutoPadSameLower(BuildAModel):
             strides=[2, 2],
         )
 
+
 register_test(ConvTransposeAutoPadSameLower, "convtranspose_autopad_same_lower_test")
+
 
 class ConvTransposeAutoPadValid(BuildAModel):
     def construct_i_o_value_info(self):
@@ -94,7 +101,9 @@ class ConvTransposeAutoPadValid(BuildAModel):
             strides=[2, 2],
         )
 
+
 register_test(ConvTransposeAutoPadValid, "convtranspose_autopad_valid_test")
+
 
 class ConvTransposeAutoPadOutputShape(BuildAModel):
     def construct_i_o_value_info(self):
@@ -117,4 +126,7 @@ class ConvTransposeAutoPadOutputShape(BuildAModel):
             strides=[2, 2],
         )
 
-register_test(ConvTransposeAutoPadOutputShape, "convtranspose_autopad_output_shape_test")
+
+register_test(
+    ConvTransposeAutoPadOutputShape, "convtranspose_autopad_output_shape_test"
+)

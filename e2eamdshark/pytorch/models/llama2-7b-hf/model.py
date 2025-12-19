@@ -17,9 +17,11 @@ E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 test_modelname = "meta-llama/Llama-2-7b-hf"
 token = os.getenv("HF_TOKEN", "")
 if token == "":
-    print(f"Huggingface token is required for this model ({test_modelname})." +
-          "\nPlease set HF_TOKEN environment variable to a valid Huggingface token value and rerun the test." +
-          "\nExample: HF_TOKEN=your_token python run.py")
+    print(
+        f"Huggingface token is required for this model ({test_modelname})."
+        + "\nPlease set HF_TOKEN environment variable to a valid Huggingface token value and rerun the test."
+        + "\nExample: HF_TOKEN=your_token python run.py"
+    )
 tokenizer = LlamaTokenizer.from_pretrained(test_modelname, token=token)
 model = LlamaForCausalLM.from_pretrained(
     test_modelname,

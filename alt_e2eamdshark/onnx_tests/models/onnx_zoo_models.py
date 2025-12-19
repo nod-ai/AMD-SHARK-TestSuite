@@ -16,34 +16,62 @@ from ..helper_classes import OnnxModelZooDownloadableModel
 
 this_file = Path(__file__)
 lists_dir = (this_file.parent).joinpath("external_lists")
-onnx_zoo_non_validated = load_test_txt_file(lists_dir.joinpath("onnx_model_zoo_non_validated_paths.txt"))
-onnx_zoo_validated = load_test_txt_file(lists_dir.joinpath("onnx_model_zoo_validated_paths.txt"))
-onnx_zoo_unsupported = load_test_txt_file(lists_dir.joinpath("onnx_model_zoo_unsupported.txt"))
+onnx_zoo_non_validated = load_test_txt_file(
+    lists_dir.joinpath("onnx_model_zoo_non_validated_paths.txt")
+)
+onnx_zoo_validated = load_test_txt_file(
+    lists_dir.joinpath("onnx_model_zoo_validated_paths.txt")
+)
+onnx_zoo_unsupported = load_test_txt_file(
+    lists_dir.joinpath("onnx_model_zoo_unsupported.txt")
+)
 
-onnx_zoo_non_validated = list(set(onnx_zoo_non_validated).difference(set(onnx_zoo_unsupported)))
+onnx_zoo_non_validated = list(
+    set(onnx_zoo_non_validated).difference(set(onnx_zoo_unsupported))
+)
 onnx_zoo_validated = list(set(onnx_zoo_validated).difference(set(onnx_zoo_unsupported)))
 
 # Putting this inside the class contructor will
 # call this repeatedly, which is wasteful.
 model_path_map = {}
+
+
 def build_model_to_path_map():
     for name in onnx_zoo_non_validated:
         test_name = name.split("/")[-2]
         model_path_map[test_name] = name
 
     for name in onnx_zoo_validated:
-        test_name = '.'.join((name.split("/")[-1]).split('.')[:-2])
+        test_name = ".".join((name.split("/")[-1]).split(".")[:-2])
         model_path_map[test_name] = name
 
 
 build_model_to_path_map()
 
-url_map = lambda name : f'https://github.com/onnx/models/raw/refs/heads/main/{model_path_map[name]}'
+url_map = (
+    lambda name: f"https://github.com/onnx/models/raw/refs/heads/main/{model_path_map[name]}"
+)
 
-meta_constructor = lambda is_validated, name : (lambda *args, **kwargs : OnnxModelZooDownloadableModel(is_validated, url_map(name), *args, **kwargs))
-meta_constructor_opt = lambda is_validated, name : (lambda *args, **kwargs : OnnxModelZooWithOpt(is_validated, url_map(name), *args, **kwargs))
-meta_constructor_opt_no_opset = lambda is_validated, name : (lambda *args, **kwargs : OnnxModelZooWithOptAndNoOpsetVersion(is_validated, url_map(name), *args, **kwargs))
-meta_constructor_remove_metadata = lambda is_validated, name : (lambda *args, **kwargs : OnnxModelZooRemoveMetadataProps(is_validated, url_map(name), *args, **kwargs))
+meta_constructor = lambda is_validated, name: (
+    lambda *args, **kwargs: OnnxModelZooDownloadableModel(
+        is_validated, url_map(name), *args, **kwargs
+    )
+)
+meta_constructor_opt = lambda is_validated, name: (
+    lambda *args, **kwargs: OnnxModelZooWithOpt(
+        is_validated, url_map(name), *args, **kwargs
+    )
+)
+meta_constructor_opt_no_opset = lambda is_validated, name: (
+    lambda *args, **kwargs: OnnxModelZooWithOptAndNoOpsetVersion(
+        is_validated, url_map(name), *args, **kwargs
+    )
+)
+meta_constructor_remove_metadata = lambda is_validated, name: (
+    lambda *args, **kwargs: OnnxModelZooRemoveMetadataProps(
+        is_validated, url_map(name), *args, **kwargs
+    )
+)
 
 # The custom registry list for ONNX Zoo Models.
 # Elements of the registry are 2-tuples, where the first element
@@ -291,8 +319,7 @@ basic_opt: List[Tuple[str, bool]] = [
     ("funnel_Opset17_transformers", False),
     ("funnel_Opset18_transformers", False),
     ("funnelbase_Opset16_transformers", False),
-    ("funnelbase_Opset18_transformers", False),    
-
+    ("funnelbase_Opset18_transformers", False),
     # Validated models
     ("candy-8", True),
     ("rain-princess-8", True),
@@ -342,12 +369,14 @@ for t in basic_opt:
 
 
 class OnnxModelZooWithOptAndNoOpsetVersion(OnnxModelZooWithOpt):
-    def __init__(self, name: str, onnx_model_path: str, is_validated: bool, model_url: str):
+    def __init__(
+        self, name: str, onnx_model_path: str, is_validated: bool, model_url: str
+    ):
         super().__init__(
             name=name,
             onnx_model_path=onnx_model_path,
             is_validated=is_validated,
-            model_url=model_url
+            model_url=model_url,
         )
         self.opset_version = None
 

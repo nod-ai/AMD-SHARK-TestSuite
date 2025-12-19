@@ -6,7 +6,7 @@
 
 # run.py creates runmodel.py by concatenating this file model.py
 # and tools/stubs/onnxmodel.py
-# Description: testing ReduceLogSumExp 
+# Description: testing ReduceLogSumExp
 # See https://onnx.ai/onnx/intro/python.html for intro on creating
 # onnx model using python onnx API
 import numpy, torch, sys
@@ -34,11 +34,7 @@ X = make_tensor_value_info("X", TensorProto.FLOAT, [2, 3, 4])
 Y = make_tensor_value_info("Y", TensorProto.FLOAT, [1, 1, 1])
 
 # Create a node (NodeProto)
-reducelogsumexp_node = make_node(
-    op_type="ReduceLogSumExp",
-    inputs=["X"],
-    outputs=["Y"]
-)
+reducelogsumexp_node = make_node(op_type="ReduceLogSumExp", inputs=["X"], outputs=["Y"])
 
 # Create the graph (GraphProto)
 graph = make_graph(
@@ -59,7 +55,9 @@ with open(model_path, "wb") as f:
 
 # Initialize the ONNX runtime session and run inference
 session = onnxruntime.InferenceSession(model_path, None)
-model_input_X = numpy.random.uniform(low = 0.1, high = 1, size = (2,3,4)).astype(numpy.float32)
+model_input_X = numpy.random.uniform(low=0.1, high=1, size=(2, 3, 4)).astype(
+    numpy.float32
+)
 
 inputs = session.get_inputs()
 outputs = session.get_outputs()

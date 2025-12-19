@@ -11,7 +11,7 @@ _SEEN_NAMES = set()
 
 
 def register_test(test_class: type, test_name: str):
-    '''After defining a ModelInfo class "MyModelInfo", you can register it as a test with register_test(MyModelInfo, "my_test_name")'''
+    """After defining a ModelInfo class "MyModelInfo", you can register it as a test with register_test(MyModelInfo, "my_test_name")"""
     # Ensure that there are no duplicate names in the global test registry.
     if test_name in _SEEN_NAMES:
         raise ValueError(
@@ -27,7 +27,8 @@ def register_test(test_class: type, test_name: str):
         )
     )
 
+
 # a class decorator alternative to register_test for convenience
 def register_with_name(name):
-    '''Use @register_with_name("my_test_name") before defining a ModelInfo class to add that ModelInfo as a test.'''
-    return lambda test_class : register_test(test_class, name)
+    """Use @register_with_name("my_test_name") before defining a ModelInfo class to add that ModelInfo as a test."""
+    return lambda test_class: register_test(test_class, name)

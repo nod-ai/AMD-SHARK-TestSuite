@@ -13,7 +13,7 @@ from onnx.helper import (
     make_graph,
     make_tensor_value_info,
     make_tensor,
-    make_attribute
+    make_attribute,
 )
 from onnx.checker import check_model
 

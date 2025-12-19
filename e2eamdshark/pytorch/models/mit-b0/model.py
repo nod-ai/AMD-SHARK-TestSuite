@@ -20,7 +20,7 @@ E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 
 # model origin: https://huggingface.co/nvidia/mit-b0
 test_modelname = "nvidia/mit-b0"
-test_image_url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
+test_image_url = "http://images.cocodataset.org/val2017/000000039769.jpg"
 image = Image.open(requests.get(test_image_url, stream=True).raw)
 
 processor = SegformerImageProcessor.from_pretrained(test_modelname)

@@ -4,13 +4,13 @@
 
 Making a model.py for an unknown model.onnx file can be done in a few steps:
 
-0. Copy boilerplate from another model.onnx file. 
+0. Copy boilerplate from another model.onnx file.
 1. Figure out what the inputs look like.
 2. Make some randomized model inputs.
 3. Start an inference session and run it.
 4. Use E2EAMDSHARK_CHECK to record inputs and outputs and apply post-processing if desired.
 
-Let's go into more depth into each step. 
+Let's go into more depth into each step.
 
 ### 0. Copy boilerplate from another model.onnx file
 
@@ -69,7 +69,7 @@ dim_values = (
 pv = dict(zip(dim_params, dim_values))
 ```
 
-It's useful to specify 'another_dim_param * 2' seperately if you want, for example, to make the model.onnx static before running the tests. 
+It's useful to specify 'another_dim_param * 2' seperately if you want, for example, to make the model.onnx static before running the tests.
 
 Now that we chose some values for the dim_params, we can make some model inputs.
 

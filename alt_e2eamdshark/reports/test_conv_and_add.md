@@ -15,7 +15,7 @@
 | import_model | 0 |
 | setup | 0 |
 
-## Test Run Detail 
+## Test Run Detail
 Test was run with the following arguments:
 Namespace(sources=['reports/test_add.json', 'reports/test_conv.json'], output='reports/test_conv_and_add.json', report=True, report_file='reports/test_conv_and_add.md')
 

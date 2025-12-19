@@ -46,7 +46,7 @@ lppool_node = make_node(
     kernel_shape=[4, 4],
     pads=[2, 2, 2, 2],
     strides=[2, 2],
-    p=3
+    p=3,
 )
 
 # Create the graph (GraphProto)
@@ -155,7 +155,7 @@ lppool_node = make_node(
     kernel_shape=[4, 4],
     pads=[2, 2, 2, 2],
     strides=[2, 2],
-    ceil_mode=1
+    ceil_mode=1,
 )
 
 # Create the graph (GraphProto)
@@ -210,7 +210,7 @@ lppool_node = make_node(
     kernel_shape=[4, 4],
     pads=[2, 2, 2, 2],
     strides=[2, 2],
-    p=3
+    p=3,
 )
 
 # Create the graph (GraphProto)

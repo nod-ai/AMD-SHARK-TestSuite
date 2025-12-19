@@ -89,11 +89,7 @@ Y = make_tensor_value_info("Y", TensorProto.FLOAT, [1, 1, 1, 1])
 
 # Create a node (NodeProto)
 lppool_node = make_node(
-    op_type="GlobalLpPool",
-    inputs=["X"],
-    outputs=["Y"],
-    name="global_lp_pool",
-    p=3
+    op_type="GlobalLpPool", inputs=["X"], outputs=["Y"], name="global_lp_pool", p=3
 )
 
 # Create the graph (GraphProto)
@@ -141,11 +137,7 @@ Y = make_tensor_value_info("Y", TensorProto.FLOAT, [1, 1, 1])
 
 # Create a node (NodeProto)
 lppool_node = make_node(
-    op_type="GlobalLpPool",
-    inputs=["X"],
-    outputs=["Y"],
-    name="global_lp_pool",
-    p=3
+    op_type="GlobalLpPool", inputs=["X"], outputs=["Y"], name="global_lp_pool", p=3
 )
 
 # Create the graph (GraphProto)

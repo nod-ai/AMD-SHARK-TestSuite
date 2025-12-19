@@ -213,10 +213,11 @@ class MultipleConvBase(BuildAModel):
             strides=[1, 1],
         )
 
-basic = lambda *args, **kwargs : MultipleConvBase(False, False, *args, **kwargs)
-bias = lambda *args, **kwargs : MultipleConvBase(True, False, *args, **kwargs)
-bias_clips = lambda *args, **kwargs : MultipleConvBase(True, True, *args, **kwargs)
-clips = lambda *args, **kwargs : MultipleConvBase(False, True, *args, **kwargs)
+
+basic = lambda *args, **kwargs: MultipleConvBase(False, False, *args, **kwargs)
+bias = lambda *args, **kwargs: MultipleConvBase(True, False, *args, **kwargs)
+bias_clips = lambda *args, **kwargs: MultipleConvBase(True, True, *args, **kwargs)
+clips = lambda *args, **kwargs: MultipleConvBase(False, True, *args, **kwargs)
 
 
 register_test(basic, "multi_conv_basic")

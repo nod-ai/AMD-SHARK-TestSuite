@@ -33,7 +33,9 @@ input = make_tensor_value_info("input", TensorProto.FLOAT, [8, 3, 32, 32])
 rois = make_tensor_value_info("rois", TensorProto.FLOAT, [2, 5])
 
 # Create an output
-Y = make_tensor_value_info("Y", TensorProto.FLOAT, [2, 3, 2, 2])  # Adjust shape according to the specification
+Y = make_tensor_value_info(
+    "Y", TensorProto.FLOAT, [2, 3, 2, 2]
+)  # Adjust shape according to the specification
 
 # Create a node (NodeProto) for MaxRoiPool
 maxroipool_node = make_node(
@@ -63,10 +65,9 @@ with open("model.onnx", "wb") as f:
 
 session = onnxruntime.InferenceSession("model.onnx", None)
 model_input_X = numpy.random.randn(8, 3, 32, 32).astype(numpy.float32)
-model_input_rois = numpy.array([
-    [2, 1, 16, 9, 24],
-    [7, 5, 5, 13, 13]
-], dtype=numpy.float32)
+model_input_rois = numpy.array(
+    [[2, 1, 16, 9, 24], [7, 5, 5, 13, 13]], dtype=numpy.float32
+)
 
 inputs = session.get_inputs()
 outputs = session.get_outputs()
@@ -80,7 +81,10 @@ print("Input shape:", model_input_X.shape)
 print("Output shape:", numpy.array(model_output[0]).shape)
 
 # Moving to torch to handle bfloat16 as numpy does not support bfloat16
-E2EAMDSHARK_CHECK["input"] = [torch.from_numpy(model_input_X), torch.from_numpy(model_input_rois)]
+E2EAMDSHARK_CHECK["input"] = [
+    torch.from_numpy(model_input_X),
+    torch.from_numpy(model_input_rois),
+]
 E2EAMDSHARK_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
 
 print("Input:", E2EAMDSHARK_CHECK["input"])

@@ -201,9 +201,14 @@ class TestTensors:
 
         # This condition should be only executed for inputs, so add a guard to ensure this.
         if len(pb_input_files) > 0 and name == "input":
-            onnx_tensor_list = [onnx.load_tensor(os.path.join(dir_path, tensor)) for tensor in pb_input_files]
+            onnx_tensor_list = [
+                onnx.load_tensor(os.path.join(dir_path, tensor))
+                for tensor in pb_input_files
+            ]
             for tensor in onnx_tensor_list:
-                tensor_list.append(onnx.numpy_helper.to_array(tensor, base_dir=dir_path))
+                tensor_list.append(
+                    onnx.numpy_helper.to_array(tensor, base_dir=dir_path)
+                )
         else:
             assert len(shapes) == len(
                 torch_dtypes

@@ -1,4 +1,3 @@
-
 # Copyright 2024 Advanced Micro Devices, Inc.
 #
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
@@ -9,6 +8,7 @@ from onnx.helper import make_node, make_tensor_value_info
 
 from ..helper_classes import BuildAModel
 from e2e_testing.registry import register_test
+
 
 class ConcatModel(BuildAModel):
     def construct_i_o_value_info(self):
@@ -29,5 +29,6 @@ class ConcatModel(BuildAModel):
             axis=0,
         )
         self.node_list = [concat_node]
+
 
 register_test(ConcatModel, "concat_test")

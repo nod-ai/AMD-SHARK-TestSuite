@@ -31,19 +31,18 @@ Y = make_tensor_value_info("Y", TensorProto.FLOAT, [5, 3])
 Z = make_tensor_value_info("Z", TensorProto.INT32, [2, 4, 3])
 
 # Create a node (NodeProto)
-qlxnode = make_node(
-    "DynamicQuantizeLinear", ["X"], ["QX", "SX", "ZPX"], "qlxnode"
-)
-qlynode = make_node(
-    "DynamicQuantizeLinear", ["Y"], ["QY", "SY", "ZPY"], "qlynode"
-)
+qlxnode = make_node("DynamicQuantizeLinear", ["X"], ["QX", "SX", "ZPX"], "qlxnode")
+qlynode = make_node("DynamicQuantizeLinear", ["Y"], ["QY", "SY", "ZPY"], "qlynode")
 mminode = make_node(
-    "MatMulInteger", ["QX", "QY", "ZPX", "ZPY"], ["Z"], "mminode"  # node name  # inputs  # outputs
+    "MatMulInteger",
+    ["QX", "QY", "ZPX", "ZPY"],
+    ["Z"],
+    "mminode",  # node name  # inputs  # outputs
 )
 
 # Create the graph (GraphProto)
 graph = make_graph(
-    [qlxnode,qlynode, mminode],
+    [qlxnode, qlynode, mminode],
     "mmigraph",
     [X, Y],
     [Z],

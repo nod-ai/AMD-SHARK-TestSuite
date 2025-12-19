@@ -25,10 +25,18 @@ X = make_tensor_value_info("X", TensorProto.FLOAT, [10, 1, 5])
 initial_h = make_tensor_value_info("initial_h", TensorProto.FLOAT, [1, 1, 20])
 
 # Create tensor value info for W, R, B, sequence_lens
-W = make_tensor_value_info("W", TensorProto.FLOAT, [1, 20, 5])  # [num_directions, hidden_size, input_size]
-R = make_tensor_value_info("R", TensorProto.FLOAT, [1, 20, 20])  # [num_directions, hidden_size, hidden_size]
-B = make_tensor_value_info("B", TensorProto.FLOAT, [1, 40])  # [num_directions, 2*hidden_size]
-sequence_lens = make_tensor_value_info("sequence_lens", TensorProto.INT32, [1])  # [batch_size]
+W = make_tensor_value_info(
+    "W", TensorProto.FLOAT, [1, 20, 5]
+)  # [num_directions, hidden_size, input_size]
+R = make_tensor_value_info(
+    "R", TensorProto.FLOAT, [1, 20, 20]
+)  # [num_directions, hidden_size, hidden_size]
+B = make_tensor_value_info(
+    "B", TensorProto.FLOAT, [1, 40]
+)  # [num_directions, 2*hidden_size]
+sequence_lens = make_tensor_value_info(
+    "sequence_lens", TensorProto.INT32, [1]
+)  # [batch_size]
 
 Y = make_tensor_value_info("Y", TensorProto.FLOAT, [10, 1, 1, 20])
 Y_h = make_tensor_value_info("Y_h", TensorProto.FLOAT, [1, 1, 20])
@@ -52,10 +60,7 @@ rnnnode = make_node(
 )
 
 graph = make_graph(
-    [rnnnode],
-    "rnn_graph",
-    [X, W, R, B, sequence_lens, initial_h],
-    [Y, Y_h]
+    [rnnnode], "rnn_graph", [X, W, R, B, sequence_lens, initial_h], [Y, Y_h]
 )
 
 # Create the model (ModelProto)
@@ -70,18 +75,27 @@ with open("model.onnx", "wb") as f:
 session = onnxruntime.InferenceSession("model.onnx", None)
 
 
-
 inputs = session.get_inputs()
 # gets Z in outputs[0]
 outputs = session.get_outputs()
 
 test_input = {
     "X": numpy.random.randn(10, 1, 5).astype(numpy.float32),  # inputs
-    "W": numpy.random.randn(1, 20, 5).astype(numpy.float32),  # weight tensor for input gate
-    "R": numpy.random.randn(1, 20, 20).astype(numpy.float32),  # recurrence weight tensor for input gate
-    "B": numpy.random.randn(1, 40).astype(numpy.float32),  # optional bias tensor for input gate
-    "sequence_lens": numpy.array([10], dtype=numpy.int32),  # optional tensor specifying lengths of the sequences
-    "initial_h": numpy.zeros((1, 1, 20)).astype(numpy.float32),  # optional initial value of the hidden
+    "W": numpy.random.randn(1, 20, 5).astype(
+        numpy.float32
+    ),  # weight tensor for input gate
+    "R": numpy.random.randn(1, 20, 20).astype(
+        numpy.float32
+    ),  # recurrence weight tensor for input gate
+    "B": numpy.random.randn(1, 40).astype(
+        numpy.float32
+    ),  # optional bias tensor for input gate
+    "sequence_lens": numpy.array(
+        [10], dtype=numpy.int32
+    ),  # optional tensor specifying lengths of the sequences
+    "initial_h": numpy.zeros((1, 1, 20)).astype(
+        numpy.float32
+    ),  # optional initial value of the hidden
 }
 
 # test_input and test_output are list of numpy arrays

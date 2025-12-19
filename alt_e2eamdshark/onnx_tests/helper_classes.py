@@ -108,6 +108,7 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
 
     def construct_model(self):
         model_dir = str(Path(self.model).parent)
+
         def find_models(model_dir):
             found_models = []
             for root, _, files in os.walk(model_dir):

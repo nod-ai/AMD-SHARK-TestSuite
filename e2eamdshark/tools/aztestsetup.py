@@ -13,6 +13,7 @@ from zipfile import ZipFile
 PRIVATE_CONN_STRING = os.environ.get("AZ_PRIVATE_CONNECTION", default="")
 priv_container_name = "onnxprivatestorage"
 
+
 def getTestsListFromFile(testlistfile):
     testlist = []
     if not os.path.exists(testlistfile):
@@ -44,28 +45,28 @@ def cleanup_e2eamdshark_test(testList, e2eamdshark_test_dir):
 def download_azure_blob(account_url, container_name, blob_name, dest_file):
     if container_name == priv_container_name:
         if PRIVATE_CONN_STRING == "":
-            print("Please set AZ_PRIVATE_CONNECTION environment variable with connection string for private azure storage account")
+            print(
+                "Please set AZ_PRIVATE_CONNECTION environment variable with connection string for private azure storage account"
+            )
         with ContainerClient.from_connection_string(
-                conn_str=PRIVATE_CONN_STRING,
-                container_name=container_name,
-            ) as container_client:
-                download_stream = container_client.download_blob(
-                    blob_name
-                )
-                with open(dest_file, mode="wb") as local_blob:
-                    local_blob.write(download_stream.readall())
+            conn_str=PRIVATE_CONN_STRING,
+            container_name=container_name,
+        ) as container_client:
+            download_stream = container_client.download_blob(blob_name)
+            with open(dest_file, mode="wb") as local_blob:
+                local_blob.write(download_stream.readall())
     else:
         with ContainerClient(
-                account_url,
-                container_name,
-                max_chunk_get_size=1024 * 1024 * 32,  # 32 MiB
-                max_single_get_size=1024 * 1024 * 32,  # 32 MiB
-            ) as container_client:
-                download_stream = container_client.download_blob(
-                        blob_name, max_concurrency=4
-                    )
-                with open(dest_file, mode="wb") as local_blob:
-                    local_blob.write(download_stream.readall())
+            account_url,
+            container_name,
+            max_chunk_get_size=1024 * 1024 * 32,  # 32 MiB
+            max_single_get_size=1024 * 1024 * 32,  # 32 MiB
+        ) as container_client:
+            download_stream = container_client.download_blob(
+                blob_name, max_concurrency=4
+            )
+            with open(dest_file, mode="wb") as local_blob:
+                local_blob.write(download_stream.readall())
 
 
 def download_and_setup_onnxmodels(cache_dir, testList):
@@ -84,7 +85,7 @@ def download_and_setup_onnxmodels(cache_dir, testList):
     priv_container_name = "onnxprivatestorage"
 
     for model in testList:
-        blob_dir =  "e2eamdshark/" + model
+        blob_dir = "e2eamdshark/" + model
         blob_name = blob_dir + "/model.onnx.zip"
         dest_file = cache_dir + "/" + blob_name
         if os.path.exists(dest_file):
@@ -99,23 +100,27 @@ def download_and_setup_onnxmodels(cache_dir, testList):
             os.makedirs(cache_dir + "/" + blob_dir, exist_ok=True)
 
         # TODO: better organisation of models in tank and cache
-        print(
-            f"Begin download for {blob_name} to {dest_file}"
-        )
+        print(f"Begin download for {blob_name} to {dest_file}")
 
         try_private = False
         try:
             download_azure_blob(account_url, container_name, blob_name, dest_file)
         except Exception as e:
             try_private = True
-            print(f"Unable to download model from public for {model}.\nError - {type(e).__name__}")
+            print(
+                f"Unable to download model from public for {model}.\nError - {type(e).__name__}"
+            )
 
         if try_private:
             print("Trying download from private storage")
             try:
-                download_azure_blob(priv_account_url, priv_container_name, blob_name, dest_file)
+                download_azure_blob(
+                    priv_account_url, priv_container_name, blob_name, dest_file
+                )
             except Exception as e:
-                print(f"Unable to download model for {model}.\nError - {type(e).__name__}")
+                print(
+                    f"Unable to download model for {model}.\nError - {type(e).__name__}"
+                )
 
 
 def pre_test_onnx_models_azure_download(testsList, cache_path, script_dir):
@@ -124,23 +129,25 @@ def pre_test_onnx_models_azure_download(testsList, cache_path, script_dir):
     # testsList: expected to contain only onnx tests
 
     # for the testList download all the onnx/models in cache_path
-    model_tests_list = [test for test in testsList if 'models' in test]
+    model_tests_list = [test for test in testsList if "models" in test]
     download_and_setup_onnxmodels(cache_path, model_tests_list)
 
     # if the the model exists for the test in the test dir, do nothing.
     # if it doesn't exist in the test directory but exists in cache dir, simply unzip cached model
     for test_name in model_tests_list:
-        model_file_path_test = script_dir + '/' + test_name + '/model.onnx'
-        model_file_path_cache = cache_path + '/e2eamdshark/' + test_name + '/model.onnx.zip'
+        model_file_path_test = script_dir + "/" + test_name + "/model.onnx"
+        model_file_path_cache = (
+            cache_path + "/e2eamdshark/" + test_name + "/model.onnx.zip"
+        )
         if not os.path.exists(model_file_path_test):
             print(f"Unzipping - {model_file_path_cache}")
             # model_file_path_cache may not exist for models which were not correctly downloaded,
             # skip unzipping such model files, only extract existing models
             if os.path.exists(model_file_path_cache):
                 # Unzip the model in the model test dir
-                with ZipFile(model_file_path_cache, 'r') as zf:
+                with ZipFile(model_file_path_cache, "r") as zf:
                     # onnx/model/testname already present in the zip file structure
-                    zf.extract(test_name + '/model.onnx', path=script_dir)
+                    zf.extract(test_name + "/model.onnx", path=script_dir)
 
 
 def setup_e2eamdshark_test(modelpy, testList, sourcedir, model_root_dir):

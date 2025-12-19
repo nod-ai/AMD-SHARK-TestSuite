@@ -22,7 +22,7 @@ E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 X = make_tensor_value_info("X", TensorProto.FLOAT, [3, 4])  # Example input shape
 
 # Create an output (ValueInfoProto)
-# Dynamic Quantize Linear returns a uint8 tensor, a f32 scale, and a uint8 zero point. 
+# Dynamic Quantize Linear returns a uint8 tensor, a f32 scale, and a uint8 zero point.
 Z = make_tensor_value_info("Z", TensorProto.UINT8, [3, 4])
 Z_1 = make_tensor_value_info("Z_1", TensorProto.INT8, [3, 4])
 S = make_tensor_value_info("scale", TensorProto.FLOAT, [])
@@ -32,14 +32,13 @@ P_1 = make_tensor_value_info("zp_1", TensorProto.INT8, [])
 
 # Create a 'DQL' node (NodeProto)
 DQL_node = make_node(
-    "DynamicQuantizeLinear", ["X"], ["Z", "scale", "zp"], "DQL_node"  # op_type  # inputs  # outputs  # node name
+    "DynamicQuantizeLinear",
+    ["X"],
+    ["Z", "scale", "zp"],
+    "DQL_node",  # op_type  # inputs  # outputs  # node name
 )
-CastTensor_node = make_node(
-    "Cast", ["Z"], ["Z_1"], to=3
-)
-CastZP_node = make_node(
-    "Cast", ["zp"], ["zp_1"], to=3
-)
+CastTensor_node = make_node("Cast", ["Z"], ["Z_1"], to=3)
+CastZP_node = make_node("Cast", ["zp"], ["zp_1"], to=3)
 
 # Create the graph (GraphProto)
 graph = make_graph(
@@ -53,7 +52,7 @@ graph = make_graph(
 onnx_model = make_model(graph)
 onnx_model.opset_import[0].version = 11  # Set the opset version to ensure compatibility
 
-#check_model(onnx_model)
+# check_model(onnx_model)
 
 # Save the model
 model_path = "model.onnx"

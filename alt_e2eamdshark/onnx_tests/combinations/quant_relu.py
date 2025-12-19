@@ -3,6 +3,7 @@ from onnx import TensorProto
 from onnx.helper import make_tensor, make_tensor_value_info
 from e2e_testing.registry import register_test
 
+
 class QuantizedRelu(BuildAModel):
     def construct_nodes(self):
         app_node = self.get_app_node()
@@ -17,9 +18,12 @@ class QuantizedRelu(BuildAModel):
         app_node("Relu", ["DQX"], ["Y"])
         app_node("QuantizeLinear", ["Y", "S", "ZP"], ["QY"])
         app_node("DequantizeLinear", ["QY", "S", "ZP"], ["DQY"])
-    
+
     def construct_i_o_value_info(self):
-        self.input_vi.append(make_tensor_value_info("X", TensorProto.FLOAT, [1,2,4]))
-        self.output_vi.append(make_tensor_value_info("DQY", TensorProto.FLOAT, [1,2,4]))
+        self.input_vi.append(make_tensor_value_info("X", TensorProto.FLOAT, [1, 2, 4]))
+        self.output_vi.append(
+            make_tensor_value_info("DQY", TensorProto.FLOAT, [1, 2, 4])
+        )
+
 
 register_test(QuantizedRelu, "quantized_relu")

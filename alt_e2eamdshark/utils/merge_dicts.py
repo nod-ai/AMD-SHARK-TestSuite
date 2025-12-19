@@ -1,12 +1,14 @@
 import json
 import argparse
-from report import generate_report, save_dict
 from pathlib import Path
 import sys
 
+# Add parent directory to path BEFORE importing modules that depend on e2e_testing
 TEST_DIR = str(Path(__file__).parents[1])
 sys.path.append(TEST_DIR)
-from run import ALL_STAGES
+
+from run import ALL_STAGES  # noqa: E402
+from report import generate_report, save_dict  # noqa: E402
 
 
 def _get_argparse():

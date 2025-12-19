@@ -12,7 +12,7 @@ on:
    - cron: '30 9 * * 1-6'
 
 
-jobs: 
+jobs:
   e2eamdshark:
     timeout-minutes: 600
     name: "Models :: ${{ matrix.backend }} :: ${{ matrix.test-file }}"
@@ -195,7 +195,7 @@ jobs:
             device: hip
             target-chip: gfx942
             test-file: hf_onnx_model_zoo_non_legacy_02
-            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache  
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: mi300_gpu26_test
             runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
@@ -491,7 +491,7 @@ jobs:
         with:
           repository: nod-ai/AMD-SHARK-TestSuite
           path: test-suite
-      
+
       - name: "Setup alt e2eamdshark python venv"
         run: |
           rm -rf ${ALT_E2E_VENV_DIR}
@@ -505,7 +505,7 @@ jobs:
           pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
           pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
         working-directory: ./test-suite
-      
+
       - name: "Setup IREE EP python venv"
         run: |
           sudo apt update
@@ -565,7 +565,7 @@ jobs:
             -v
           python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
         working-directory: ./test-suite
-      
+
       - name: Run OnnxRT IREE EP
         if: contains(matrix.test-file, 'onnxrt-iree-ep')
         run: |
@@ -595,12 +595,12 @@ jobs:
         with:
           name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_onnx_md
           path: ./test-suite/alt_e2eamdshark/reports/${{ matrix.test-file }}.md
-      
+
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_onnx_json
           path: ./test-suite/alt_e2eamdshark/reports/${{ matrix.test-file }}.json
-      
+
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ci_reports_${{ matrix.backend }}_${{ matrix.test-file }}_duplicates_json
@@ -928,7 +928,7 @@ jobs:
             --reports-dir ./e2eamdshark-reports \
             --test-suite-dir ./test-suite \
             --venv-dir ./report_venv_alt
-      
+
       - name: Regression Reports
         run: |
           source report_venv_alt/bin/activate
@@ -945,14 +945,14 @@ jobs:
             --report-file ./e2eamdshark-reports/yesterday_comparison.md \
             --perf_tol_regression=0.05 \
             --perf_tol_progression=0.05
-          
+
           python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
             --new ./e2eamdshark-reports/combined_reports_unique.json \
             --old ./test-suite/baseline/combined_reports_${{ matrix.backend }}.json \
             --report-file ./e2eamdshark-reports/baseline_comparison.md \
             --perf_tol_regression=0.1 \
             --perf_tol_progression=0.1
-          
+
           az storage blob upload --account-name amdsharkpublic --container-name amdsharkpublic \
             --name latest-test-suite/combined_reports_${{ matrix.backend }}.json \
             --file ./e2eamdshark-reports/combined_reports_unique.json \

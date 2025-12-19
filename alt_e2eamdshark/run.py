@@ -17,7 +17,12 @@ TEST_DIR = str(Path(__file__).parent)
 sys.path.append(TEST_DIR)
 
 from e2e_testing.framework import *
-from e2e_testing.logging_utils import log_exception, log_result, post_test_clean, log_error
+from e2e_testing.logging_utils import (
+    log_exception,
+    log_result,
+    post_test_clean,
+    log_error,
+)
 
 # import frontend test configs:
 from e2e_testing.test_configs.onnxconfig import (
@@ -55,7 +60,12 @@ DEFAULT_STAGES = [
     "postprocessing",
 ]
 
-def get_tests(groups: Literal["all", "combinations", "operators"], test_filter: Optional[str], testsfile: Optional[str]) -> List[str]:
+
+def get_tests(
+    groups: Literal["all", "combinations", "operators"],
+    test_filter: Optional[str],
+    testsfile: Optional[str],
+) -> List[str]:
     """imports tests based on groups and test_filter specification"""
     combinations = True if groups == "all" or groups == "combinations" else False
     models = True if groups == "all" or groups == "models" else False
@@ -84,7 +94,7 @@ def get_tests(groups: Literal["all", "combinations", "operators"], test_filter: 
     else:
         test_list = pre_test_list
 
-    test_list = sorted(test_list, key=lambda test : test.unique_name.lower())
+    test_list = sorted(test_list, key=lambda test: test.unique_name.lower())
 
     return test_list
 
@@ -96,17 +106,32 @@ def main(args):
     if args.mode == "onnx-iree":
         pipeline = REDUCE_TO_LINALG_PIPELINE if args.torchtolinalg else []
         config = OnnxTestConfig(
-            str(TEST_DIR), SimpleIREEBackend(device=args.device, hal_target_backend=args.backend, extra_args=args.iree_compile_args), pipeline
+            str(TEST_DIR),
+            SimpleIREEBackend(
+                device=args.device,
+                hal_target_backend=args.backend,
+                extra_args=args.iree_compile_args,
+            ),
+            pipeline,
         )
     elif args.mode == "cl-onnx-iree":
         pipeline = REDUCE_TO_LINALG_PIPELINE if args.torchtolinalg else []
         config = CLOnnxTestConfig(
-            str(TEST_DIR), CLIREEBackend(device=args.device, hal_target_backend=args.backend, target_chip=args.target_chip, extra_args=args.iree_compile_args), pipeline
+            str(TEST_DIR),
+            CLIREEBackend(
+                device=args.device,
+                hal_target_backend=args.backend,
+                target_chip=args.target_chip,
+                extra_args=args.iree_compile_args,
+            ),
+            pipeline,
         )
     elif args.mode == "ort-ep":
         # TODO: allow specifying provider explicitly from cl args.
         config = OnnxEpTestConfig(
-            str(TEST_DIR), OnnxrtIreeEpBackend(device=args.device, hal_target_device=args.backend))
+            str(TEST_DIR),
+            OnnxrtIreeEpBackend(device=args.device, hal_target_device=args.backend),
+        )
     else:
         raise NotImplementedError(f"unsupported mode: {args.mode}")
 
@@ -114,7 +139,7 @@ def main(args):
     test_list = get_tests(args.groups, args.test_filter, args.testsfile)
     test_list.sort()
 
-    #setup test stages
+    # setup test stages
     stages = ALL_STAGES if args.benchmark else DEFAULT_STAGES
 
     if args.stages:
@@ -138,12 +163,24 @@ def main(args):
 
     if args.report:
         generate_report(args, stages, status_dict)
-        json_save_to = str(Path(args.report_file).parent.joinpath(Path(args.report_file).stem + ".json"))
+        json_save_to = str(
+            Path(args.report_file).parent.joinpath(
+                Path(args.report_file).stem + ".json"
+            )
+        )
         save_dict(status_dict, json_save_to)
 
 
 def run_tests(
-    test_list: List[Test], config: TestConfig, parent_log_dir: str, no_artifacts: bool, verbose: bool, stages: List[str], load_inputs: bool, cleanup: int, get_metadata=bool,
+    test_list: List[Test],
+    config: TestConfig,
+    parent_log_dir: str,
+    no_artifacts: bool,
+    verbose: bool,
+    stages: List[str],
+    load_inputs: bool,
+    cleanup: int,
+    get_metadata=bool,
 ) -> Dict[str, Dict]:
     """runs tests in test_list based on config. Returns a dictionary containing the test statuses."""
     # TODO: multi-process
@@ -159,7 +196,7 @@ def run_tests(
     if verbose:
         warnings.simplefilter("once", UserWarning)
         print(f"Stages to be run: {stages}")
-        print(f'Test list: {[test.unique_name for test in test_list]}')
+        print(f"Test list: {[test.unique_name for test in test_list]}")
 
     status_dict = dict()
 
@@ -174,8 +211,10 @@ def run_tests(
             os.makedirs(log_dir)
 
         # setup stage notifications
-        ws = lambda curr_stage : " "*(max([len(s) for s in stages]) - len(curr_stage))
-        notify_stage = lambda : print(f"\tRunning stage '{curr_stage}'..." + ws(curr_stage), end="\r")
+        ws = lambda curr_stage: " " * (max([len(s) for s in stages]) - len(curr_stage))
+        notify_stage = lambda: print(
+            f"\tRunning stage '{curr_stage}'..." + ws(curr_stage), end="\r"
+        )
 
         mean_time_ms = None
         try:
@@ -204,7 +243,9 @@ def run_tests(
             if curr_stage in stages:
                 notify_stage()
                 model_artifact, func_name = config.import_model(
-                    inst, save_to=artifact_save_to, extra_options=options.import_model_options
+                    inst,
+                    save_to=artifact_save_to,
+                    extra_options=options.import_model_options,
                 )
 
             # apply config-specific preprocessing to the ModelArtifact
@@ -219,7 +260,11 @@ def run_tests(
             curr_stage = "compilation"
             if curr_stage in stages:
                 notify_stage()
-                compiled_artifact = config.compile(model_artifact, save_to=artifact_save_to, extra_options=options.compilation_options)
+                compiled_artifact = config.compile(
+                    model_artifact,
+                    save_to=artifact_save_to,
+                    extra_options=options.compilation_options,
+                )
 
             # get inputs from inst
             curr_stage = "construct_inputs"
@@ -239,14 +284,22 @@ def run_tests(
                 # most reliable way to get output shapes for dynamic models
                 # these shapes are needed to load the outputs from iree-run-module
                 if isinstance(config, CLOnnxTestConfig):
-                    config.tensor_info_dict[t.unique_name] = ([list(d.shape) for d in golden_outputs_raw.data], [d.dtype for d in golden_outputs_raw.to_torch().data])
+                    config.tensor_info_dict[t.unique_name] = (
+                        [list(d.shape) for d in golden_outputs_raw.data],
+                        [d.dtype for d in golden_outputs_raw.to_torch().data],
+                    )
                 golden_outputs_raw.save_to(log_dir, base_stem="golden_output")
 
             # run inference with the compiled module
             curr_stage = "compiled_inference"
             if curr_stage in stages:
                 notify_stage()
-                outputs_raw = config.run(compiled_artifact, inputs, func_name=func_name, extra_options=options.compiled_inference_options)
+                outputs_raw = config.run(
+                    compiled_artifact,
+                    inputs,
+                    func_name=func_name,
+                    extra_options=options.compiled_inference_options,
+                )
                 outputs_raw.save_to(log_dir, base_stem="output")
 
             # apply model-specific post-processing:
@@ -259,7 +312,10 @@ def run_tests(
                 inst.save_processed_output(outputs, log_dir, "output")
 
         except Exception as e:
-            status_dict[t.unique_name] = {"exit_status" : curr_stage, "time_ms" : mean_time_ms}
+            status_dict[t.unique_name] = {
+                "exit_status": curr_stage,
+                "time_ms": mean_time_ms,
+            }
             log_exception(e, log_dir, curr_stage, t.unique_name, verbose)
             log_error(status_dict, log_dir, curr_stage, t.unique_name)
             post_test_clean(log_dir, cleanup, verbose)
@@ -271,7 +327,13 @@ def run_tests(
             notify_stage()
             # TODO: make repetitions configurable from a command line arg
             try:
-                mean_time_ms = config.benchmark(compiled_artifact, inputs, repetitions=3, func_name=func_name, extra_options=options.compiled_inference_options)
+                mean_time_ms = config.benchmark(
+                    compiled_artifact,
+                    inputs,
+                    repetitions=3,
+                    func_name=func_name,
+                    extra_options=options.compiled_inference_options,
+                )
             except Exception as e:
                 # don't exit test because of a benchmarking failure
                 mean_time_ms = "ERROR"
@@ -289,32 +351,47 @@ def run_tests(
                 # log the results
                 test_passed = log_result(result, log_dir, [1e-3, 1e-3])
                 if test_passed:
-                    status_dict[t.unique_name] = {"exit_status" : "PASS", "time_ms" : mean_time_ms}
+                    status_dict[t.unique_name] = {
+                        "exit_status": "PASS",
+                        "time_ms": mean_time_ms,
+                    }
                 else:
-                    status_dict[t.unique_name] = {"exit_status" : "Numerics", "time_ms" : mean_time_ms}
+                    status_dict[t.unique_name] = {
+                        "exit_status": "Numerics",
+                        "time_ms": mean_time_ms,
+                    }
             except Exception as e:
-                status_dict[inst.name] = {"exit_status" : "results-summary", "time_ms" : mean_time_ms}
+                status_dict[inst.name] = {
+                    "exit_status": "results-summary",
+                    "time_ms": mean_time_ms,
+                }
                 log_exception(e, log_dir, "results-summary", t.unique_name, verbose)
 
         if verbose:
             # "PASS" is only recorded if a results-summary is generated
             # if running a subset of ALL_STAGES, manually indicate "PASS".
             if t.unique_name not in status_dict.keys():
-                status_dict[t.unique_name] = {"exit_status": "PASS", "time_ms" : mean_time_ms}
+                status_dict[t.unique_name] = {
+                    "exit_status": "PASS",
+                    "time_ms": mean_time_ms,
+                }
             if status_dict[t.unique_name]["exit_status"] == "PASS":
-                print(f"\tPASSED" + " "*30)
+                print(f"\tPASSED" + " " * 30)
             else:
-                print(f"\tFAILED ({status_dict[t.unique_name]['exit_status']})" + " "*20)
+                print(
+                    f"\tFAILED ({status_dict[t.unique_name]['exit_status']})" + " " * 20
+                )
 
         # test is complete, perform cleanup
-        post_test_clean(log_dir,  cleanup, verbose)
+        post_test_clean(log_dir, cleanup, verbose)
 
     num_passes = [v["exit_status"] for v in status_dict.values()].count("PASS")
     print("\nTest Summary:")
     print(f"\tPASSES: {num_passes}\n\tTOTAL: {len(test_list)}")
     print(f"results stored in {parent_log_dir}")
-    status_dict = dict(sorted(status_dict.items(), key=lambda item : item[0].lower()))
+    status_dict = dict(sorted(status_dict.items(), key=lambda item: item[0].lower()))
     return status_dict
+
 
 def _get_argparse():
     msg = "The run.py script to run e2e amdshark tests"
@@ -330,7 +407,16 @@ def _get_argparse():
     parser.add_argument(
         "-b",
         "--backend",
-        choices=["llvm-cpu", "amd-aie", "rocm", "hip", "cuda", "vmvx", "metal-spirv", "vulkan-spirv"],
+        choices=[
+            "llvm-cpu",
+            "amd-aie",
+            "rocm",
+            "hip",
+            "cuda",
+            "vmvx",
+            "metal-spirv",
+            "vulkan-spirv",
+        ],
         default="llvm-cpu",
         help="specifies the iree-hal-target-device / iree-hal-target-backends for compile phase",
     )
@@ -344,7 +430,7 @@ def _get_argparse():
         "-a",
         "--iree-compile-args",
         nargs="*",
-        default = None,
+        default=None,
         help="Manually specify a space-seperated list of extra args for iree-compile. Do not put `--` before the args.",
     )
     # parser.add_argument(
@@ -360,8 +446,8 @@ def _get_argparse():
         choices=["onnx-iree", "cl-onnx-iree", "ort-ep"],
         default="cl-onnx-iree",
         help="(cl-)onnx-iree : onnx->torch-mlir->IREE, "
-             "cl-onnx-iree runs this through command line tools "
-             "ort : onnx->run with custom ORT EP inference session",
+        "cl-onnx-iree runs this through command line tools "
+        "ort : onnx->run with custom ORT EP inference session",
     )
     parser.add_argument(
         "--torchtolinalg",
@@ -451,8 +537,8 @@ def _get_argparse():
     parser.add_argument(
         "--cleanup",
         help="Specify cleanup level: 0 (nothing), 1 (size >= 500M), 2 (.mlir and .vmfb), 3 (all but .log), 4 (everything)",
-        choices=['0','1','2','3','4'],
-        default='0',
+        choices=["0", "1", "2", "3", "4"],
+        default="0",
     )
     parser.add_argument(
         "--report",
@@ -469,7 +555,7 @@ def _get_argparse():
         "--get-metadata",
         action="store_true",
         default=False,
-        help="save some model metadata to log_dir/metadata.json"
+        help="save some model metadata to log_dir/metadata.json",
     )
     # parser.add_argument(
     #     "-d",

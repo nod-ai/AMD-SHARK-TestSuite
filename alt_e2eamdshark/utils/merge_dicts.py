@@ -13,8 +13,7 @@ from report import generate_report, save_dict  # noqa: E402
 
 def _get_argparse():
     msg = "A script for loading two or more dictionary jsons and merging them."
-    parser = argparse.ArgumentParser(
-        prog="merge_dicts.py", description=msg, epilog="")
+    parser = argparse.ArgumentParser(prog="merge_dicts.py", description=msg, epilog="")
     parser.add_argument(
         "-s",
         "--sources",

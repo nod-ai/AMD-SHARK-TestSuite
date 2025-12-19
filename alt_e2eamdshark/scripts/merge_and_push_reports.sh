@@ -273,10 +273,10 @@ log_info "Creating directory structure and copying report files..."
 for mapping in "${REPORT_MAPPINGS[@]}"; do
     # Parse the mapping
     IFS=':' read -r target_dir source_prefix source_type <<< "$mapping"
-    
+
     # Create target directory
     run_cmd mkdir -p "${DATE}/ci_reports_onnx/${BACKEND}/${target_dir}"
-    
+
     # Determine source path based on type
     if [ "$source_type" = "merged" ]; then
         source_dir="."
@@ -285,14 +285,14 @@ for mapping in "${REPORT_MAPPINGS[@]}"; do
         source_dir="ci_reports_${BACKEND}_${source_prefix}_onnx_md"
         source_file="${source_dir}/${source_prefix}.md"
     fi
-    
+
     # Copy main summary file
     if [ -f "$source_file" ]; then
         run_cmd cp "$source_file" "${DATE}/ci_reports_onnx/${BACKEND}/${target_dir}/summary.md"
     else
         log_warn "Source file not found: $source_file"
     fi
-    
+
     # Copy error report files (*_errors.md)
     if [ "$source_type" = "merged" ]; then
         if ls "${source_prefix}_"*_errors.md 1> /dev/null 2>&1; then
@@ -322,4 +322,3 @@ log_info "Merge and push completed successfully!"
 log_info "Backend: $BACKEND"
 log_info "Date: $DATE"
 log_info "=========================================="
-

@@ -830,9 +830,15 @@ def runTest(aTuple):
     # Do not construct absolute path here as this will run
     # in a new process and cur dir may change over time giving
     # unpredicatble results
-    (frameworkname, testName, args, script_dir, run_dir, uploadDict, dateAndTime) = (
-        aTuple
-    )
+    (
+        frameworkname,
+        testName,
+        args,
+        script_dir,
+        run_dir,
+        uploadDict,
+        dateAndTime,
+    ) = aTuple
     testRunDir = run_dir + "/" + testName
     modelname = os.path.basename(testName)
     modelinputptfilename = (

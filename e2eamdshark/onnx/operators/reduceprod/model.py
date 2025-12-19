@@ -29,7 +29,7 @@ X = make_tensor_value_info("X", TensorProto.FLOAT, [2, 3, 4])
 # Y = make_tensor_value_info("Y", TensorProto.INT64, [3])
 
 # Create an output
-Z = make_tensor_value_info("Z", TensorProto.FLOAT, [1,1,1])
+Z = make_tensor_value_info("Z", TensorProto.FLOAT, [1, 1, 1])
 
 # Create a node (NodeProto)
 reduceprodnode = make_node(

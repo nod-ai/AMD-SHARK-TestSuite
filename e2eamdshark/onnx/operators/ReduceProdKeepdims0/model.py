@@ -12,7 +12,13 @@
 import numpy, torch, sys
 import onnxruntime
 from onnx import numpy_helper, TensorProto, save_model
-from onnx.helper import make_model, make_node, make_graph, make_tensor_value_info, make_attribute
+from onnx.helper import (
+    make_model,
+    make_node,
+    make_graph,
+    make_tensor_value_info,
+    make_attribute,
+)
 from onnx.checker import check_model
 
 # import from e2eamdshark/tools to allow running in current dir, for run through

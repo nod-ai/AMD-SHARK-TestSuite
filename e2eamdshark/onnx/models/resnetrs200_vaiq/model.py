@@ -41,4 +41,3 @@ E2EAMDSHARK_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
 
 print("Input:", E2EAMDSHARK_CHECK["input"])
 print("Output:", E2EAMDSHARK_CHECK["output"])
-

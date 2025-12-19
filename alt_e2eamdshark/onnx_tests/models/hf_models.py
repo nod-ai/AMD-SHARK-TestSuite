@@ -22,7 +22,7 @@ from e2e_testing.framework import (
     ImporterOptions,
     ExtraOptions,
     RuntimeOptions,
-    )
+)
 from e2e_testing.onnx_utils import update_no_ext
 
 from torchvision import transforms
@@ -49,8 +49,7 @@ task_list = [
     "sentence-similarity",
 ]
 
-large_models = {
-}
+large_models = {}
 
 models_need_externalization = {
     "hf_StableBeluga2",
@@ -209,7 +208,6 @@ models_with_input_names_3 = {
     "hf_gpt2",
     "hf_llama-68m",
     "hf_tiny-random-mistral",
-
 }
 
 models_with_input_names_4 = {
@@ -219,14 +217,17 @@ models_with_input_names_4 = {
 # Add a basic_opt list to apply O1 to the models.
 basic_opt = []
 
+
 def get_tokenizer_from_model_path(model_repo_path: str, cache_dir: str | Path):
     trust_remote_code = False
 
     name = model_repo_path.split("/")[-1]
-    if 'kobert' in name.lower():
+    if "kobert" in name.lower():
         trust_remote_code = True
 
-    return AutoTokenizer.from_pretrained(model_repo_path, cache_dir=cache_dir, trust_remote_code=trust_remote_code)
+    return AutoTokenizer.from_pretrained(
+        model_repo_path, cache_dir=cache_dir, trust_remote_code=trust_remote_code
+    )
 
 
 def build_repo_to_model_map():
@@ -296,7 +297,7 @@ class HfModelWithTokenizers(HfDownloadableModel):
             return
 
         # for large models, externalizing params
-        import_model_options=ImporterOptions(
+        import_model_options = ImporterOptions(
             # externalize_inputs_threshold=2,
             num_elements_threshold=32,
             externalize_params=True,
@@ -310,12 +311,11 @@ class HfModelWithTokenizers(HfDownloadableModel):
                 common_extra_args=(
                     f'parameters=model={Path(self.model).parent / "model.torch_onnx_params.irpa"}',
                 )
-            )
+            ),
         )
 
         self.construct_model()
         self.update_model_without_ext_data()
-
 
     def export_model(self, optim_level: str | None = None):
         # We won't need optim_level.
@@ -326,24 +326,22 @@ class HfModelWithTokenizers(HfDownloadableModel):
         else:
             self.export_large_models()
 
-
     def export_large_models(self):
         from transformers import AutoModelForCausalLM
+
         print("\nLoading Hugging Face model...")
         model = AutoModelForCausalLM.from_pretrained(
             self.model_repo_path,
             cache_dir=self.cache_dir,
-            #torch_dtype=self.torch_dtype,
+            # torch_dtype=self.torch_dtype,
         )
         print("Model loaded.")
 
-        dynamic_axes = (
-            {
-                "input_ids": {0: "B", 1: "L"},
-                "attention_mask": {0: "B", 1: "L"},
-                "output": {0: "B", 1: "L"},
-            }
-        )
+        dynamic_axes = {
+            "input_ids": {0: "B", 1: "L"},
+            "attention_mask": {0: "B", 1: "L"},
+            "output": {0: "B", 1: "L"},
+        }
         inputs = self.construct_inputs().data
 
         print("Exporting model to ONNX (this might take a while)...")
@@ -368,7 +366,6 @@ class HfModelWithTokenizers(HfDownloadableModel):
                 f"Torch onnx export failed to produce an onnx model at {self.model}"
             )
 
-
     def construct_inputs(self):
         prompt = ["Deeds will not be less valiant because they are unpraised."]
 
@@ -384,7 +381,9 @@ class HfModelWithTokenizers(HfDownloadableModel):
             padding = True
             truncation = True
 
-        tokens = tokenizer(prompt, return_tensors="pt", padding=padding, truncation=truncation)
+        tokens = tokenizer(
+            prompt, return_tensors="pt", padding=padding, truncation=truncation
+        )
 
         if self.name in models_with_input_names_4:
             # Handles 4 inputs
@@ -392,16 +391,25 @@ class HfModelWithTokenizers(HfDownloadableModel):
             # For now, "token_type_ids" will be reused as bbox in this case
             # bbox is a bounding box with size [?, ?, 4]
             #   where each 4 numbers represent x_min, y_min, x_max, y_max
-            tokens["token_type_ids"] = tokens["token_type_ids"].unsqueeze(-1).repeat(1, 1, 4)
+            tokens["token_type_ids"] = (
+                tokens["token_type_ids"].unsqueeze(-1).repeat(1, 1, 4)
+            )
 
         self.input_name_to_shape_map = {k: v.shape for (k, v) in tokens.items()}
-        if self.name in models_with_input_names_3 or self.name in models_with_input_names_4:
+        if (
+            self.name in models_with_input_names_3
+            or self.name in models_with_input_names_4
+        ):
             # Handles 3 and 4 inputs
-            self.input_name_to_shape_map["position_ids"] = self.input_name_to_shape_map["input_ids"]
-            zeros = torch.zeros(*(self.input_name_to_shape_map["position_ids"]), dtype=int)
+            self.input_name_to_shape_map["position_ids"] = self.input_name_to_shape_map[
+                "input_ids"
+            ]
+            zeros = torch.zeros(
+                *(self.input_name_to_shape_map["position_ids"]), dtype=int
+            )
             inputs = (*list(tokens.values()), zeros)
         else:
-            inputs = (*list(tokens.values()), )
+            inputs = (*list(tokens.values()),)
 
         test_tensors = TestTensors(inputs)
         return test_tensors
@@ -416,7 +424,10 @@ class HfModelWithRandomInput(HfDownloadableModel):
     def construct_inputs(self):
         inputs = torch.randn(1, 4, 16000)
 
-        self.input_name_to_shape_map = {'input_ids': torch.Size([16000, 4]), 'attention_mask': torch.Size([16000, 4])}
+        self.input_name_to_shape_map = {
+            "input_ids": torch.Size([16000, 4]),
+            "attention_mask": torch.Size([16000, 4]),
+        }
 
         test_tensors = TestTensors(inputs)
         return test_tensors

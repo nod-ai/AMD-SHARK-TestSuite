@@ -66,7 +66,11 @@ outputs = session.get_outputs()
 
 model_output = session.run(
     [outputs[0].name],
-    {inputs[0].name: model_input_X, inputs[1].name: model_input_Y, inputs[2].name: model_input_B},
+    {
+        inputs[0].name: model_input_X,
+        inputs[1].name: model_input_Y,
+        inputs[2].name: model_input_B,
+    },
 )
 
 # Moving to torch to handle bfloat16 as numpy does not support bfloat16

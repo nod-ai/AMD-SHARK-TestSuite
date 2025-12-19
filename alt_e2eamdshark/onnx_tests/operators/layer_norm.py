@@ -9,6 +9,7 @@ from onnx.helper import make_node, make_tensor_value_info
 from ..helper_classes import BuildAModel
 from e2e_testing.registry import register_test
 
+
 class LayerNormalizationModel(BuildAModel):
     def construct_i_o_value_info(self):
         X = make_tensor_value_info("X", TensorProto.FLOAT16, [2, 3, 5])
@@ -30,5 +31,6 @@ class LayerNormalizationModel(BuildAModel):
             stash_type=1,
         )
         self.node_list = [layer_norm_node]
+
 
 register_test(LayerNormalizationModel, "layer_norm_test")

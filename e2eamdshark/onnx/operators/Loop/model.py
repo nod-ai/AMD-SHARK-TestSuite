@@ -17,8 +17,7 @@ from commonutils import E2EAMDSHARK_CHECK_DEF
 E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 
 
-
-# LOOP 
+# LOOP
 # Given a tensor x of values [x1, ..., xN], and initial tensor y
 # sum up its elements using a scan
 # returning the final state (y+x1+x2+...+xN) as well the scan_output
@@ -26,15 +25,9 @@ E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 
 y_in = onnx.helper.make_tensor_value_info("y_in", onnx.TensorProto.FLOAT, [1])
 y_out = onnx.helper.make_tensor_value_info("y_out", onnx.TensorProto.FLOAT, [1])
-scan_out = onnx.helper.make_tensor_value_info(
-    "scan_out", onnx.TensorProto.FLOAT, [1]
-)
-cond_in = onnx.helper.make_tensor_value_info(
-    "cond_in", onnx.TensorProto.BOOL, []
-)
-cond_out = onnx.helper.make_tensor_value_info(
-    "cond_out", onnx.TensorProto.BOOL, []
-)
+scan_out = onnx.helper.make_tensor_value_info("scan_out", onnx.TensorProto.FLOAT, [1])
+cond_in = onnx.helper.make_tensor_value_info("cond_in", onnx.TensorProto.BOOL, [])
+cond_out = onnx.helper.make_tensor_value_info("cond_out", onnx.TensorProto.BOOL, [])
 iter_count = onnx.helper.make_tensor_value_info(
     "iter_count", onnx.TensorProto.INT64, []
 )
@@ -42,11 +35,11 @@ iter_count = onnx.helper.make_tensor_value_info(
 x_inp = np.array([1, 2, 3, 4, 5]).astype(np.float32)
 y_inp = np.array([-2]).astype(np.float32)
 
-cond = make_tensor_value_info('cond', TensorProto.BOOL, [])
-y = make_tensor_value_info('y', TensorProto.FLOAT, [1])
-res_y = make_tensor_value_info('res_y', TensorProto.FLOAT, [1])
-res_scan = make_tensor_value_info('res_scan', TensorProto.FLOAT, [5,1])
-trip_count = make_tensor_value_info('trip_count', TensorProto.INT64, [])
+cond = make_tensor_value_info("cond", TensorProto.BOOL, [])
+y = make_tensor_value_info("y", TensorProto.FLOAT, [1])
+res_y = make_tensor_value_info("res_y", TensorProto.FLOAT, [1])
+res_scan = make_tensor_value_info("res_scan", TensorProto.FLOAT, [5, 1])
+trip_count = make_tensor_value_info("trip_count", TensorProto.INT64, [])
 
 x_const_node = onnx.helper.make_node(
     "Constant",
@@ -84,9 +77,7 @@ axes_node = onnx.helper.make_node(
     ),
 )
 
-i_add_node = onnx.helper.make_node(
-    "Add", inputs=["iter_count", "one"], outputs=["end"]
-)
+i_add_node = onnx.helper.make_node("Add", inputs=["iter_count", "one"], outputs=["end"])
 
 start_unsqueeze_node = onnx.helper.make_node(
     "Unsqueeze", inputs=["iter_count", "axes"], outputs=["slice_start"]
@@ -138,15 +129,13 @@ loop_node = onnx.helper.make_node(
 )
 
 graph = onnx.helper.make_graph(
-    nodes = [
-        loop_node
-    ],
+    nodes=[loop_node],
     name="loop_example",
     inputs=[trip_count, cond, y],
     outputs=[res_y],
 )
 
-onnx_model = make_model(graph, producer_name='loop_example')
+onnx_model = make_model(graph, producer_name="loop_example")
 onnx_model.opset_import[0].version = 13
 
 
@@ -163,15 +152,12 @@ trip_count_inp = np.array(5).astype(np.int64)
 cond_inp = np.array(1).astype(bool)
 
 input_dict = {
-    inputs[0].name : trip_count_inp, 
-    inputs[1].name : cond_inp,
-    inputs[2].name : y_inp,
+    inputs[0].name: trip_count_inp,
+    inputs[1].name: cond_inp,
+    inputs[2].name: y_inp,
 }
 
-output_list = [
-    node.name
-    for node in outputs
-]
+output_list = [node.name for node in outputs]
 
 model_output = session.run(
     output_list,

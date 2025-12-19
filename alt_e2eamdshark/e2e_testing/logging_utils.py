@@ -55,11 +55,10 @@ def log_result(result, log_dir, tol):
     return num_match == num_total
 
 
-
 def log_error(status_dict: Dict[str, Dict], log_dir: str, stage: str, name: str):
     """
     Populate status_dict with error information for a given test.
-    
+
     Args:
         status_dict: Dictionary to populate with error info
         log_dir: Base directory containing the test logs
@@ -69,7 +68,6 @@ def log_error(status_dict: Dict[str, Dict], log_dir: str, stage: str, name: str)
     if stage == "compilation":
         handler = CompilationErrorHandler(log_dir, stage)
         handler.populate_status_dict(status_dict, name)
-
 
 
 def log_exception(e: Exception, path: str, stage: str, name: str, verbose: bool):

@@ -42,7 +42,10 @@ if __name__ == "__main__":
         "-p", "--print", action="store_true", help="Print in human readable format"
     )
     parser.add_argument(
-        "-s", "--signature", action="store_true", help="Get model input output information"
+        "-s",
+        "--signature",
+        action="store_true",
+        help="Get model input output information",
     )
     parser.add_argument(
         "-f",

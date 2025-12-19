@@ -84,9 +84,13 @@ def postProcess(e2eamdsharkDict):
         postprocess_output = test_output
     return postprocess_output
 
+
 # used for image inputs for onnx vision models
 def to_numpy(tensor):
-    return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
+    return (
+        tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
+    )
+
 
 def setup_test_image(height=224, weight=224):
     url = "http://images.cocodataset.org/val2017/000000039769.jpg"
@@ -94,12 +98,12 @@ def setup_test_image(height=224, weight=224):
 
     resize = transforms.Resize([height, weight])
     img = resize(img)
-    
-    # Define a transform to convert 
-    # the image to torch tensor 
-    img_ycbcr = img.convert('YCbCr')
-    
-    # Convert the image to Torch tensor 
+
+    # Define a transform to convert
+    # the image to torch tensor
+    img_ycbcr = img.convert("YCbCr")
+
+    # Convert the image to Torch tensor
     to_tensor = transforms.ToTensor()
     img_ycbcr = to_tensor(img_ycbcr)
     img_ycbcr.unsqueeze_(0)

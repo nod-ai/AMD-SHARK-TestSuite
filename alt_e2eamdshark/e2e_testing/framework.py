@@ -16,31 +16,38 @@ from e2e_testing.onnx_utils import *
 
 Module = TypeVar("Module")
 
+
 class ImporterOptions(NamedTuple):
-    opset_version : Optional[int] = None
-    large_model : bool = False
-    externalize_params : bool = False
-    externalize_inputs_threshold : Optional[int] = None
+    opset_version: Optional[int] = None
+    large_model: bool = False
+    externalize_params: bool = False
+    externalize_inputs_threshold: Optional[int] = None
     num_elements_threshold: int = 100
-    params_scope : str = "model"
-    param_gb_threshold : Optional[float] = None
+    params_scope: str = "model"
+    param_gb_threshold: Optional[float] = None
+
 
 class CompilerOptions(NamedTuple):
     """Specify, for specific iree-hal-target-backends, a tuple of extra compiler flags.
-       Also allows backend-agnostic options to be included."""
-    backend_specific_flags : Dict[str, Tuple[str]] = dict()
-    common_extra_args : Tuple[str] = tuple()
+    Also allows backend-agnostic options to be included."""
+
+    backend_specific_flags: Dict[str, Tuple[str]] = dict()
+    common_extra_args: Tuple[str] = tuple()
+
 
 class RuntimeOptions(NamedTuple):
     """Specify, for specific iree-hal-target-backends, a tuple of extra runtime flags.
-       Also allows backend-agnostic options to be included."""
-    backend_specific_flags : Dict[str, Tuple[str]] = dict()
-    common_extra_args : Tuple[str] = tuple()
+    Also allows backend-agnostic options to be included."""
+
+    backend_specific_flags: Dict[str, Tuple[str]] = dict()
+    common_extra_args: Tuple[str] = tuple()
+
 
 class ExtraOptions(NamedTuple):
-    import_model_options : ImporterOptions = ImporterOptions()
-    compilation_options : CompilerOptions = CompilerOptions()
-    compiled_inference_options : RuntimeOptions = RuntimeOptions()
+    import_model_options: ImporterOptions = ImporterOptions()
+    compilation_options: CompilerOptions = CompilerOptions()
+    compiled_inference_options: RuntimeOptions = RuntimeOptions()
+
 
 class OnnxModelInfo:
     """Stores information about an onnx test: the filepath to model.onnx, how to construct/download it, and how to construct sample inputs for a test run."""
@@ -64,13 +71,11 @@ class OnnxModelInfo:
         self.extra_options = ExtraOptions()
         self.update_extra_options()
 
-
     def update_model_without_ext_data(self):
         """For large models, which fail opset_version updating, use this method to update without loading external data.
         This will also trace the graph and copy the external data references which gets wiped out otherwise.
         """
         update_no_ext(onnx_model_path=self.model, opset_version=self.opset_version)
-
 
     def forward(self, input: Optional[TestTensors] = None) -> TestTensors:
         """Applies self.model to self.input. Only override if necessary for specific models"""
@@ -140,7 +145,12 @@ class OnnxModelInfo:
             self.construct_model()
         if not leave_dynamic:
             self.update_dim_param_dict()
-        return get_signature_for_onnx_model(self.model, from_inputs=from_inputs, dim_param_dict=self.dim_param_dict, leave_dynamic=leave_dynamic)
+        return get_signature_for_onnx_model(
+            self.model,
+            from_inputs=from_inputs,
+            dim_param_dict=self.dim_param_dict,
+            leave_dynamic=leave_dynamic,
+        )
 
     def load_inputs(self, dir_path):
         """computes the input signature of the onnx model and loads inputs from bin files"""
@@ -171,17 +181,14 @@ class OnnxModelInfo:
         og_model = onnx.load(self.model)
         if og_model.opset_import[0].version >= self.opset_version:
             return
-        model = onnx.version_converter.convert_version(
-            og_model, self.opset_version
-        )
+        model = onnx.version_converter.convert_version(og_model, self.opset_version)
         onnx.save(model, self.model)
 
     def get_metadata(self):
         model_size = os.path.getsize(self.model)
         freq = get_op_frequency(self.model)
-        metadata = {"model_size" : model_size, "op_frequency" : freq}
+        metadata = {"model_size": model_size, "op_frequency": freq}
         return metadata
-
 
 
 # TODO: extend TestModel to a union, or make TestModel a base class when supporting other frontends
@@ -190,29 +197,48 @@ CompiledArtifact = TypeVar("CompiledArtifact")
 ModelArtifact = Union[Module, onnx.ModelProto]
 CompiledOutput = Union[CompiledArtifact, ort.InferenceSession]
 
-class TestConfig(abc.ABC):
 
+class TestConfig(abc.ABC):
     @abc.abstractmethod
-    def import_model(self, program: TestModel, *, save_to: str, extra_options : ImporterOptions) -> Tuple[ModelArtifact, str | None]:
+    def import_model(
+        self, program: TestModel, *, save_to: str, extra_options: ImporterOptions
+    ) -> Tuple[ModelArtifact, str | None]:
         """imports the test model to model artifact (e.g., loads the onnx model )"""
         pass
 
     @abc.abstractmethod
-    def preprocess_model(self, model_artifact: ModelArtifact, *, save_to: str) -> ModelArtifact:
+    def preprocess_model(
+        self, model_artifact: ModelArtifact, *, save_to: str
+    ) -> ModelArtifact:
         """applies preprocessing to model_artifact."""
         pass
 
     @abc.abstractmethod
-    def compile(self, module: ModelArtifact, *, save_to: str, extra_options : CompilerOptions) -> CompiledOutput:
+    def compile(
+        self, module: ModelArtifact, *, save_to: str, extra_options: CompilerOptions
+    ) -> CompiledOutput:
         """converts the test program to a compiled artifact"""
         pass
 
     @abc.abstractmethod
-    def run(self, artifact: CompiledOutput, input: TestTensors, extra_options : RuntimeOptions) -> TestTensors:
+    def run(
+        self,
+        artifact: CompiledOutput,
+        input: TestTensors,
+        extra_options: RuntimeOptions,
+    ) -> TestTensors:
         """runs the input through the compiled artifact"""
         pass
 
-    def benchmark(self, artifact: CompiledOutput, input: TestTensors, repetitions: int, *, func_name=None, extra_options : RuntimeOptions) -> float:
+    def benchmark(
+        self,
+        artifact: CompiledOutput,
+        input: TestTensors,
+        repetitions: int,
+        *,
+        func_name=None,
+        extra_options: RuntimeOptions,
+    ) -> float:
         """returns a float representing inference time in ms"""
         pass
 

@@ -25,41 +25,43 @@ E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 
 
 # condition has to be a float tensor
-condition = make_tensor_value_info('condition', TensorProto.BOOL, [1])
-input1 = make_tensor_value_info('input1', TensorProto.FLOAT, [2,3])
-input2 = make_tensor_value_info('input2', TensorProto.FLOAT, [2,3])
-output = make_tensor_value_info('output', TensorProto.FLOAT, [2,3])
-output_then = make_tensor_value_info('output_then', TensorProto.FLOAT, [2,3])
-output_else = make_tensor_value_info('output_else', TensorProto.FLOAT, [2,3])
+condition = make_tensor_value_info("condition", TensorProto.BOOL, [1])
+input1 = make_tensor_value_info("input1", TensorProto.FLOAT, [2, 3])
+input2 = make_tensor_value_info("input2", TensorProto.FLOAT, [2, 3])
+output = make_tensor_value_info("output", TensorProto.FLOAT, [2, 3])
+output_then = make_tensor_value_info("output_then", TensorProto.FLOAT, [2, 3])
+output_else = make_tensor_value_info("output_else", TensorProto.FLOAT, [2, 3])
 
 then_branch = make_graph(
-    nodes=[
-        make_node('Add', ['input1', 'input2'], ['output_then'])
-    ],
-    name='then_branch',
+    nodes=[make_node("Add", ["input1", "input2"], ["output_then"])],
+    name="then_branch",
     inputs=[],
-    outputs=[output_then]
+    outputs=[output_then],
 )
 
 else_branch = make_graph(
-    nodes=[
-        make_node('Sub', ['input1', 'input2'], ['output_else'])
-    ],
-    name='else_branch',
+    nodes=[make_node("Sub", ["input1", "input2"], ["output_else"])],
+    name="else_branch",
     inputs=[],
-    outputs=[output_else]
+    outputs=[output_else],
 )
 
 graph = make_graph(
     nodes=[
-        make_node('If', ['condition'], ['output'], then_branch=then_branch, else_branch=else_branch)
+        make_node(
+            "If",
+            ["condition"],
+            ["output"],
+            then_branch=then_branch,
+            else_branch=else_branch,
+        )
     ],
-    name='if_example',
+    name="if_example",
     inputs=[condition, input1, input2],
-    outputs=[output]
+    outputs=[output],
 )
 
-onnx_model = make_model(graph, producer_name='conditional_example')
+onnx_model = make_model(graph, producer_name="conditional_example")
 
 onnx_model.opset_import[0].version = 19
 
@@ -75,6 +77,7 @@ inputs = session.get_inputs()
 # gets Z in outputs[0]
 outputs = session.get_outputs()
 
+
 def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg):
     if node.type == "tensor(float)":
         return numpy.random.randn(*node.shape).astype(numpy.float32)
@@ -82,16 +85,11 @@ def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.N
         return numpy.random.randint(0, 10000, size=node.shape).astype(numpy.int32)
     if node.type == "tensor(bool)":
         return numpy.random.randint(0, 2, size=node.shape).astype(bool)
-    
-input_dict = {
-    node.name: generate_input_from_node(node)
-    for node in inputs
-}
 
-output_list = [
-    node.name
-    for node in outputs
-]
+
+input_dict = {node.name: generate_input_from_node(node) for node in inputs}
+
+output_list = [node.name for node in outputs]
 
 model_output = session.run(
     output_list,

@@ -145,5 +145,5 @@ def generate_report(
 
     # We can enable the following code when we want to get all the data
     # for stage in stages:
-    #    generate_stage_error_summary(status_dict, stage, args.report_file) 
+    #    generate_stage_error_summary(status_dict, stage, args.report_file)
     generate_stage_error_summary(status_dict, "compilation", args.report_file)

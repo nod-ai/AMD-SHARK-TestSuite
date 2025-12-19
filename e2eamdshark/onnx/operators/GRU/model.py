@@ -28,16 +28,26 @@ num_directions = 1
 
 # Create an input (ValueInfoProto)
 X = make_tensor_value_info("X", TensorProto.FLOAT, [seq_length, batch_size, input_size])
-initial_h = make_tensor_value_info("initial_h", TensorProto.FLOAT, [num_directions, batch_size, hidden_size])
+initial_h = make_tensor_value_info(
+    "initial_h", TensorProto.FLOAT, [num_directions, batch_size, hidden_size]
+)
 
 # Create tensor value info for W, R, B, sequence_lens
-W = make_tensor_value_info("W", TensorProto.FLOAT, [num_directions, 3*hidden_size, input_size])
-R = make_tensor_value_info("R", TensorProto.FLOAT, [num_directions, 3*hidden_size, hidden_size])
-B = make_tensor_value_info("B", TensorProto.FLOAT, [num_directions, 6*hidden_size])
+W = make_tensor_value_info(
+    "W", TensorProto.FLOAT, [num_directions, 3 * hidden_size, input_size]
+)
+R = make_tensor_value_info(
+    "R", TensorProto.FLOAT, [num_directions, 3 * hidden_size, hidden_size]
+)
+B = make_tensor_value_info("B", TensorProto.FLOAT, [num_directions, 6 * hidden_size])
 sequence_lens = make_tensor_value_info("sequence_lens", TensorProto.INT32, [batch_size])
 
-Y = make_tensor_value_info("Y", TensorProto.FLOAT, [seq_length, num_directions, batch_size, hidden_size])
-Y_h = make_tensor_value_info("Y_h", TensorProto.FLOAT, [num_directions, batch_size, hidden_size])
+Y = make_tensor_value_info(
+    "Y", TensorProto.FLOAT, [seq_length, num_directions, batch_size, hidden_size]
+)
+Y_h = make_tensor_value_info(
+    "Y_h", TensorProto.FLOAT, [num_directions, batch_size, hidden_size]
+)
 
 grunode = make_node(
     op_type="GRU",
@@ -57,10 +67,7 @@ grunode = make_node(
 )
 
 graph = make_graph(
-    [grunode],
-    "gru_graph",
-    [X, W, R, B, sequence_lens, initial_h],
-    [Y, Y_h]
+    [grunode], "gru_graph", [X, W, R, B, sequence_lens, initial_h], [Y, Y_h]
 )
 
 # Create the model (ModelProto)
@@ -78,11 +85,17 @@ outputs = session.get_outputs()
 
 test_input = {
     "X": numpy.random.randn(seq_length, batch_size, input_size).astype(numpy.float32),
-    "W": numpy.random.randn(num_directions, 3*hidden_size, input_size).astype(numpy.float32),
-    "R": numpy.random.randn(num_directions, 3*hidden_size, hidden_size).astype(numpy.float32),
-    "B": numpy.random.randn(num_directions, 6*hidden_size).astype(numpy.float32),
+    "W": numpy.random.randn(num_directions, 3 * hidden_size, input_size).astype(
+        numpy.float32
+    ),
+    "R": numpy.random.randn(num_directions, 3 * hidden_size, hidden_size).astype(
+        numpy.float32
+    ),
+    "B": numpy.random.randn(num_directions, 6 * hidden_size).astype(numpy.float32),
     "sequence_lens": numpy.array([seq_length], dtype=numpy.int32),
-    "initial_h": numpy.zeros((num_directions, batch_size, hidden_size)).astype(numpy.float32),
+    "initial_h": numpy.zeros((num_directions, batch_size, hidden_size)).astype(
+        numpy.float32
+    ),
 }
 
 test_output = session.run(None, test_input)

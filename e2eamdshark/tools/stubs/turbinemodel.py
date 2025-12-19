@@ -70,7 +70,7 @@ else:
 module_str = str(module.mlir_module)
 torch_mlir_name = outfileprefix + ".pytorch.torch.mlir"
 with open(torch_mlir_name, "w+") as f:
-        f.write(module_str)
+    f.write(module_str)
 
 inputsavefilename = outfileprefix + ".input.pt"
 outputsavefilename = outfileprefix + ".goldoutput.pt"

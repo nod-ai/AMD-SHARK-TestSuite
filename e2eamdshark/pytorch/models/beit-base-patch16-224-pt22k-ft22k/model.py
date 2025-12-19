@@ -19,7 +19,7 @@ E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 
 # model origin: https://huggingface.co/microsoft/beit-base-patch16-224-pt22k-ft22k
 test_modelname = "microsoft/beit-base-patch16-224-pt22k-ft22k"
-test_image_url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
+test_image_url = "http://images.cocodataset.org/val2017/000000039769.jpg"
 image = Image.open(requests.get(test_image_url, stream=True).raw)
 
 processor = BeitImageProcessor.from_pretrained(test_modelname)

@@ -30,7 +30,7 @@ def pre_test_onnx_model_azure_download(name, cache_dir, model_path):
     # if the the model exists for the test in the test dir, do nothing.
     # if it doesn't exist in the test directory but exists in cache dir, simply unzip cached model
     dest_file = os.path.join(cache_dir, "model.onnx.zip")
-    print(f"Unzipping - {dest_file}...","\t")
+    print(f"Unzipping - {dest_file}...", "\t")
     # model_file_path_cache may not exist for models which were not correctly downloaded,
     # skip unzipping such model files, only extract existing models
     if os.path.exists(dest_file):
@@ -38,9 +38,9 @@ def pre_test_onnx_model_azure_download(name, cache_dir, model_path):
         with ZipFile(dest_file, "r") as zf:
             # onnx/model/testname already present in the zip file structure
             zf.extractall(model_dir)
-            print(f'Unzipping succeded. Look for extracted contents in {model_dir}')
+            print(f"Unzipping succeded. Look for extracted contents in {model_dir}")
     else:
-        print(f'Failed: path {dest_file} does not exist!')
+        print(f"Failed: path {dest_file} does not exist!")
 
 
 def download_and_setup_onnxmodel(cache_dir, name):

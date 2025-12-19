@@ -27,7 +27,10 @@ Z = make_tensor_value_info("Z", TensorProto.FLOAT, [3, 4])  # Same shape as inpu
 
 # Create an 'Identity' node (NodeProto)
 identity_node = make_node(
-    "Identity", ["X"], ["Z"], "identity_node"  # op_type  # inputs  # outputs  # node name
+    "Identity",
+    ["X"],
+    ["Z"],
+    "identity_node",  # op_type  # inputs  # outputs  # node name
 )
 
 # Create the graph (GraphProto)

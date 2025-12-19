@@ -31,7 +31,12 @@ def dtype_from_ort_node(node):
         return torch.bool
     raise NotImplementedError(f"Unhandled dtype string found: {dtypestr}")
 
-def get_node_shape_from_dim_param_dict(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg, dim_param_dict: Optional[dict[str, int]] = None, input_name_to_shape_map: Optional[dict[str, list[int]]] = None) -> list[int]:
+
+def get_node_shape_from_dim_param_dict(
+    node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg,
+    dim_param_dict: Optional[dict[str, int]] = None,
+    input_name_to_shape_map: Optional[dict[str, list[int]]] = None,
+) -> list[int]:
     """Get the shape of a node, replacing any string dims with values from a dim_param_dict"""
     if input_name_to_shape_map and node.name in input_name_to_shape_map.keys():
         # Particularly used for models from ONNX Model Zoo,
@@ -43,7 +48,9 @@ def get_node_shape_from_dim_param_dict(node: onnxruntime.capi.onnxruntime_pybind
     for dim in node.shape:
         if isinstance(dim, str) and dim_param_dict:
             if not dim in dim_param_dict.keys():
-                raise ValueError(f"input node {node.name} has a dim param='{dim}' not found in provided dim_param_dict: '{dim_param_dict}'")
+                raise ValueError(
+                    f"input node {node.name} has a dim param='{dim}' not found in provided dim_param_dict: '{dim_param_dict}'"
+                )
             else:
                 int_dims.append(dim_param_dict[dim])
                 continue
@@ -59,7 +66,11 @@ def get_node_shape_from_dim_param_dict(node: onnxruntime.capi.onnxruntime_pybind
     return int_dims
 
 
-def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg, dim_param_dict: Optional[dict[str, int]] = None, input_name_to_shape_map: Optional[dict[str, list[int]]] = None):
+def generate_input_from_node(
+    node: onnxruntime.capi.onnxruntime_pybind11_state.NodeArg,
+    dim_param_dict: Optional[dict[str, int]] = None,
+    input_name_to_shape_map: Optional[dict[str, list[int]]] = None,
+):
     """
     Generate a random input tensor for a given node
 
@@ -68,8 +79,9 @@ def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.N
         dim_param_dict: a dictionary mapping onnx string dims to int values
     """
 
-
-    int_dims = get_node_shape_from_dim_param_dict(node, dim_param_dict, input_name_to_shape_map)
+    int_dims = get_node_shape_from_dim_param_dict(
+        node, dim_param_dict, input_name_to_shape_map
+    )
 
     rng = numpy.random.default_rng(19)
     if node.type == "tensor(float)":
@@ -77,7 +89,9 @@ def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.N
     if node.type == "tensor(float16)":
         return rng.random(int_dims).astype(numpy.float16)
     if node.type == "tensor(bfloat16)":
-        raise NotImplementedError("Numpy doesn't support bfloat16. Please consider modifying the boundary types.")
+        raise NotImplementedError(
+            "Numpy doesn't support bfloat16. Please consider modifying the boundary types."
+        )
     if node.type == "tensor(int)" or node.type == "tensor(int32)":
         return rng.integers(0, 10000, size=int_dims, dtype=numpy.int32)
     if node.type == "tensor(int8)":
@@ -89,22 +103,37 @@ def generate_input_from_node(node: onnxruntime.capi.onnxruntime_pybind11_state.N
     raise NotImplementedError(f"Found an unhandled dtype: {node.type}.")
 
 
-def get_sample_inputs_for_onnx_model(model_path, dim_param_dict = None, input_name_to_shape_map = None) -> TestTensors:
+def get_sample_inputs_for_onnx_model(
+    model_path, dim_param_dict=None, input_name_to_shape_map=None
+) -> TestTensors:
     """A convenience function for generating sample inputs for an onnx model"""
     opt = onnxruntime.SessionOptions()
     opt.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
     s = onnxruntime.InferenceSession(model_path, opt)
     inputs = s.get_inputs()
     sample_inputs = TestTensors(
-        tuple([generate_input_from_node(node, dim_param_dict, input_name_to_shape_map) for node in inputs])
+        tuple(
+            [
+                generate_input_from_node(node, dim_param_dict, input_name_to_shape_map)
+                for node in inputs
+            ]
+        )
     )
     return sample_inputs
 
 
-def get_signature_for_onnx_model(model_path, *, from_inputs: bool = True, dim_param_dict: Optional[dict[str, int]] = None, leave_dynamic: bool = False):
+def get_signature_for_onnx_model(
+    model_path,
+    *,
+    from_inputs: bool = True,
+    dim_param_dict: Optional[dict[str, int]] = None,
+    leave_dynamic: bool = False,
+):
     """A convenience funtion for retrieving the input or output shapes and dtypes"""
     sess_opt = onnxruntime.SessionOptions()
-    sess_opt.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
+    sess_opt.graph_optimization_level = (
+        onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
+    )
     s = onnxruntime.InferenceSession(model_path, sess_opt)
     if from_inputs:
         nodes = s.get_inputs()
@@ -115,7 +144,12 @@ def get_signature_for_onnx_model(model_path, *, from_inputs: bool = True, dim_pa
     for i in nodes:
         shape = i.shape
         for index, s in enumerate(shape):
-            if dim_param_dict and not leave_dynamic and isinstance(s, str) and s in dim_param_dict.keys():
+            if (
+                dim_param_dict
+                and not leave_dynamic
+                and isinstance(s, str)
+                and s in dim_param_dict.keys()
+            ):
                 shape[index] = dim_param_dict[s]
         shapes.append(shape)
         dtypes.append(dtype_from_ort_node(i))
@@ -128,7 +162,7 @@ def get_op_frequency(model_or_path):
     elif isinstance(model_or_path, onnx.ModelProto):
         model = model_or_path
     else:
-        raise TypeError(f'Input argument must be a path, string, or onnx model.')
+        raise TypeError(f"Input argument must be a path, string, or onnx model.")
     op_freq = dict()
     for n in model.graph.node:
         if n.op_type in op_freq:
@@ -186,8 +220,8 @@ def find_minimal_graph(graph: onnx.GraphProto, top_key: int):
     i = top_key
     while i >= 0:
         node = graph.node[i]
-        if node.name == '':
-            node.name = f'node_{i}'
+        if node.name == "":
+            node.name = f"node_{i}"
         if len(set(node.output).intersection(keep_vi_names)) != 0:
             keep_names.add(node.name)
             keep_vi_names.update(set(node.input))
@@ -200,8 +234,10 @@ def find_node(model: onnx.ModelProto, n: int, op_name: str) -> onnx.NodeProto:
     """returns the output names for the nth node in the onnx model with op_type given by op_name"""
     op_freq = get_op_frequency(model)
     N = op_freq[op_name]
-    if n > N-1 or n < -N:
-        raise ValueError(f"There are {N} nodes with op name {op_name} in model. Provided index {n} is OOB.\n{op_freq}")
+    if n > N - 1 or n < -N:
+        raise ValueError(
+            f"There are {N} nodes with op name {op_name} in model. Provided index {n} is OOB.\n{op_freq}"
+        )
     if n < 0:
         n += N
     match_counter = 0
@@ -220,9 +256,7 @@ def find_node(model: onnx.ModelProto, n: int, op_name: str) -> onnx.NodeProto:
 def update_no_ext(onnx_model_path: str, opset_version: int):
     """Models larger than 2GB do not allow updating opset version, so we update opset version without loading external data. Unfortunately, all external data references get wiped, and we need to manually trace through the graph and copy them back in."""
     model = onnx.load(onnx_model_path, load_external_data=False)
-    new_model = onnx.version_converter.convert_version(
-        model, opset_version
-    )
+    new_model = onnx.version_converter.convert_version(model, opset_version)
     nv_init_map = {init.name: init for init in model.graph.initializer}
     for new_init in new_model.graph.initializer:
         if new_init.name not in nv_init_map.keys():
@@ -248,4 +282,3 @@ def update_no_ext(onnx_model_path: str, opset_version: int):
                 new_attr.CopyFrom(old_attr)
 
     onnx.save(new_model, onnx_model_path)
-

@@ -22,14 +22,17 @@ E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 X = make_tensor_value_info("X", TensorProto.FLOAT, [3, 4])  # Example input shape
 
 # Create an output (ValueInfoProto)
-# Dynamic Quantize Linear returns a uint8 tensor, a f32 scale, and a uint8 zero point. 
+# Dynamic Quantize Linear returns a uint8 tensor, a f32 scale, and a uint8 zero point.
 Z = make_tensor_value_info("Z", TensorProto.UINT8, [3, 4])
 S = make_tensor_value_info("scale", TensorProto.FLOAT, [])
 P = make_tensor_value_info("zp", TensorProto.UINT8, [])
 
 # Create a 'DQL' node (NodeProto)
 DQL_node = make_node(
-    "DynamicQuantizeLinear", ["X"], ["Z", "scale", "zp"], "DQL_node"  # op_type  # inputs  # outputs  # node name
+    "DynamicQuantizeLinear",
+    ["X"],
+    ["Z", "scale", "zp"],
+    "DQL_node",  # op_type  # inputs  # outputs  # node name
 )
 
 

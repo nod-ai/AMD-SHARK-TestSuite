@@ -16,7 +16,9 @@ hf_onnx_zoo_models_non_legacy = []
 for hf_onnx_model_file in lists_dir.glob("hf_onnx_model_zoo_non_legacy_*.txt"):
     hf_onnx_zoo_models_non_legacy.extend(load_test_txt_file(hf_onnx_model_file))
 
-meta_constructor = lambda model_name:  (lambda *args, **kwargs : HfOnnxModelZooNonLegacyModel(model_name, *args, **kwargs))
+meta_constructor = lambda model_name: (
+    lambda *args, **kwargs: HfOnnxModelZooNonLegacyModel(model_name, *args, **kwargs)
+)
 
 for model_name in hf_onnx_zoo_models_non_legacy:
     register_test(meta_constructor(model_name), model_name)

@@ -1,20 +1,20 @@
  # e2eamdshark framework-to-iree-to-inference tests
 
  This test suite enables developers to add small (operator level) to large (full model)
- end-2-end tests that compare output of running a model in a Framework 
- (e.g. Pytorch, ONNX) to the output of running the IREE-compiled artefact of 
+ end-2-end tests that compare output of running a model in a Framework
+ (e.g. Pytorch, ONNX) to the output of running the IREE-compiled artefact of
  the same model on a target backend (e.g. CPU, AIE). If the difference in outputs
- is within a tolerable limit, then the test is reported as have passed, else the 
- test is reported as have failed. In case of a failing test, the stage of the 
- failure is reported. 
+ is within a tolerable limit, then the test is reported as have passed, else the
+ test is reported as have failed. In case of a failing test, the stage of the
+ failure is reported.
 
- The test suite is organized starting with a framework name: pytorch, tensorflow, onnx. 
- For each framework category, multiple modes are tested. 
+ The test suite is organized starting with a framework name: pytorch, tensorflow, onnx.
+ For each framework category, multiple modes are tested.
 
  - pytorch : starting model is a pytorch model (planned for later)
  - tensorflow : starting model is a tensorflow model (planned for later)
  - onnx : starting model is an onnx model generated using onnx python API or an existing onnx model
- 
+
  The target backend can be any IREE supported backend: llvm-cpu, amd-aie etc.
 
 ## Contents
@@ -28,14 +28,14 @@
  - e2e_testing/storage.py : contains helper functions and classes for managing the storage of tensors.
  - e2e_testing/test_configs/onnxconfig.py : defines the onnx frontend test config. Other configs (e.g. pytorch, tensorflow) should be created in sibling files.
  - onnx_tests/ : contains files that define OnnxModelInfo child classes, which customize model/input generation for various kinds of tests. Individual tests are also registered here together with their corresponding OnnxModelInfo child class.
- - base_requirements.txt : `pip install -r base_requirements.txt` installs necessary packages. Doesn't include torch-mlir or iree. If using local builds of torch-mlir or iree, this is the only pip requirements necessary. 
+ - base_requirements.txt : `pip install -r base_requirements.txt` installs necessary packages. Doesn't include torch-mlir or iree. If using local builds of torch-mlir or iree, this is the only pip requirements necessary.
  - iree_requirements.txt : `pip install -r iree_requirements.txt` to install a nightly build of IREE (compiler and runtime).
- - torch_mlir_requirements.txt : `pip install --no-deps -r torch_mlir_requirements.txt` to install a nightly build of torch_mlir. No deps is recommended since the torch/torchvision versions from base requirements sometimes don't line up with the selected torch_mlir package. 
+ - torch_mlir_requirements.txt : `pip install --no-deps -r torch_mlir_requirements.txt` to install a nightly build of torch_mlir. No deps is recommended since the torch/torchvision versions from base requirements sometimes don't line up with the selected torch_mlir package.
 
  - run.py : Run `python run.py --help` to learn about the script. This is the script to run tests.
- 
- The logs are created as .log files in the test-run sub directory. Examine the logs to find and fix 
- cause of any failure. You can specify -r 'your dir name' to the run.py to name your test run directory 
+
+ The logs are created as .log files in the test-run sub directory. Examine the logs to find and fix
+ cause of any failure. You can specify -r 'your dir name' to the run.py to name your test run directory
  as per your choice. The default name for the run directory is 'test-run'.
 
  Note that, you may need to set a `CACHE_DIR` environment variable before using run.py.
@@ -68,7 +68,7 @@ Therefore, you are not required to have a local build of either torch mlir or IR
 
 ## Setting up (using local build of torch-mlir or iree)
 
-If you want to use a custom build of torch-mlir or iree, you need to build those projects with python bindings enabled. 
+If you want to use a custom build of torch-mlir or iree, you need to build those projects with python bindings enabled.
 
 If you only installed `base_requirements.txt` to your venv, and want to use a local build of iree or torch-mlir, you can activate the appropriate `.env` file for the project you want to use. For example,
 
@@ -102,9 +102,9 @@ export PYTHONPATH="${TORCH_MLIR_BUILD_DIR}/tools/torch-mlir/python_packages/torc
 
 For onnx framework tests, you add a test in one of the model.py files contained in `/e2eamdshark/onnx_tests/`.
 
-The OnnxModelInfo class simply requires that you define a function called "construct_model", which should define how to build the model.onnx file (be sure that the model.onnx file gets saved to your class' self.model, which should store the filepath to the model). 
+The OnnxModelInfo class simply requires that you define a function called "construct_model", which should define how to build the model.onnx file (be sure that the model.onnx file gets saved to your class' self.model, which should store the filepath to the model).
 
-We provide a convenience function for generating inputs by default, but to override this for an individual test, you can redefine "construct_inputs" for your test class. 
+We provide a convenience function for generating inputs by default, but to override this for an individual test, you can redefine "construct_inputs" for your test class.
 
 Once a test class is generated, register the test with the test suite with:
 
@@ -122,9 +122,9 @@ Here is an example of running the test we made in the previous section with some
 python run.py --torchtolinalg -t name_of_test
 ```
 
-This will generate a new folder './test-run/name_of_test/' which contains some artifacts generated during the test. These artifacts can be used to run command line scripts to debug various failures. 
+This will generate a new folder './test-run/name_of_test/' which contains some artifacts generated during the test. These artifacts can be used to run command line scripts to debug various failures.
 
-If you are running an `AzureDownloadableModel` or another model type that requires downloading large files, it will be necessary to set a `CACHE_DIR` environment variable. E.g., 
+If you are running an `AzureDownloadableModel` or another model type that requires downloading large files, it will be necessary to set a `CACHE_DIR` environment variable. E.g.,
 
 ```bash
 export CACHE_DIR="/home/username/.cache/"
@@ -144,6 +144,3 @@ export AZ_PRIVATE_CONNECTION="DefaultEndpointsProtocol=https;AccountName=onnxpri
 # for debugging iree failures, its useful to add iree-compile and iree-run-module to path
 export PATH="${IREE_BUILD_DIR}/tools/:${PATH}"
 ```
-
-
-

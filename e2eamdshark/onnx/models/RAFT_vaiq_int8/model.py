@@ -44,12 +44,12 @@ model_output = session.run(
         outputs[10].name,
         outputs[11].name,
     ],
-    {
-        inputs[0].name: model_input_X,
-        inputs[1].name: model_input_Y
-    },
+    {inputs[0].name: model_input_X, inputs[1].name: model_input_Y},
 )
-E2EAMDSHARK_CHECK["input"] = [torch.from_numpy(model_input_X), torch.from_numpy(model_input_Y)]
+E2EAMDSHARK_CHECK["input"] = [
+    torch.from_numpy(model_input_X),
+    torch.from_numpy(model_input_Y),
+]
 E2EAMDSHARK_CHECK["output"] = [torch.from_numpy(arr) for arr in model_output]
 
 print("Input:", E2EAMDSHARK_CHECK["input"])

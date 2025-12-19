@@ -20,19 +20,27 @@ E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 
 
 # Create an input (ValueInfoProto)
-X = make_tensor_value_info("X", TensorProto.FLOAT, [15,1,10])
-initial_h = make_tensor_value_info("initial_h", TensorProto.FLOAT, [1,1,20])
-initial_c = make_tensor_value_info("initial_c", TensorProto.FLOAT, [1,1,20])
+X = make_tensor_value_info("X", TensorProto.FLOAT, [15, 1, 10])
+initial_h = make_tensor_value_info("initial_h", TensorProto.FLOAT, [1, 1, 20])
+initial_c = make_tensor_value_info("initial_c", TensorProto.FLOAT, [1, 1, 20])
 
 # Create tensor value info for W, R, B, sequence_lens
-W = make_tensor_value_info("W", TensorProto.FLOAT, [1, 80, 10])  # [num_directions, 4*hidden_size, input_size]
-R = make_tensor_value_info("R", TensorProto.FLOAT, [1, 80, 20])  # [num_directions, 4*hidden_size, hidden_size]
-B = make_tensor_value_info("B", TensorProto.FLOAT, [1, 160])  # [num_directions, 8*hidden_size]
-sequence_lens = make_tensor_value_info("sequence_lens", TensorProto.INT32, [1])  # [batch_size]
+W = make_tensor_value_info(
+    "W", TensorProto.FLOAT, [1, 80, 10]
+)  # [num_directions, 4*hidden_size, input_size]
+R = make_tensor_value_info(
+    "R", TensorProto.FLOAT, [1, 80, 20]
+)  # [num_directions, 4*hidden_size, hidden_size]
+B = make_tensor_value_info(
+    "B", TensorProto.FLOAT, [1, 160]
+)  # [num_directions, 8*hidden_size]
+sequence_lens = make_tensor_value_info(
+    "sequence_lens", TensorProto.INT32, [1]
+)  # [batch_size]
 
-Y = make_tensor_value_info("Y", TensorProto.FLOAT, [15,1,1,20])
-Y_h = make_tensor_value_info("Y_h", TensorProto.FLOAT, [1,1,20])
-Y_c = make_tensor_value_info("Y_c", TensorProto.FLOAT, [1,1,20])
+Y = make_tensor_value_info("Y", TensorProto.FLOAT, [15, 1, 1, 20])
+Y_h = make_tensor_value_info("Y_h", TensorProto.FLOAT, [1, 1, 20])
+Y_c = make_tensor_value_info("Y_c", TensorProto.FLOAT, [1, 1, 20])
 
 
 lstmnode = make_node(
@@ -50,15 +58,15 @@ lstmnode = make_node(
     outputs=[
         "Y",  # output tensor
         "Y_h",  # the last output value of the hidden
-        "Y_c"  # the last output value of the cell
-    ]
+        "Y_c",  # the last output value of the cell
+    ],
 )
 
 graph = make_graph(
     [lstmnode],
     "lstm_graph",
     [X, W, R, B, sequence_lens, initial_h, initial_c],
-    [Y, Y_h, Y_c]
+    [Y, Y_h, Y_c],
 )
 
 # Create the model (ModelProto)
@@ -73,19 +81,28 @@ with open("model.onnx", "wb") as f:
 session = onnxruntime.InferenceSession("model.onnx", None)
 
 
-
 inputs = session.get_inputs()
 # gets Z in outputs[0]
 outputs = session.get_outputs()
 
 test_input = {
-    "X": numpy.random.randn(15,1,10).astype(numpy.float32), # inputs
-    "W": numpy.random.randn(1, 80, 10).astype(numpy.float32),  # weight tensor for the gates
-    "R": numpy.random.randn(1, 80, 20).astype(numpy.float32),  # recurrence weight tensor
-    "B": numpy.random.randn(1,160).astype(numpy.float32),  # optional bias tensor
-    "sequence_lens": numpy.array([15], dtype=numpy.int32),  # optional tensor specifying lengths of the sequences
-    "initial_h": numpy.zeros((1,1,20)).astype(numpy.float32),  # optional initial value of the hidden
-    "initial_c": numpy.zeros((1,1,20)).astype(numpy.float32),  # optional initial value of the cell
+    "X": numpy.random.randn(15, 1, 10).astype(numpy.float32),  # inputs
+    "W": numpy.random.randn(1, 80, 10).astype(
+        numpy.float32
+    ),  # weight tensor for the gates
+    "R": numpy.random.randn(1, 80, 20).astype(
+        numpy.float32
+    ),  # recurrence weight tensor
+    "B": numpy.random.randn(1, 160).astype(numpy.float32),  # optional bias tensor
+    "sequence_lens": numpy.array(
+        [15], dtype=numpy.int32
+    ),  # optional tensor specifying lengths of the sequences
+    "initial_h": numpy.zeros((1, 1, 20)).astype(
+        numpy.float32
+    ),  # optional initial value of the hidden
+    "initial_c": numpy.zeros((1, 1, 20)).astype(
+        numpy.float32
+    ),  # optional initial value of the cell
 }
 
 # test_input and test_output are list of numpy arrays
@@ -96,4 +113,3 @@ test_output = session.run(None, test_input)
 
 print("Input:", test_input)
 print("Output:", test_output)
-

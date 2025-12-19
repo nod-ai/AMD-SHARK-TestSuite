@@ -16,22 +16,26 @@ from commonutils import E2EAMDSHARK_CHECK_DEF
 # Create an instance of it for this test
 E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 
+
 class op_gridsampler(nn.Module):
     def __init__(self):
         super().__init__()
 
     def forward(self, x, g):
-        z = nn.functional.grid_sample(x, g, mode="bilinear", padding_mode="zeros", align_corners=True)
+        z = nn.functional.grid_sample(
+            x, g, mode="bilinear", padding_mode="zeros", align_corners=True
+        )
         return z
+
 
 model = op_gridsampler()
 torch.manual_seed(42)
 X = torch.rand(4, 7, 8, 11)
-Y = torch.rand(4, 9, 13, 2)*2-1
+Y = torch.rand(4, 9, 13, 2) * 2 - 1
 Z = model(X, Y)
 
 E2EAMDSHARK_CHECK["input"] = [X, Y]
-E2EAMDSHARK_CHECK["output"] =  Z
+E2EAMDSHARK_CHECK["output"] = Z
 print("Input:", X)
 print("Grid:", Y)
 print("Output:", Z)

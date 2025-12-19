@@ -9,6 +9,7 @@ from onnx.helper import make_node, make_tensor_value_info
 from ..helper_classes import BuildAModel
 from e2e_testing.registry import register_test
 
+
 class AddModel(BuildAModel):
     def construct_i_o_value_info(self):
         self.input_vi = [
@@ -20,5 +21,5 @@ class AddModel(BuildAModel):
     def construct_nodes(self):
         self.node_list.append(make_node("Add", ["X", "Y"], ["Z"], "addnode"))
 
-register_test(AddModel, "add_test")
 
+register_test(AddModel, "add_test")

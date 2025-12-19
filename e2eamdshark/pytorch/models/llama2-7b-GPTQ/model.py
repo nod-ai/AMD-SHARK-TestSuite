@@ -34,7 +34,10 @@ prompt = "What is nature of our existence?"
 encoding = tokenizer(prompt, return_tensors="pt")
 E2EAMDSHARK_CHECK["input"] = encoding["input_ids"].cpu()
 E2EAMDSHARK_CHECK["output"] = model(E2EAMDSHARK_CHECK["input"])
-E2EAMDSHARK_CHECK["output"] = (E2EAMDSHARK_CHECK["output"].logits, E2EAMDSHARK_CHECK["output"].past_key_values)
+E2EAMDSHARK_CHECK["output"] = (
+    E2EAMDSHARK_CHECK["output"].logits,
+    E2EAMDSHARK_CHECK["output"].past_key_values,
+)
 E2EAMDSHARK_CHECK["output_for_validation"] = [E2EAMDSHARK_CHECK["output"][0]]
 model_response = model.generate(
     E2EAMDSHARK_CHECK["input"],

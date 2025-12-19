@@ -7,6 +7,7 @@
 from pathlib import Path
 import argparse
 
+
 def _get_argparse():
     msg = "A script for setting up a .env file."
     parser = argparse.ArgumentParser(prog="write_env.py", description=msg, epilog="")
@@ -33,9 +34,11 @@ def _get_argparse():
     )
     return parser
 
+
 def test_path(path: Path):
     if not path.exists():
-        raise OSError(f'path: {path.absolute()} could not be resolved')
+        raise OSError(f"path: {path.absolute()} could not be resolved")
+
 
 def main(args):
     s = ""
@@ -51,10 +54,12 @@ def main(args):
         pypaths.append(str(compiler_bindings))
         pypaths.append(str(runtime_bindings))
 
-    if args.torch_mlir_build: 
+    if args.torch_mlir_build:
         torch_mlir_build_dir = Path(args.torch_mlir_build).resolve()
         test_path(torch_mlir_build_dir)
-        torch_mlir_bindings = torch_mlir_build_dir.joinpath("tools/torch-mlir/python_packages/torch_mlir/")
+        torch_mlir_bindings = torch_mlir_build_dir.joinpath(
+            "tools/torch-mlir/python_packages/torch_mlir/"
+        )
         test_path(torch_mlir_bindings)
         pypaths.append(str(torch_mlir_bindings))
 
@@ -63,7 +68,7 @@ def main(args):
         test_path(cache_dir)
         s += f"CACHE_DIR='{cache_dir}'\n"
 
-    if args.azure_private_connection: 
+    if args.azure_private_connection:
         s += f'AZ_PRIVATE_CONNECTION="{args.azure_private_connection}"\n'
 
     if len(pypaths) > 0:
@@ -74,9 +79,12 @@ def main(args):
         with open(".env", "w") as file:
             file.write(s)
 
-    print("Check .env and run this script to export the variables to your environment (linux):")
+    print(
+        "Check .env and run this script to export the variables to your environment (linux):"
+    )
     print("export $(cat .env | xargs)")
-    
+
+
 if __name__ == "__main__":
     parser = _get_argparse()
     main(parser.parse_args())

@@ -76,27 +76,31 @@ with open("model.onnx", "wb") as f:
     f.write(onnx_model.SerializeToString())
 
 session = onnxruntime.InferenceSession("model.onnx", None)
-model_input_data= numpy.array([
-    [0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0],
-], dtype=numpy.float32)
-model_input_updates = numpy.array([
-    [1.0, 1.1, 1.2],
-    [2.0, 2.1, 2.2],
-], dtype=numpy.float32)
+model_input_data = numpy.array(
+    [
+        [0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0],
+    ],
+    dtype=numpy.float32,
+)
+model_input_updates = numpy.array(
+    [
+        [1.0, 1.1, 1.2],
+        [2.0, 2.1, 2.2],
+    ],
+    dtype=numpy.float32,
+)
 
 inputs = session.get_inputs()
 outputs = session.get_outputs()
 
 model_output = session.run(
-    [
-        outputs[0].name
-    ],
+    [outputs[0].name],
     {
-        inputs[0].name: model_input_data, 
-        # inputs[1].name: model_input_indices, 
-        inputs[1].name: model_input_updates
+        inputs[0].name: model_input_data,
+        # inputs[1].name: model_input_indices,
+        inputs[1].name: model_input_updates,
     },
 )
 

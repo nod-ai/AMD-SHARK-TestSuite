@@ -11,7 +11,6 @@ from ..helper_classes import BuildAModel
 from e2e_testing.registry import register_test
 
 
-
 class DynamicQuantizeLinearModel(BuildAModel):
     def construct_i_o_value_info(self):
         self.input_vi = [make_tensor_value_info("X", TensorProto.FLOAT, [3, 4])]
@@ -23,11 +22,14 @@ class DynamicQuantizeLinearModel(BuildAModel):
 
     def construct_nodes(self):
         # Create a 'DQL' node (NodeProto)
-        self.node_list = [make_node(
-            "DynamicQuantizeLinear",
-            ["X"],
-            ["Z", "scale", "zp"],
-            "DQL_node",  # op_type  # inputs  # outputs  # node name
-        )]
+        self.node_list = [
+            make_node(
+                "DynamicQuantizeLinear",
+                ["X"],
+                ["Z", "scale", "zp"],
+                "DQL_node",  # op_type  # inputs  # outputs  # node name
+            )
+        ]
+
 
 register_test(DynamicQuantizeLinearModel, "dynamic_quanitze_linear_test")

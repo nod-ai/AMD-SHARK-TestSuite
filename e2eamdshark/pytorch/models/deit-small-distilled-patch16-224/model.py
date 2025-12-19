@@ -19,7 +19,7 @@ E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 
 # model origin: https://huggingface.co/facebook/deit-small-distilled-patch16-224
 test_modelname = "facebook/deit-small-distilled-patch16-224"
-test_image_url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
+test_image_url = "http://images.cocodataset.org/val2017/000000039769.jpg"
 image = Image.open(requests.get(test_image_url, stream=True).raw)
 
 processor = DeiTImageProcessor.from_pretrained(test_modelname)

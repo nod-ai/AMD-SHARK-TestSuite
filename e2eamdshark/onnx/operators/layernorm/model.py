@@ -30,11 +30,14 @@ S = make_tensor_value_info("S", TensorProto.FLOAT, [768])
 B = make_tensor_value_info("B", TensorProto.FLOAT, [768])
 
 # Create an output
-Z = make_tensor_value_info("Z", TensorProto.FLOAT, [1,4,768])
+Z = make_tensor_value_info("Z", TensorProto.FLOAT, [1, 4, 768])
 
 # Create a node (NodeProto)
 layernode = make_node(
-    "LayerNormalization", ["X", "S", "B"], ["Z"], "layernode"  # node name  # inputs  # outputs
+    "LayerNormalization",
+    ["X", "S", "B"],
+    ["Z"],
+    "layernode",  # node name  # inputs  # outputs
 )
 
 # Create the graph (GraphProto)
@@ -55,7 +58,7 @@ with open("model.onnx", "wb") as f:
     f.write(onnx_model.SerializeToString())
 
 session = onnxruntime.InferenceSession("model.onnx", None)
-model_input_X = numpy.random.randn(1,4,768).astype(numpy.float32)
+model_input_X = numpy.random.randn(1, 4, 768).astype(numpy.float32)
 model_input_S = numpy.random.randn(768).astype(numpy.float32)
 model_input_B = numpy.random.randn(768).astype(numpy.float32)
 # gets X in inputs[0] and Y in inputs[1]
@@ -65,7 +68,11 @@ outputs = session.get_outputs()
 
 model_output = session.run(
     [outputs[0].name],
-    {inputs[0].name: model_input_X, inputs[1].name: model_input_S, inputs[2].name: model_input_B},
+    {
+        inputs[0].name: model_input_X,
+        inputs[1].name: model_input_S,
+        inputs[2].name: model_input_B,
+    },
 )
 
 # Moving to torch to handle bfloat16 as numpy does not support bfloat16

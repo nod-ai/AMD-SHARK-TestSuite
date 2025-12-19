@@ -27,7 +27,7 @@ TEST_PARAMS = {
         "min_gram_length": 1,
         "max_gram_length": 2,
         "max_skip_count": 0,
-        "ngram_counts":[0,4],
+        "ngram_counts": [0, 4],
         "pool_int64s": [2, 3, 5, 4, 5, 6, 7, 8, 6, 7],
         "ngram_indexes": [0, 2, 4, 5, 6, 7, 8, 9],
         "weights": [0.491, 0.15, 0.1, 1.0, 1.0, 7.0, 2.0, 0.0],
@@ -37,7 +37,7 @@ TEST_PARAMS = {
         "min_gram_length": 1,
         "max_gram_length": 2,
         "max_skip_count": 5,
-        "ngram_counts":[0,4],
+        "ngram_counts": [0, 4],
         "pool_int64s": [2, 3, 5, 4, 5, 6, 7, 8, 6, 7],
         "ngram_indexes": [0, 2, 4, 5, 6, 7, 8, 9],
         "weights": [0.0, 0.15, 0.1, 1.0, 1.0, 7.0, 2.0, 0.0],
@@ -47,17 +47,15 @@ TEST_PARAMS = {
         "min_gram_length": 1,
         "max_gram_length": 2,
         "max_skip_count": 2,
-        "ngram_counts":[0,2],
+        "ngram_counts": [0, 2],
         "pool_int64s": [2, 3, 5, 4, 5, 6, 7, 8, 6, 7],
         "ngram_indexes": [0, 2, 4, 5, 6, 7, 8, 9],
         "weights": None,
     },
 }
 
-def create_vectorizer_node(
-        mode: str,
-        params: Dict[str, Any]
-    ):
+
+def create_vectorizer_node(mode: str, params: Dict[str, Any]):
     return make_node(
         op_type="TfIdfVectorizer",
         inputs=["X"],
@@ -72,6 +70,7 @@ def create_vectorizer_node(
         weights=params["weights"],
     )
 
+
 def create_test_case(test_case, mode):
     class TFIDFModel(BuildAModel):
         def construct_i_o_value_info(self):
@@ -80,13 +79,14 @@ def create_test_case(test_case, mode):
             X = make_tensor_value_info(
                 "X",
                 TensorProto.INT32,
-                shape=[params["n"], max(params["ngram_indexes"])]
+                shape=[params["n"], max(params["ngram_indexes"])],
             )
             # Output
             Y = make_tensor_value_info(
                 "Y",
                 TensorProto.FLOAT,
-                shape=[params["n"], max(params["ngram_indexes"]) + 1])
+                shape=[params["n"], max(params["ngram_indexes"]) + 1],
+            )
             self.input_vi = [X]
             self.output_vi = [Y]
 
@@ -100,7 +100,8 @@ def create_test_case(test_case, mode):
 
     return TFIDFModel
 
+
 for mode in ["IDF", "TFIDF"]:
     for test_key in TEST_PARAMS.keys():
         test_case = create_test_case(test_key, mode)
-        register_test(test_case, f'tfidfvectorizer_{mode.lower()}_{test_key}')
+        register_test(test_case, f"tfidfvectorizer_{mode.lower()}_{test_key}")

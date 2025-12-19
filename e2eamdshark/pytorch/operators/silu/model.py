@@ -16,12 +16,11 @@ from commonutils import E2EAMDSHARK_CHECK_DEF
 # Create an instance of it for this test
 E2EAMDSHARK_CHECK = dict(E2EAMDSHARK_CHECK_DEF)
 
+
 class op_silu(nn.Module):
     def __init__(self):
         super().__init__()
-        self.layers = nn.Sequential(
-            nn.SiLU()
-        )
+        self.layers = nn.Sequential(nn.SiLU())
 
     def forward(self, x):
         return self.layers(x)

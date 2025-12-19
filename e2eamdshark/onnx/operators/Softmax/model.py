@@ -49,7 +49,9 @@ with open(model_path, "wb") as f:
 
 # Initialize the ONNX runtime session and run inference
 session = onnxruntime.InferenceSession(model_path, None)
-model_input_X = numpy.random.randn(3, 4, 5).astype(numpy.float32)  # Match the input shape
+model_input_X = numpy.random.randn(3, 4, 5).astype(
+    numpy.float32
+)  # Match the input shape
 
 inputs = session.get_inputs()
 outputs = session.get_outputs()

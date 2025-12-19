@@ -12,12 +12,30 @@ from e2e_testing.registry import register_test
 
 class ResizeModel(BuildAModel):
     def construct_i_o_value_info(self):
-        self.input_vi = [make_tensor_value_info("X", TensorProto.FLOAT, [1,2,60,60])]
-        self.output_vi = [make_tensor_value_info("Y", TensorProto.FLOAT, [1,2,80,80])]
-    
+        self.input_vi = [make_tensor_value_info("X", TensorProto.FLOAT, [1, 2, 60, 60])]
+        self.output_vi = [
+            make_tensor_value_info("Y", TensorProto.FLOAT, [1, 2, 80, 80])
+        ]
+
     def construct_nodes(self):
-        C0T = make_tensor("C0T",TensorProto.FLOAT, [4], [1.000000e+00, 1.000000e+00, 1.34, 1.34])
-        C1T = make_tensor("C1T",TensorProto.FLOAT, [8], [0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 1.000000e+00, 1.000000e+00, 1.000000e+00, 1.000000e+00])
+        C0T = make_tensor(
+            "C0T", TensorProto.FLOAT, [4], [1.000000e00, 1.000000e00, 1.34, 1.34]
+        )
+        C1T = make_tensor(
+            "C1T",
+            TensorProto.FLOAT,
+            [8],
+            [
+                0.000000e00,
+                0.000000e00,
+                0.000000e00,
+                0.000000e00,
+                1.000000e00,
+                1.000000e00,
+                1.000000e00,
+                1.000000e00,
+            ],
+        )
         app_node = self.get_app_node()
         app_node("Constant", [], ["C0"], value=C0T)
         app_node("Constant", [], ["C1"], value=C1T)
@@ -25,7 +43,7 @@ class ResizeModel(BuildAModel):
         # this node has a lot of redundant info. Testing to see how it is treated.
         app_node(
             "Resize",
-            ["X","C1","C0"],
+            ["X", "C1", "C0"],
             ["Y"],
             mode="cubic",
             exclude_outside=0,
@@ -34,5 +52,6 @@ class ResizeModel(BuildAModel):
             extrapolation_value=0.0,
             nearest_mode="round_prefer_floor",
         )
+
 
 register_test(ResizeModel, "cubic_test")

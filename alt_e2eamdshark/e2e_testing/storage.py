@@ -112,6 +112,10 @@ def write_inference_input_bin_file(modelinput, modelinputbinfilename):
         f.write(bytearr)
 
 
+def write_inference_input_npy_file(modelinput, modelinputnpyfilename):
+    numpy.save(modelinputnpyfilename, modelinput)
+
+
 def load_test_txt_file(filepath: Union[str, Path]) -> List[str]:
     with open(filepath, "r") as file:
         contents = file.read().split()
@@ -183,12 +187,21 @@ class TestTensors:
                 new_data = tuple([d.to(dtype=dtype) for d in self.data])
         return TestTensors(new_data)
 
-    def save_to(self, path: str, *, base_stem: str = "input"):
+    def save_to(
+        self, path: str, *, base_stem: str = "input", save_as_npy: bool = False
+    ):
         """path should be to test-run/<test-name>/ (default) or run-directory/<test-name>/ if modified"""
         if self.type == torch.Tensor:
             data = self.data
         else:
             data = self.to_torch().data
+
+        if save_as_npy:
+            data_to_save = self.to_numpy().data
+            for i in range(len(data_to_save)):
+                file_path = Path(path) / f"{base_stem}.{i}.npy"
+                write_inference_input_npy_file(data_to_save[i], str(file_path))
+
         for i in range(len(data)):
             file_path = Path(path) / f"{base_stem}.{i}.bin"
             write_inference_input_bin_file(data[i], str(file_path))

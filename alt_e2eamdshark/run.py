@@ -159,6 +159,7 @@ def main(args):
         args.load_inputs,
         int(args.cleanup),
         args.get_metadata,
+        args.dump_data_as_npy,
     )
 
     if args.report:
@@ -180,7 +181,8 @@ def run_tests(
     stages: List[str],
     load_inputs: bool,
     cleanup: int,
-    get_metadata=bool,
+    get_metadata: bool,
+    dump_npys: bool,
 ) -> Dict[str, Dict]:
     """runs tests in test_list based on config. Returns a dictionary containing the test statuses."""
     # TODO: multi-process
@@ -274,7 +276,7 @@ def run_tests(
                     inputs = inst.load_inputs(log_dir)
                 else:
                     inputs = inst.construct_inputs()
-                    inputs.save_to(log_dir)
+                    inputs.save_to(log_dir, save_as_npy=dump_npys)
 
             # run native inference
             curr_stage = "native_inference"
@@ -288,7 +290,9 @@ def run_tests(
                         [list(d.shape) for d in golden_outputs_raw.data],
                         [d.dtype for d in golden_outputs_raw.to_torch().data],
                     )
-                golden_outputs_raw.save_to(log_dir, base_stem="golden_output")
+                golden_outputs_raw.save_to(
+                    log_dir, base_stem="golden_output", save_as_npy=dump_npys
+                )
 
             # run inference with the compiled module
             curr_stage = "compiled_inference"
@@ -300,7 +304,7 @@ def run_tests(
                     func_name=func_name,
                     extra_options=options.compiled_inference_options,
                 )
-                outputs_raw.save_to(log_dir, base_stem="output")
+                outputs_raw.save_to(log_dir, base_stem="output", save_as_npy=dump_npys)
 
             # apply model-specific post-processing:
             curr_stage = "postprocessing"
@@ -556,6 +560,12 @@ def _get_argparse():
         action="store_true",
         default=False,
         help="save some model metadata to log_dir/metadata.json",
+    )
+    parser.add_argument(
+        "--dump-data-as-npy",
+        action="store_true",
+        default=False,
+        help="Dump generated model inputs/outputs and the golden outputs as npy files",
     )
     # parser.add_argument(
     #     "-d",

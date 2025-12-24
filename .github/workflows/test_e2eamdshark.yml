@@ -935,7 +935,7 @@ jobs:
           cd test-suite
           mkdir latest
           mkdir baseline
-          wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/latest-test-suite/combined_reports_${{ matrix.backend }}.json -O latest/combined_reports_${{ matrix.backend }}.json
+          wget https://amdsharkpublic.blob.core.windows.net/ciartifacts/latest-test-suite/combined_reports_${{ matrix.backend }}.json -O latest/combined_reports_${{ matrix.backend }}.json
           wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/baseline-test-suite/combined_reports_${{ matrix.regression-blob }}.json -O baseline/combined_reports_${{ matrix.backend }}.json
           cd ..
 
@@ -953,10 +953,10 @@ jobs:
             --perf_tol_regression=0.1 \
             --perf_tol_progression=0.1
 
-          az storage blob upload --account-name amdsharkpublic --container-name amdsharkpublic \
+          az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
             --name latest-test-suite/combined_reports_${{ matrix.backend }}.json \
             --file ./e2eamdshark-reports/combined_reports_unique.json \
-            --account-key ${AZ_PUBLIC_KEY} --overwrite
+            --overwrite
 
       - name: Push regression artifacts
         run: |

@@ -1,6 +1,7 @@
 name: GEMM Sweep Profiling and Analysis
 
 on:
+  pull_request:
   schedule:
     # Run every other day at midnight UTC
     - cron: '0 0 */2 * *'

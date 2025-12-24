@@ -474,7 +474,7 @@ jobs:
         shell: bash
     env:
       E2E_VENV_DIR: ${{ github.workspace }}/test-suite_venv
-      EP_VENV_DIR: ${{ github.workspace }}/ep_venv
+      #EP_VENV_DIR: ${{ github.workspace }}/ep_venv
       ALT_E2E_VENV_DIR: ${{ github.workspace }}/alt-test-suite_venv
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
       AZ_PRIVATE_CONNECTION: ${{ secrets.ONNXPRIVATESTORAGE_AZ_PRIVATE_CONNECTION }}
@@ -506,20 +506,20 @@ jobs:
           pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
         working-directory: ./test-suite
 
-      - name: "Setup IREE EP python venv"
-        run: |
-          sudo apt update
-          sudo apt install wget
-          python -m venv ${EP_VENV_DIR}
-          source ${EP_VENV_DIR}/bin/activate
-          pip install --upgrade pip
-          pip install -r ./alt_e2eamdshark/base_requirements.txt
-          pip install -r ./alt_e2eamdshark/iree_requirements.txt
-          pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
-          pip uninstall -y onnxruntime
-          wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/onnxruntime/pip_whl/onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
-          pip install ./onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
-        working-directory: ./test-suite
+      #- name: "Setup IREE EP python venv"
+      #  run: |
+      #    sudo apt update
+      #    sudo apt install wget
+      #    python -m venv ${EP_VENV_DIR}
+      #    source ${EP_VENV_DIR}/bin/activate
+      #    pip install --upgrade pip
+      #    pip install -r ./alt_e2eamdshark/base_requirements.txt
+      #    pip install -r ./alt_e2eamdshark/iree_requirements.txt
+      #    pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
+      #    pip uninstall -y onnxruntime
+      #    wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/onnxruntime/pip_whl/onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
+      #    pip install ./onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
+      #  working-directory: ./test-suite
 
       - name: Run Onnx Bench Mode
         if: contains(matrix.test-file, 'migraphx')
@@ -566,30 +566,30 @@ jobs:
           python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
         working-directory: ./test-suite
 
-      - name: Run OnnxRT IREE EP
-        if: contains(matrix.test-file, 'onnxrt-iree-ep')
-        run: |
-          source ${EP_VENV_DIR}/bin/activate
-          export COMPILER_PATH=$(python -c "import iree.compiler as _; print(_.__path__[0])")
-          export LD_LIBRARY_PATH="$COMPILER_PATH/_mlir_libs/"
-          echo "COMPILER_PATH=$COMPILER_PATH" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
-          pip freeze
-          cd alt_e2eamdshark
-          free -mh
-          python ./run.py -m ort-ep \
-            -r ./test-onnx \
-            --report \
-            --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
-            -b ${{ matrix.backend }} \
-            -d ${{ matrix.device }} \
-            -c ${{ matrix.target-chip }} \
-            --report-file reports/${{ matrix.test-file }}.md \
-            --cleanup=3 \
-            --get-metadata \
-            -v
-          python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
-        working-directory: ./test-suite
+      #- name: Run OnnxRT IREE EP
+      #  if: contains(matrix.test-file, 'onnxrt-iree-ep')
+      #  run: |
+      #    source ${EP_VENV_DIR}/bin/activate
+      #    export COMPILER_PATH=$(python -c "import iree.compiler as _; print(_.__path__[0])")
+      #    export LD_LIBRARY_PATH="$COMPILER_PATH/_mlir_libs/"
+      #    echo "COMPILER_PATH=$COMPILER_PATH" >> $GITHUB_ENV
+      #    echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      #    pip freeze
+      #    cd alt_e2eamdshark
+      #    free -mh
+      #    python ./run.py -m ort-ep \
+      #      -r ./test-onnx \
+      #      --report \
+      #      --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
+      #      -b ${{ matrix.backend }} \
+      #      -d ${{ matrix.device }} \
+      #      -c ${{ matrix.target-chip }} \
+      #      --report-file reports/${{ matrix.test-file }}.md \
+      #      --cleanup=3 \
+      #      --get-metadata \
+      #      -v
+      #    python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
+      #  working-directory: ./test-suite
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:

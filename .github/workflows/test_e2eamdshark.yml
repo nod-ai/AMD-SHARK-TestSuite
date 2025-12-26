@@ -936,7 +936,7 @@ jobs:
           mkdir latest
           mkdir baseline
           wget https://amdsharkpublic.blob.core.windows.net/ciartifacts/latest-test-suite/combined_reports_${{ matrix.backend }}.json -O latest/combined_reports_${{ matrix.backend }}.json
-          wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/baseline-test-suite/combined_reports_${{ matrix.regression-blob }}.json -O baseline/combined_reports_${{ matrix.backend }}.json
+          wget https://amdsharkpublic.blob.core.windows.net/ciartifacts/baseline-test-suite/combined_reports_${{ matrix.regression-blob }}.json -O baseline/combined_reports_${{ matrix.backend }}.json
           cd ..
 
           python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \

@@ -956,7 +956,7 @@ jobs:
           az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
             --name latest-test-suite/combined_reports_${{ matrix.backend }}.json \
             --file ./e2eamdshark-reports/combined_reports_unique.json \
-            --overwrite
+            --account-key ${AZ_PUBLIC_KEY} --overwrite
 
       - name: Push regression artifacts
         run: |

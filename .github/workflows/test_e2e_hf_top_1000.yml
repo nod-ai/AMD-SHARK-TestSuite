@@ -206,6 +206,7 @@ jobs:
         source ${ALT_E2E_VENV_DIR}/bin/activate
         pip install --upgrade pip
         pip install -r ./alt_e2eamdshark/base_requirements.txt
+        pip install -r ./alt_e2eamdshark/hf_requirements.txt
         pip install -r ./alt_e2eamdshark/iree_requirements.txt
         pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
         pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html

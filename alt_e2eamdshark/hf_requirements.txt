@@ -1,4 +1,4 @@
-optimum[exporters]
+optimum-onnx[onnxruntime]
 compressed_tensors
 sentence_transformers
 fugashi

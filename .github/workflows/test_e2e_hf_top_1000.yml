@@ -409,8 +409,8 @@ jobs:
           date=$(date '+%Y-%m-%d')
           mkdir -p ${date}/hf-model-top1k/${{ matrix.backend }}/hf-feature-extraction-shard
           mkdir -p ${date}/hf-model-top1k/${{ matrix.backend }}/hf-fill-mask-shard
-          cp ci_reports_${{ matrix.backend }}_hf-feature-extraction-shard_onnx_md/hf-feature-extraction-shard.md ${date}/ci_reports_onnx/${{ matrix.backend }}/hf-feature-extraction-shard/summary.md
-          cp ci_reports_${{ matrix.backend }}_hf-fill-mask-shard_onnx_md/hf-fill-mask-shard.md ${date}/ci_reports_onnx/${{ matrix.backend }}/hf-fill-mask-shard/summary.md
+          cp ci_reports_${{ matrix.backend }}_hf-feature-extraction-shard_onnx_md/hf-feature-extraction-shard.md ${date}/hf-model-top1k/${{ matrix.backend }}/hf-feature-extraction-shard/summary.md
+          cp ci_reports_${{ matrix.backend }}_hf-fill-mask-shard_onnx_md/hf-fill-mask-shard.md ${date}/hf-model-top1k/${{ matrix.backend }}/hf-fill-mask-shard/summary.md
           cp combined_reports_unique.md ${date}/hf-model-top1k/${{ matrix.backend }}/combined-reports_unique/summary.md
           git add $date
           git commit -m "add CI status reports for e2eamdshark for ${{ matrix.backend }}"

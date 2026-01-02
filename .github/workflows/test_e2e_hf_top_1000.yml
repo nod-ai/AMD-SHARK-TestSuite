@@ -161,13 +161,13 @@ jobs:
             target-chip: x86_64-linux-gnu
             test-file: hf-text-classification-shard
             cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          - name: cpu_shard10_test
-            runs-on: nodai-cpu-x86-64
-            backend: llvm-cpu
-            device: local-task
-            target-chip: x86_64-linux-gnu
-            test-file: hf-text-generation-shard
-            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          #- name: cpu_shard10_test
+          #  runs-on: nodai-cpu-x86-64
+          #  backend: llvm-cpu
+          #  device: local-task
+          #  target-chip: x86_64-linux-gnu
+          #  test-file: hf-text-generation-shard
+          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard11_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu

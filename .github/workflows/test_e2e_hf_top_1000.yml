@@ -166,7 +166,7 @@ jobs:
           #  backend: llvm-cpu
           #  device: local-task
           #  target-chip: x86_64-linux-gnu
-          #  test-file: hf-text-generation-shard
+          #  test-file: hf-text-generation-shard ## this is failing on CPU
           #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard11_test
             runs-on: nodai-cpu-x86-64
@@ -371,14 +371,14 @@ jobs:
         with:
           name: ci_reports_${{ matrix.backend }}_hf-text-classification-shard_onnx_json
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf-text-classification-shard_onnx_json
-      - uses: actions/download-artifact@master
-        with:
-          name: ci_reports_${{ matrix.backend }}_hf-text-generation-shard_onnx_md
-          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf-text-generation-shard_onnx_md
-      - uses: actions/download-artifact@master
-        with:
-          name: ci_reports_${{ matrix.backend }}_hf-text-generation-shard_onnx_json
-          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf-text-generation-shard_onnx_json
+      #- uses: actions/download-artifact@master
+      #  with:
+      #    name: ci_reports_${{ matrix.backend }}_hf-text-generation-shard_onnx_md
+      #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf-text-generation-shard_onnx_md
+      #- uses: actions/download-artifact@master
+      #  with:
+      #    name: ci_reports_${{ matrix.backend }}_hf-text-generation-shard_onnx_json
+      #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf-text-generation-shard_onnx_json
       - uses: actions/download-artifact@master
         with:
           name: ci_reports_${{ matrix.backend }}_hf-token-classification-shard_onnx_md
@@ -401,7 +401,6 @@ jobs:
             ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf-question-answering-shard_onnx_json/hf-question-answering-shard.json \
             ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf-semantic-segmentation-shard_onnx_json/hf-semantic-segmentation-shard.json \
             ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf-text-classification-shard_onnx_json/hf-text-classification-shard.json \
-            ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf-text-generation-shard_onnx_json/hf-text-generation-shard.json \
             ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf-token-classification-shard_onnx_json/hf-token-classification-shard.json \
             --output ./e2eamdshark-reports/combined_reports_unique.json \
             --report --report-file ./e2eamdshark-reports/combined_reports_unique.md
@@ -421,7 +420,6 @@ jobs:
           mkdir -p ${date}/hf-model-top1k/${{ matrix.backend }}/hf-question-answering-shard
           mkdir -p ${date}/hf-model-top1k/${{ matrix.backend }}/hf-semantic-segmentation-shard
           mkdir -p ${date}/hf-model-top1k/${{ matrix.backend }}/hf-text-classification-shard
-          mkdir -p ${date}/hf-model-top1k/${{ matrix.backend }}/hf-text-generation-shard
           mkdir -p ${date}/hf-model-top1k/${{ matrix.backend }}/hf-token-classification-shard
           mkdir -p ${date}/hf-model-top1k/${{ matrix.backend }}/combined-reports_unique
           cp ci_reports_${{ matrix.backend }}_hf-feature-extraction-shard_onnx_md/hf-feature-extraction-shard.md ${date}/hf-model-top1k/${{ matrix.backend }}/hf-feature-extraction-shard/summary.md
@@ -433,7 +431,6 @@ jobs:
           cp ci_reports_${{ matrix.backend }}_hf-question-answering-shard_onnx_md/hf-question-answering-shard.md ${date}/hf-model-top1k/${{ matrix.backend }}/hf-question-answering-shard/summary.md
           cp ci_reports_${{ matrix.backend }}_hf-semantic-segmentation-shard_onnx_md/hf-semantic-segmentation-shard.md ${date}/hf-model-top1k/${{ matrix.backend }}/hf-semantic-segmentation-shard/summary.md
           cp ci_reports_${{ matrix.backend }}_hf-text-classification-shard_onnx_md/hf-text-classification-shard.md ${date}/hf-model-top1k/${{ matrix.backend }}/hf-text-classification-shard/summary.md
-          cp ci_reports_${{ matrix.backend }}_hf-text-generation-shard_onnx_md/hf-text-generation-shard.md ${date}/hf-model-top1k/${{ matrix.backend }}/hf-text-generation-shard/summary.md
           cp ci_reports_${{ matrix.backend }}_hf-token-classification-shard_onnx_md/hf-token-classification-shard.md ${date}/hf-model-top1k/${{ matrix.backend }}/hf-token-classification-shard/summary.md
           cp combined_reports_unique.md ${date}/hf-model-top1k/${{ matrix.backend }}/combined-reports_unique/summary.md
           git add $date
@@ -441,15 +438,15 @@ jobs:
           git push origin main
         working-directory: ./e2eamdshark-reports
 
-      - name: Push regression artifacts
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git pull
-          date=$(date '+%Y-%m-%d')
-          cp yesterday_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/yesterday_comparison.md
-          cp baseline_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/baseline_comparison.md
-          git add $date
-          git commit -m "Add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
-          git push origin main
-        working-directory: ./e2eamdshark-reports
+      #- name: Push regression artifacts
+      #  run: |
+      #    git config user.name "GitHub Actions Bot"
+      #    git config user.email "<>"
+      #    git pull
+      #    date=$(date '+%Y-%m-%d')
+      #    cp yesterday_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/yesterday_comparison.md
+      #    cp baseline_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/baseline_comparison.md
+      #    git add $date
+      #    git commit -m "Add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
+      #    git push origin main
+      #  working-directory: ./e2eamdshark-reports

@@ -47,6 +47,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ROCm/aorta
+          ref : prosenj_gh_action
           path: aorta
 
       - name: Set up experiment directory
@@ -65,6 +66,7 @@ jobs:
           sudo chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version
           echo ${{ secrets.ROCM_SHARED_KEY }} | docker login -u rocmshared --password-stdin
+          az storage blob download  --account-name amdsharkpublic --sas-token ${{ secrets.AMD_SHARKPUBLIC_AZ_KEY }} -container-name amdsharkpublic --name prosenj/aorta/amdgpu-install-internal-7.0_9-1.noarch.rpm --file docker/amdgpu-install-internal-7.0_9-1.noarch.rpm
           docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} build
           docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d
 

@@ -60,7 +60,8 @@ jobs:
       - name: Build Docker container
         working-directory: aorta
         run: |
-          sudo apt-get install docker-compose-plugin
+          sudo curl -L "https://github.com/docker/compose/releases/download/v5.0.1/docker-compose-$(uname -s)-$(uname -m)"  -o ~/.docker/cli-plugins/docker-compose
+          chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version
           docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} build
           docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d

@@ -60,8 +60,9 @@ jobs:
       - name: Build Docker container
         working-directory: aorta
         run: |
-          docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} build
-          docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d
+          docker compose version
+          docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} build
+          docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d
 
       - name: Run training sweep
         working-directory: aorta

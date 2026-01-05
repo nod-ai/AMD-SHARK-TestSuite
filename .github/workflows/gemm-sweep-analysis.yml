@@ -60,6 +60,7 @@ jobs:
       - name: Build Docker container
         working-directory: aorta
         run: |
+          sudo apt-get install docker-compose-plugin
           docker compose version
           docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} build
           docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d

@@ -225,6 +225,12 @@ run_cmd python "$MERGE_SCRIPT" \
     --output "$REPORTS_DIR/combined_reports_unique.json" \
     --report --report-file "$REPORTS_DIR/combined_reports_unique.md"
 
+log_info "Adding issue links to combined report..."
+run_cmd python "$TEST_SUITE_DIR/alt_e2eamdshark/scripts/add_issue_links.py" \
+    -i "$REPORTS_DIR/combined_reports_unique_compilation_errors.md" \
+    -o "$REPORTS_DIR/combined_reports_unique_compilation_errors_with_issues.md" \
+    -m "$TEST_SUITE_DIR/alt_e2eamdshark/scripts/issue_list.csv"
+
 log_info "Report merge completed!"
 
 # ============================================================================

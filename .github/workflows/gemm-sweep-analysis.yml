@@ -60,6 +60,7 @@ jobs:
       - name: Build Docker container
         working-directory: aorta
         run: |
+          mkdir -p ~/.docker/cli-plugins
           sudo curl -L "https://github.com/docker/compose/releases/download/v5.0.1/docker-compose-$(uname -s)-$(uname -m)"  -o ~/.docker/cli-plugins/docker-compose
           chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version

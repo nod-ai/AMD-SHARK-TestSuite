@@ -8,7 +8,6 @@ name: E2EAMDSHARK Test Suite unique models
 on:
   workflow_dispatch:
   schedule:
-  # Runs at 2:30 AM PST
    - cron: '30 3 * * 1-6'
 
 

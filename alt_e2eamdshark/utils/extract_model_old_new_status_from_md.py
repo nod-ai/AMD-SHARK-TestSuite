@@ -8,9 +8,7 @@ md_path = Path(sys.argv[1])
 text = md_path.read_text()
 
 match = re.search(
-    r"##\s+\d+\s+Regressions Found:\s*\n+"
-    r"(.*?)"
-    r"\n##\s+\d+\s+Progressions Found:",
+    r"##\s+\d+\s+Regressions Found:\s*\n+" r"(.*?)" r"\n##\s+\d+\s+Progressions Found:",
     text,
     re.DOTALL,
 )
@@ -42,3 +40,4 @@ with out_path.open("w") as f:
     json.dump(regressions, f, indent=2)
 
 print(f"Wrote {len(regressions)} regressions to {out_path}")
+

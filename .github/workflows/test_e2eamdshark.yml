@@ -953,7 +953,7 @@ jobs:
           ### Recheck for Regression Models ###
           # 1. extract the model and its old status from the yesterday_comparison.md
           python ./test-suite/alt_e2eamdshark/utils/extract_model_old_new_status_from_md.py e2eamdshark-reports/yesterday_comparison.md # generates model_old_new_status.json which has the model_name, it's old status and it's new status from the yesterday_comparison.md file
-          python ./test-suite/alt_e2eamdshark/utils/extract_regression_model_names.py                                                   # generated regression_models.txt which extracts only the regression model names in the yesterday_comparison.md file 
+          python ./test-suite/alt_e2eamdshark/utils/extract_regression_model_names.py                                                   # generated regression_models.txt which extracts only the regression model names in the yesterday_comparison.md file
                                                                                                                                         # (so this is the testsfile for run.py)
 
           #2. run the model generating a report file
@@ -971,7 +971,7 @@ jobs:
              --get-metadata \
              -v
           cd ../..
-          
+
           #3. check if the current status in the report file genrated matches with that of the old status,
           #   if yes remove that model from the regression found table in yesterday_comparison.md
           REGRESSION_LIST="regression_models.txt"
@@ -1017,3 +1017,4 @@ jobs:
           git commit -m "add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
           git push origin main
         working-directory: ./e2eamdshark-reports
+

@@ -12,3 +12,4 @@ with out_path.open("w") as f:
         f.write(f"{model_name}\n")
 
 print(f"Wrote {len(data)} models to {out_path}")
+

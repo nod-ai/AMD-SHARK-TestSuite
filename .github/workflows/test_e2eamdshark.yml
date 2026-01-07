@@ -1017,4 +1017,3 @@ jobs:
           git commit -m "add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
           git push origin main
         working-directory: ./e2eamdshark-reports
-

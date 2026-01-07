@@ -72,4 +72,3 @@ if actual_status == expected_status:
 # --- STATUS MISMATCH ---
 else:
     print("STATUS MISMATCH (Old Status != New Status) -> keeping in regression table")
-

@@ -617,12 +617,17 @@ jobs:
             runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             regression-blob: rocm
+            device: hip
+            target-chip: gfx942
           - name: merge_cpu_reports
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             regression-blob: cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
     env:
       AZ_PUBLIC_KEY: ${{ secrets.AMD_SHARKPUBLIC_AZ_KEY }}
+      CACHE_DIR: ${{ matrix.cache-dir }}
     steps:
       - name: Checkout Test Suite
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -944,6 +949,49 @@ jobs:
             --report-file ./e2eamdshark-reports/yesterday_comparison.md \
             --perf_tol_regression=0.05 \
             --perf_tol_progression=0.05
+
+          ### Recheck for Regression Models ###
+          # 1. extract the model and its old status from the yesterday_comparison.md
+          python ./test-suite/alt_e2eamdshark/utils/extract_model_old_new_status_from_md.py e2eamdshark-reports/yesterday_comparison.md # generates model_old_new_status.json which has the model_name, it's old status and it's new status from the yesterday_comparison.md file
+          python ./test-suite/alt_e2eamdshark/utils/extract_regression_model_names.py                                                   # generated regression_models.txt which extracts only the regression model names in the yesterday_comparison.md file 
+                                                                                                                                        # (so this is the testsfile for run.py)
+
+          #2. run the model generating a report file
+          cd test-suite/alt_e2eamdshark/
+          python ./run.py \
+             -r ./test-onnx \
+             --report \
+             --testsfile regression_models.txt \
+             -b ${{ matrix.backend }} \
+             -d ${{ matrix.device }} \
+             -c ${{ matrix.target-chip }} \
+             --report-file current_result.md \
+             --mode=cl-onnx-iree \
+             --cleanup=3 \
+             --get-metadata \
+             -v
+          cd ../..
+          
+          #3. check if the current status in the report file genrated matches with that of the old status,
+          #   if yes remove that model from the regression found table in yesterday_comparison.md
+          REGRESSION_LIST="regression_models.txt"
+          BASELINE_JSON="model_old_new_status.json"
+          CURRENT_JSON="test-suite/alt_e2eamdshark/current_result.json"
+          REPORT_MD="e2eamdshark-reports/yesterday_comparison.md"
+
+          while IFS= read -r MODEL; do
+            # skip empty lines
+            [[ -z "$MODEL" ]] && continue
+
+            echo "Processing model: $MODEL"
+
+            python test-suite/alt_e2eamdshark/utils/check_model_status_and_remove.py \
+              "$MODEL" \
+              "$BASELINE_JSON" \
+              "$CURRENT_JSON" \
+              "$REPORT_MD"
+
+          done < "$REGRESSION_LIST"
 
           python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
             --new ./e2eamdshark-reports/combined_reports_unique.json \

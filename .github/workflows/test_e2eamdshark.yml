@@ -470,7 +470,7 @@ jobs:
           #  target-chip: x86_64-linux-gnu
           #  test-file: hf_onnx_model_zoo_non_legacy_09
           #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-    defaul#ts:
+    defaults:
       run:
         shell: bash
     env:

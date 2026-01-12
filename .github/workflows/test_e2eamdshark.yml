@@ -926,7 +926,6 @@ jobs:
       #   with:
       #     name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
       #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
-
       - name: Merge and Push Reports
         run: |
           source report_venv_alt/bin/activate
@@ -959,7 +958,7 @@ jobs:
 
           echo "**************** starting recheck for regression models ****************"
           # generate a json with model name and old status
-          MD_FILE = "e2eamdshark-reports/yesterday_comparison.md"
+          MD_FILE="e2eamdshark-reports/yesterday_comparison.md"
           python ./test-suite/alt_e2eamdshark/utils/extract_model_old_new_status_from_md.py "$MD_FILE" || echo "[WARN] Failed to extract model old/new status"
           cat "model_old_new_status.json" || echo "[WARN] model_old_new_status.json not generated"
 
@@ -981,7 +980,7 @@ jobs:
              --cleanup=3 \
              --get-metadata \
              -v || echo "[WARN] run.py Regression test execution failed"
-          cd $PWD/../..
+          cd ../..
 
           REGRESSION_MODELS="regression_models.txt"
           BASELINE_JSON="model_old_new_status.json"
@@ -990,21 +989,22 @@ jobs:
 
           if [[ ! -f "$REGRESSION_MODELS" ]]; then
             echo "[WARN] regression_models.txt missing — skipping per-model updates"
+          else
+            while IFS= read -r MODEL; do
+              # skip empty lines
+              [[ -z "$MODEL" ]] && continue
 
+              echo "Processing model: $MODEL"
 
-          while IFS= read -r MODEL; do
-            # skip empty lines
-            [[ -z "$MODEL" ]] && continue
+              python test-suite/alt_e2eamdshark/utils/check_model_status_and_remove.py \
+                "$MODEL" \
+                "$BASELINE_JSON" \
+                "$CURRENT_JSON" \
+                "$REPORT_MD" || echo "[WARN] Failed to process model: $MODEL in check_model_status_and_remove.py"
 
-            echo "Processing model: $MODEL"
+            done < "$REGRESSION_MODELS"
+          fi
 
-            python test-suite/alt_e2eamdshark/utils/check_model_status_and_remove.py \
-              "$MODEL" \
-              "$BASELINE_JSON" \
-              "$CURRENT_JSON" \
-              "$REPORT_MD" || echo "[WARN] Failed to process model: $MODEL in check_model_status_and_remove.py"
-
-          done < "$REGRESSION_MODELS"
           cat "e2eamdshark-reports/yesterday_comparison.md" || echo "[WARN] yesterday_comparison.md 2 not found or unreadable"
 
           echo "**************** starting recheck for regression models ****************"

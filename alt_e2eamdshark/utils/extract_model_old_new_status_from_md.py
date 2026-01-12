@@ -13,10 +13,16 @@ out_path = Path("model_old_new_status.json")
 md_path = Path(sys.argv[1])
 text = md_path.read_text()
 
+if re.search(r"##\s+No\s+Regression[s]?\s+Found", text, re.IGNORECASE):
+    print("No regressions explicitly reported")
+    sys.exit(0)
+
 match = re.search(
-    r"##\s+\d+\s+Regressions Found:\s*\n+" r"(.*?)" r"\n##\s+\d+\s+Progressions Found:",
+    r"##\s+.+?\s+Regression[s]?\s+Found:\s*\n+"
+    r"(.*?)"
+    r"\n##\s+(?:No|.+?)\s+Progression[s]?\s+Found:",
     text,
-    re.DOTALL,
+    re.DOTALL | re.IGNORECASE,
 )
 
 if not match:

@@ -28,225 +28,223 @@ jobs:
             target-chip: gfx942
             test-file: nlp-shard1_unique
             cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #
-          # - name: mi300_gpu2_test
-          #   runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: nlp-shard2_unique
-          #   cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          # - name: mi300_gpu3_test
-          #   runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: nlp-shard3_unique
-          #   cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          # - name: mi300_gpu4_test
-          #   runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: amdshark-test-suite_unique
-          #   cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          # - name: mi300_gpu5_test
-          #   runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-hf-cnn-fp32-shard1_unique
-          #   cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          # - name: mi300_gpu6_test
-          #   runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-hf-cnn-fp32-shard2_unique
-          #   cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          # #
-          # - name: mi300_gpu7_test
-          #   runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-hf-cnn-fp32-shard3_unique
-          #   cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          # - name: mi300_gpu8_test
-          #   runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-int8-p0p1-shard1_unique
-          #   cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          # - name: mi300_gpu9_test
-          #   runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-int8-p0p1-shard2_unique
-          #   cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          # - name: mi300_gpu10_test
-          #   runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-int8-p0p1-shard3_unique
-          #   cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          # - name: mi300_gpu11_test
-          #   runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #   backend: rocm
-          #   device: hip
-          #   target-chip: gfx942
-          #   test-file: vai-vision-int8_unique
-          #   cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu12_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: migraphx_unique
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu13_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: onnx_model_zoo_computer_vision_1_unique
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu14_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: onnx_model_zoo_computer_vision_2_unique
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu15_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: onnx_model_zoo_computer_vision_3_unique
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu16_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: onnx_model_zoo_computer_vision_4_unique
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          ##- name: mi300_gpu17_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: onnx_model_zoo_computer_vision_5_unique
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu18_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: onnx_model_zoo_gen_ai_unique
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu19_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: onnx_model_zoo_graph_ml_unique
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu20_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: onnx_model_zoo_nlp_unique
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu21_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: onnx_model_zoo_validated_text_unique
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu22_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: onnx_model_zoo_validated_vision_unique
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu23_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: hf_onnx_model_zoo_non_legacy_00
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu24_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: hf_onnx_model_zoo_non_legacy_01
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu25_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: hf_onnx_model_zoo_non_legacy_02
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu26_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: hf_onnx_model_zoo_non_legacy_03
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu27_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: hf_onnx_model_zoo_non_legacy_04
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu28_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: hf_onnx_model_zoo_non_legacy_05
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu29_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: hf_onnx_model_zoo_non_legacy_06
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu30_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: hf_onnx_model_zoo_non_legacy_07
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu31_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: hf_onnx_model_zoo_non_legacy_08
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
-          #- name: mi300_gpu32_test
-          #  runs-on: linux-mi325-1gpu-ossci-nod-ai
-          #  backend: rocm
-          #  device: hip
-          #  target-chip: gfx942
-          #  test-file: hf_onnx_model_zoo_non_legacy_09
-          #  cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu2_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: nlp-shard2_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu3_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: nlp-shard3_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu4_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: amdshark-test-suite_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu5_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-hf-cnn-fp32-shard1_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu6_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-hf-cnn-fp32-shard2_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu7_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-hf-cnn-fp32-shard3_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu8_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-int8-p0p1-shard1_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu9_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-int8-p0p1-shard2_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu10_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-int8-p0p1-shard3_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu11_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: vai-vision-int8_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu12_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: migraphx_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu13_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: onnx_model_zoo_computer_vision_1_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu14_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: onnx_model_zoo_computer_vision_2_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu15_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: onnx_model_zoo_computer_vision_3_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu16_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: onnx_model_zoo_computer_vision_4_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu17_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: onnx_model_zoo_computer_vision_5_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu18_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: onnx_model_zoo_gen_ai_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu19_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: onnx_model_zoo_graph_ml_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu20_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: onnx_model_zoo_nlp_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu21_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: onnx_model_zoo_validated_text_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu22_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: onnx_model_zoo_validated_vision_unique
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu23_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: hf_onnx_model_zoo_non_legacy_00
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu24_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: hf_onnx_model_zoo_non_legacy_01
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu25_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: hf_onnx_model_zoo_non_legacy_02
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu26_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: hf_onnx_model_zoo_non_legacy_03
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu27_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: hf_onnx_model_zoo_non_legacy_04
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu28_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: hf_onnx_model_zoo_non_legacy_05
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu29_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: hf_onnx_model_zoo_non_legacy_06
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu30_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: hf_onnx_model_zoo_non_legacy_07
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu31_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: hf_onnx_model_zoo_non_legacy_08
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
+          - name: mi300_gpu32_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
+            backend: rocm
+            device: hip
+            target-chip: gfx942
+            test-file: hf_onnx_model_zoo_non_legacy_09
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: cpu_shard1_test
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
@@ -254,223 +252,223 @@ jobs:
             target-chip: x86_64-linux-gnu
             test-file: nlp-shard1_unique
             cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard2_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: nlp-shard2_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard3_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: nlp-shard3_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard4_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: amdshark-test-suite_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard5_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: vai-hf-cnn-fp32-shard1_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard6_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: vai-hf-cnn-fp32-shard2_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard7_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: vai-hf-cnn-fp32-shard3_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard8_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: vai-int8-p0p1-shard1_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard9_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: vai-int8-p0p1-shard2_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard10_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: vai-int8-p0p1-shard3_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard11_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: vai-vision-int8_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard12_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: migraphx_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard13_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: onnx_model_zoo_computer_vision_1_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard14_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: onnx_model_zoo_computer_vision_2_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard15_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: onnx_model_zoo_computer_vision_3_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard16_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: onnx_model_zoo_computer_vision_4_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard17_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: onnx_model_zoo_computer_vision_5_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard18_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: onnx_model_zoo_gen_ai_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard19_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: onnx_model_zoo_graph_ml_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard20_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: onnx_model_zoo_nlp_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard21_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: onnx_model_zoo_validated_text_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard22_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: onnx_model_zoo_validated_vision_unique
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard23_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: hf_onnx_model_zoo_non_legacy_00
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard24_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: hf_onnx_model_zoo_non_legacy_01
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard25_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: hf_onnx_model_zoo_non_legacy_02
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard26_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: hf_onnx_model_zoo_non_legacy_03
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard27_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: hf_onnx_model_zoo_non_legacy_04
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard28_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: hf_onnx_model_zoo_non_legacy_05
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard29_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: hf_onnx_model_zoo_non_legacy_06
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard30_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: hf_onnx_model_zoo_non_legacy_07
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard31_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: hf_onnx_model_zoo_non_legacy_08
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
-          #- name: cpu_shard32_test
-          #  runs-on: nodai-cpu-x86-64
-          #  backend: llvm-cpu
-          #  device: local-task
-          #  target-chip: x86_64-linux-gnu
-          #  test-file: hf_onnx_model_zoo_non_legacy_09
-          #  cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard2_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: nlp-shard2_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard3_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: nlp-shard3_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard4_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: amdshark-test-suite_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard5_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-hf-cnn-fp32-shard1_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard6_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-hf-cnn-fp32-shard2_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard7_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-hf-cnn-fp32-shard3_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard8_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-int8-p0p1-shard1_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard9_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-int8-p0p1-shard2_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard10_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-int8-p0p1-shard3_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard11_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: vai-vision-int8_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard12_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: migraphx_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard13_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: onnx_model_zoo_computer_vision_1_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard14_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: onnx_model_zoo_computer_vision_2_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard15_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: onnx_model_zoo_computer_vision_3_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard16_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: onnx_model_zoo_computer_vision_4_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard17_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: onnx_model_zoo_computer_vision_5_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard18_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: onnx_model_zoo_gen_ai_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard19_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: onnx_model_zoo_graph_ml_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard20_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: onnx_model_zoo_nlp_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard21_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: onnx_model_zoo_validated_text_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard22_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: onnx_model_zoo_validated_vision_unique
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard23_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: hf_onnx_model_zoo_non_legacy_00
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard24_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: hf_onnx_model_zoo_non_legacy_01
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard25_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: hf_onnx_model_zoo_non_legacy_02
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard26_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: hf_onnx_model_zoo_non_legacy_03
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard27_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: hf_onnx_model_zoo_non_legacy_04
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard28_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: hf_onnx_model_zoo_non_legacy_05
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard29_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: hf_onnx_model_zoo_non_legacy_06
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard30_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: hf_onnx_model_zoo_non_legacy_07
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard31_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: hf_onnx_model_zoo_non_legacy_08
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+          - name: cpu_shard32_test
+            runs-on: nodai-cpu-x86-64
+            backend: llvm-cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            test-file: hf_onnx_model_zoo_non_legacy_09
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
     defaults:
       run:
         shell: bash
@@ -661,79 +659,78 @@ jobs:
           pip install -r ./test-suite/alt_e2eamdshark/iree_requirements.txt
           pip install --no-deps -r ./test-suite/alt_e2eamdshark/torch_mlir_requirements.txt
           pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_md
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_md
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_json
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_json
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_md
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_md
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_json
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_json
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_md
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_md
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_json
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_json
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_md
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_md
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_json
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_json
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_md
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_md
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_json
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_json
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_md
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_md
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_json
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_json
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_md
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_md
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_json
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_json
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_md
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_md
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_json
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_json
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_md
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_md
-          #- uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-          #  with:
-          #    name: ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_json
-          #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_json
-          #
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_amdshark-test-suite_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard1_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard2_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-hf-cnn-fp32-shard3_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard1_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard2_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-int8-p0p1-shard3_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_vai-vision-int8_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_migraphx_unique_onnx_json
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_md
@@ -742,188 +739,184 @@ jobs:
         with:
           name: ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_json
           path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard1_unique_onnx_json
-      #
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard2_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_nlp-shard3_unique_onnx_json
 
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_00_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_01_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_02_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_03_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_04_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_05_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_06_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_07_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_08_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_hf_onnx_model_zoo_non_legacy_09_onnx_json
 
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_json
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_json
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #   with:
-      #     name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_md
-      #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_md
-      # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      #  with:
-      #    name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_json
-      #    path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_json
-
-
-            
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_1_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_2_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_3_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_4_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_computer_vision_5_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_gen_ai_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_graph_ml_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_text_unique_onnx_json
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_md
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_md
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_json
+          path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_unique_onnx_json
       # - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
       #   with:
       #     name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_md
@@ -932,8 +925,6 @@ jobs:
       #   with:
       #     name: ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
       #     path: ./e2eamdshark-reports/ci_reports_${{ matrix.backend }}_onnxrt-iree-ep_onnx_json
-      
-
 
       - name: Merge and Push Reports
         run: |
@@ -961,17 +952,21 @@ jobs:
             --perf_tol_regression=0.05 \
             --perf_tol_progression=0.05
 
-          cat "e2eamdshark-reports/yesterday_comparison.md"
+          cat "e2eamdshark-reports/yesterday_comparison.md" || echo "[WARN] yesterday_comparison.md 1 not found or unreadable"
 
           # --- Recheck for Regression Models ---
-          
+
+          echo "**************** starting recheck for regression models ****************"
+          # generate a json with model name and old status
           MD_FILE = "e2eamdshark-reports/yesterday_comparison.md"
-          python ./test-suite/alt_e2eamdshark/utils/extract_model_old_new_status_from_md.py "$MD_FILE"
+          python ./test-suite/alt_e2eamdshark/utils/extract_model_old_new_status_from_md.py "$MD_FILE" || echo "[WARN] Failed to extract model old/new status"
+          cat "model_old_new_status.json" || echo "[WARN] model_old_new_status.json not generated"
 
           JSON_FILE="e2eamdshark-reports/yesterday_comparison.md"
-          python ./test-suite/alt_e2eamdshark/utils/extract_regression_model_names.py "$JSON_FILE"
+          python ./test-suite/alt_e2eamdshark/utils/extract_regression_model_names.py "$JSON_FILE" || echo "[WARN] Failed to extract regression models from json"
+          cat "regression_models.txt" || echo "[WARN] regression_models.txt not generated"
 
-          cd test-suite/alt_e2eamdshark/
+          cd test-suite/alt_e2eamdshark/ || echo "failed to cd into test-suite/alt_e2eamdshark/"
           REGRESSION_MODELS="$PWD/../../regression_models.txt"
           python ./run.py \
              -r ./test-onnx \
@@ -984,13 +979,17 @@ jobs:
              --mode=cl-onnx-iree \
              --cleanup=3 \
              --get-metadata \
-             -v
+             -v || echo "[WARN] run.py Regression test execution failed"
           cd $PWD/../..
 
           REGRESSION_MODELS="regression_models.txt"
           BASELINE_JSON="model_old_new_status.json"
           CURRENT_JSON="test-suite/alt_e2eamdshark/current_result.json"
           REPORT_MD="e2eamdshark-reports/yesterday_comparison.md"
+
+          if [[ ! -f "$REGRESSION_MODELS" ]]; then
+            echo "[WARN] regression_models.txt missing — skipping per-model updates"
+
 
           while IFS= read -r MODEL; do
             # skip empty lines
@@ -1002,32 +1001,34 @@ jobs:
               "$MODEL" \
               "$BASELINE_JSON" \
               "$CURRENT_JSON" \
-              "$REPORT_MD"
+              "$REPORT_MD" || echo "[WARN] Failed to process model: $MODEL in check_model_status_and_remove.py"
 
           done < "$REGRESSION_MODELS"
-          cat "e2eamdshark-reports/yesterday_comparison.md"
+          cat "e2eamdshark-reports/yesterday_comparison.md" || echo "[WARN] yesterday_comparison.md 2 not found or unreadable"
 
-          #          python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
-          #            --new ./e2eamdshark-reports/combined_reports_unique.json \
-          #            --old ./test-suite/baseline/combined_reports_${{ matrix.backend }}.json \
-          #            --report-file ./e2eamdshark-reports/baseline_comparison.md \
-          #            --perf_tol_regression=0.1 \
-          #            --perf_tol_progression=0.1
-          #
-          #          az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
-          #            --name latest-test-suite/combined_reports_${{ matrix.backend }}.json \
-          #            --file ./e2eamdshark-reports/combined_reports_unique.json \
-          #            --account-key ${AZ_PUBLIC_KEY} --overwrite
-          #
-          #      - name: Push regression artifacts
-          #        run: |
-          #          git config user.name "GitHub Actions Bot"
-          #          git config user.email "<>"
-          #          git pull
-          #          date=$(date '+%Y-%m-%d')
-          #          cp yesterday_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/yesterday_comparison.md
-          #          cp baseline_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/baseline_comparison.md
-          #          git add $date
-          #          git commit -m "add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
-          #          git push origin main
-          #        working-directory: ./e2eamdshark-reports
+          echo "**************** starting recheck for regression models ****************"
+
+          python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
+            --new ./e2eamdshark-reports/combined_reports_unique.json \
+            --old ./test-suite/baseline/combined_reports_${{ matrix.backend }}.json \
+            --report-file ./e2eamdshark-reports/baseline_comparison.md \
+            --perf_tol_regression=0.1 \
+            --perf_tol_progression=0.1
+
+          az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
+            --name latest-test-suite/combined_reports_${{ matrix.backend }}.json \
+            --file ./e2eamdshark-reports/combined_reports_unique.json \
+            --account-key ${AZ_PUBLIC_KEY} --overwrite
+
+      - name: Push regression artifacts
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git pull
+          date=$(date '+%Y-%m-%d')
+          cp yesterday_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/yesterday_comparison.md
+          cp baseline_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/baseline_comparison.md
+          git add $date
+          git commit -m "add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
+          git push origin main
+        working-directory: ./e2eamdshark-reports

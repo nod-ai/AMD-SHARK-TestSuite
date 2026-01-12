@@ -7,7 +7,6 @@
 name: E2EAMDSHARK Test Suite unique models
 on:
   workflow_dispatch:
-  pull_request:
   schedule:
    - cron: '30 3 * * 1-6'
 
@@ -620,12 +619,14 @@ jobs:
             regression-blob: rocm
             device: hip
             target-chip: gfx942
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
           - name: merge_cpu_reports
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             regression-blob: cpu
             device: local-task
             target-chip: x86_64-linux-gnu
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
     env:
       AZ_PUBLIC_KEY: ${{ secrets.AMD_SHARKPUBLIC_AZ_KEY }}
       CACHE_DIR: ${{ matrix.cache-dir }}
@@ -962,7 +963,7 @@ jobs:
           python ./test-suite/alt_e2eamdshark/utils/extract_model_old_new_status_from_md.py "$MD_FILE" || echo "[WARN] Failed to extract model old/new status"
           cat "model_old_new_status.json" || echo "[WARN] model_old_new_status.json not generated"
 
-          JSON_FILE="e2eamdshark-reports/yesterday_comparison.md"
+          JSON_FILE="model_old_new_status.json"
           python ./test-suite/alt_e2eamdshark/utils/extract_regression_model_names.py "$JSON_FILE" || echo "[WARN] Failed to extract regression models from json"
           cat "regression_models.txt" || echo "[WARN] regression_models.txt not generated"
 

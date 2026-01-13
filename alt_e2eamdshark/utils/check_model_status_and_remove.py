@@ -62,7 +62,6 @@ if actual_status == expected_status:
             new_lines.append(line)
             continue
 
-
         # Exit section on next header
         if in_regression_section and stripped.startswith("##"):
             in_regression_section = False

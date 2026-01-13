@@ -57,10 +57,11 @@ if actual_status == expected_status:
         stripped = line.strip()
 
         # Enter regressions section
-        if stripped.startswith("##") and "Regressions Found" in stripped:
+        if stripped.startswith("##") and "Regression" in stripped and "Found" in stripped:
             in_regression_section = True
             new_lines.append(line)
             continue
+
 
         # Exit section on next header
         if in_regression_section and stripped.startswith("##"):

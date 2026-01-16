@@ -355,6 +355,8 @@ jobs:
       - name: "Setup alt e2eamdshark python venv"
         run: |
           rm -rf ${ALT_E2E_VENV_DIR}
+          sudo apt update
+          sudo apt install wget
           python -m venv ${ALT_E2E_VENV_DIR}
           source ${ALT_E2E_VENV_DIR}/bin/activate
           pip install --upgrade pip
@@ -364,18 +366,18 @@ jobs:
           pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
         working-directory: ./test-suite
 
-      - name: "Setup IREE EP python venv"
-        run: |
-          python -m venv ${EP_VENV_DIR}
-          source ${EP_VENV_DIR}/bin/activate
-          pip install --upgrade pip
-          pip install -r ./alt_e2eamdshark/base_requirements.txt
-          pip install -r ./alt_e2eamdshark/iree_requirements.txt
-          pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
-          pip uninstall -y onnxruntime
-          wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/onnxruntime/pip_whl/onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
-          pip install ./onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
-        working-directory: ./test-suite
+      #- name: "Setup IREE EP python venv"
+      #  run: |
+      #    python -m venv ${EP_VENV_DIR}
+      #    source ${EP_VENV_DIR}/bin/activate
+      #    pip install --upgrade pip
+      #    pip install -r ./alt_e2eamdshark/base_requirements.txt
+      #    pip install -r ./alt_e2eamdshark/iree_requirements.txt
+      #    pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
+      #    pip uninstall -y onnxruntime
+      #    wget https://amdsharkpublic.blob.core.windows.net/amdsharkpublic/onnxruntime/pip_whl/onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
+      #    pip install ./onnxruntime-1.20.0-cp311-cp311-linux_x86_64.whl
+      #  working-directory: ./test-suite
 
       - name: Run Onnx Bench Mode
         if: contains(matrix.test-file, 'migraphx')
@@ -500,6 +502,8 @@ jobs:
           python-version: "3.11"
       - name: "Setup alt test suite venv"
         run: |
+          sudo apt update
+          sudo apt install wget
           python -m venv report_venv_alt
           source report_venv_alt/bin/activate
           pip install --upgrade pip

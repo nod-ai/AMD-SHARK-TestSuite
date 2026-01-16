@@ -20,310 +20,310 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: mi300_gpu1_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu1_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: nlp-shard1_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu2_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu2_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: nlp-shard2_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu3_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu3_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: nlp-shard3_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu4_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu4_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: amdshark-test-suite_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu5_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu5_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard1_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu6_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu6_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard2_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu7_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu7_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-hf-cnn-fp32-shard3_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu8_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu8_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard1_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu9_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu9_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard2_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu10_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu10_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-int8-p0p1-shard3_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu11_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu11_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: vai-vision-int8_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu12_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu12_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: migraphx_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu13_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu13_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_1_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu14_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu14_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_2_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu15_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu15_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_3_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu16_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu16_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_4_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu17_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu17_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_computer_vision_5_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu18_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu18_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_gen_ai_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu19_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu19_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_graph_ml_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu20_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu20_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_nlp_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
-          - name: mi300_gpu21_test
-            runs-on: nodai-amdgpu-mi300-x86-64
+          - name: mi325_gpu21_test
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             device: hip
             target-chip: gfx942
             test-file: onnx_model_zoo_validated_vision_others
             cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
 
-          # - name: mi300_gpu13_test
-          #   runs-on: nodai-amdgpu-mi300-x86-64
+          # - name: mi325_gpu13_test
+          #   runs-on: linux-mi325-1gpu-ossci-nod-ai
           #   backend: hip
           #   device: hip
           #   target-chip: gfx942
           #   test-file: onnxrt-iree-ep
           #   cache-dir: /data/e2eamdshark/amdshark-test-suite-models-cache
           - name: cpu_shard1_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: nlp-shard1_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard2_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: nlp-shard2_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard3_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: nlp-shard3_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard4_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: amdshark-test-suite_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard5_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard1_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard6_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard2_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard7_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-hf-cnn-fp32-shard3_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard8_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-int8-p0p1-shard1_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard9_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-int8-p0p1-shard2_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard10_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-int8-p0p1-shard3_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard11_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: vai-vision-int8_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard12_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: migraphx_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard13_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_1_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard14_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_2_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard15_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_3_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard16_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_4_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard17_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_computer_vision_5_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard18_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_gen_ai_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard19_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_graph_ml_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard20_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_nlp_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           - name: cpu_shard21_test
-            runs-on: nodai-amdgpu-mi250-x86-64
+            runs-on: nodai-cpu-x86-64
             backend: llvm-cpu
             device: local-task
             target-chip: x86_64-linux-gnu
             test-file: onnx_model_zoo_validated_vision_others
             cache-dir: /groups/aig_amdsharks/test-suite-ci-cache
           # - name: cpu_shard13_test
-          #   runs-on: nodai-amdgpu-mi250-x86-64
+          #   runs-on: nodai-cpu-x86-64
           #   backend: llvm-cpu
           #   device: local-task
           #   target-chip: x86_64-linux-gnu
@@ -462,11 +462,11 @@ jobs:
       matrix:
         include:
           - name: merge_rocm_reports
-            runs-on: nodai-amdgpu-mi300-x86-64
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             regression-blob: rocm
           - name: merge_cpu_reports
-            runs-on: nodai-amdgpu-mi300-x86-64
+            runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: llvm-cpu
             regression-blob: cpu
     env:

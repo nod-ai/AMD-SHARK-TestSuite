@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
   schedule:
   # Runs at 2:30 AM PST
-  - cron: '0 1 * * 6'
+  - cron: '0 1 * * 1-6'
 
 
 jobs:

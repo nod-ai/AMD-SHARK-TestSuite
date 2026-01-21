@@ -47,3 +47,5 @@ jobs:
       run: |
         cd /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
         df -h .
+        cd  /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+        df -h .

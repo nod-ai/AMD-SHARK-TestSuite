@@ -6,6 +6,7 @@
 
 name: E2EAMDSHARK Test Suite unique models
 on:
+  pull_request:
   workflow_dispatch:
   schedule:
    - cron: '30 3 * * 1-6'
@@ -1021,15 +1022,15 @@ jobs:
             --file ./e2eamdshark-reports/combined_reports_unique.json \
             --account-key ${AZ_PUBLIC_KEY} --overwrite
 
-      - name: Push regression artifacts
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git pull
-          date=$(date '+%Y-%m-%d')
-          cp yesterday_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/yesterday_comparison.md
-          cp baseline_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/baseline_comparison.md
-          git add $date
-          git commit -m "add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
-          git push origin main
-        working-directory: ./e2eamdshark-reports
+      # - name: Push regression artifacts
+      #   run: |
+      #     git config user.name "GitHub Actions Bot"
+      #     git config user.email "<>"
+      #     git pull
+      #     date=$(date '+%Y-%m-%d')
+      #     cp yesterday_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/yesterday_comparison.md
+      #     cp baseline_comparison.md ${date}/ci_reports_onnx/${{ matrix.backend }}/combined-reports_unique/baseline_comparison.md
+      #     git add $date
+      #     git commit -m "add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
+      #     git push origin main
+      #   working-directory: ./e2eamdshark-reports

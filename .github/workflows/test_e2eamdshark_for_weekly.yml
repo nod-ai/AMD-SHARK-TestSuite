@@ -768,6 +768,7 @@ jobs:
           cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_nlp_others_onnx_md/onnx_model_zoo_nlp_others.md ${date}/ci_reports_onnx_dup/${{ matrix.backend }}/onnx_model_zoo_nlp_others/summary.md
           cp ci_reports_${{ matrix.backend }}_onnx_model_zoo_validated_vision_others_onnx_md/onnx_model_zoo_validated_vision_others.md ${date}/ci_reports_onnx_dup/${{ matrix.backend }}/onnx_model_zoo_validated_vision_others/summary.md
           cp combined_reports_others.md ${date}/ci_reports_onnx_dup/${{ matrix.backend }}/combined-reports_others/summary.md
+          cp combined_reports_others.json ${date}/ci_reports_onnx_dup/${{ matrix.backend }}/combined-reports_others/combined_reports_others.json
           git add $date
           git commit -m "add CI status reports for e2eamdshark for ${{ matrix.backend }}"
           git push origin main

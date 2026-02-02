@@ -775,6 +775,7 @@ jobs:
 
       - name: Regression Reports
         run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
           source report_venv_alt/bin/activate
           cd test-suite
           mkdir latest

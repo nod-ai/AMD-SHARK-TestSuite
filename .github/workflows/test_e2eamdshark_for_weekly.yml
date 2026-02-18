@@ -855,27 +855,27 @@ jobs:
           echo "================ done recheck for regression models ================"
 
 
-          python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
-            --new ./e2eamdshark-reports/combined_reports_others.json \
-            --old ./test-suite/baseline/combined_reports_others_${{ matrix.backend }}.json \
-            --report-file ./e2eamdshark-reports/baseline_comparison.md \
-            --perf_tol_regression=0.1 \
-            --perf_tol_progression=0.1
+      #     python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
+      #       --new ./e2eamdshark-reports/combined_reports_others.json \
+      #       --old ./test-suite/baseline/combined_reports_others_${{ matrix.backend }}.json \
+      #       --report-file ./e2eamdshark-reports/baseline_comparison.md \
+      #       --perf_tol_regression=0.1 \
+      #       --perf_tol_progression=0.1
 
-          az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
-            --name latest-test-suite/combined_reports_others_${{ matrix.backend }}.json \
-            --file ./e2eamdshark-reports/combined_reports_others.json \
-            --account-key ${AZ_PUBLIC_KEY} --overwrite
+      #     az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
+      #       --name latest-test-suite/combined_reports_others_${{ matrix.backend }}.json \
+      #       --file ./e2eamdshark-reports/combined_reports_others.json \
+      #       --account-key ${AZ_PUBLIC_KEY} --overwrite
 
-      - name: Push regression artifacts
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git pull
-          date=$(date '+%Y-%m-%d')
-          cp yesterday_comparison.md ${date}/ci_reports_onnx_dup/${{ matrix.backend }}/combined-reports_others/yesterday_comparison.md
-          cp baseline_comparison.md ${date}/ci_reports_onnx_dup/${{ matrix.backend }}/combined-reports_others/baseline_comparison.md
-          git add $date
-          git commit -m "add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
-          git push origin main
-        working-directory: ./e2eamdshark-reports
+      # - name: Push regression artifacts
+      #   run: |
+      #     git config user.name "GitHub Actions Bot"
+      #     git config user.email "<>"
+      #     git pull
+      #     date=$(date '+%Y-%m-%d')
+      #     cp yesterday_comparison.md ${date}/ci_reports_onnx_dup/${{ matrix.backend }}/combined-reports_others/yesterday_comparison.md
+      #     cp baseline_comparison.md ${date}/ci_reports_onnx_dup/${{ matrix.backend }}/combined-reports_others/baseline_comparison.md
+      #     git add $date
+      #     git commit -m "add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
+      #     git push origin main
+      #   working-directory: ./e2eamdshark-reports

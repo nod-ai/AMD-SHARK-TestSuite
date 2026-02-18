@@ -468,6 +468,7 @@ jobs:
   push_artifacts:
     needs: [e2eamdshark]
     runs-on: ${{ matrix.runs-on }}
+    if: always()
     strategy:
       fail-fast: false
       max-parallel: 1

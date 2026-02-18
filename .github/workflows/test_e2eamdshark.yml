@@ -619,7 +619,7 @@ jobs:
             regression-blob: rocm
             device: hip
             target-chip: gfx942
-            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: merge_cpu_reports
             runs-on: nodai-cpu-x86-64
             backend: llvm-cpu

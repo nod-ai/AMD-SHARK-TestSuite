@@ -1,0 +1,123 @@
+# GitHub Actions Step Retry Setup
+
+## Summary
+
+Added automatic retry logic to handle transient failures in the HF Top-1000 models test suite workflow.
+
+## What Was Changed
+
+### Modified Workflow: `test_e2e_hf_top_1000.yml`
+
+Two critical steps now have automatic retry:
+
+#### 1. Setup Python Virtual Environment (Lines 201-220)
+```yaml
+- name: "Setup alt e2eamdshark python venv"
+  uses: nick-fields/retry@v3
+  with:
+    timeout_minutes: 30
+    max_attempts: 2
+    retry_on: error
+```
+
+**Why?** This step failed in run #22133201851 due to transient dependency installation issues.
+
+#### 2. Run HF Model Tests (Lines 222-247)
+```yaml
+- name: Run HF top-1000 model
+  uses: nick-fields/retry@v3
+  with:
+    timeout_minutes: 120
+    max_attempts: 2
+    retry_on: error
+```
+
+**Why?** Prevents test flakiness from causing complete job failures.
+
+## How It Works
+
+- **First Attempt**: Runs normally
+- **On Failure**: Automatically retries once more
+- **On Success**: Proceeds to next step (no retry needed)
+- **After 2 Failures**: Marks the step as failed (same as before, but after retry)
+
+## Example Run Behavior
+
+### Before (without retry):
+```
+✗ Setup venv → FAILED (transient network issue)
+  Job terminates ❌
+```
+
+### After (with retry):
+```
+✗ Setup venv (Attempt 1) → FAILED (transient network issue)
+  ↓ Automatic retry
+✓ Setup venv (Attempt 2) → SUCCESS
+  ↓
+✓ Run tests → SUCCESS
+  Job completes ✅
+```
+
+## Testing the Retry Mechanism
+
+The demo workflow will run automatically on:
+- **Pull requests** to `main` or `update_*` branches (when workflow files or markdown are changed)
+- **Manual trigger** via workflow_dispatch
+
+### Manual trigger:
+```bash
+# Trigger the example workflow
+gh workflow run example_retry_demo.yml --repo nod-ai/AMD-SHARK-TestSuite
+
+# Watch the results
+gh run watch
+```
+
+### Via Pull Request:
+The demo will automatically run when you create a PR that modifies workflow files or markdown files.
+
+The demo includes:
+- **Job 1**: No retry (50% chance of failure)
+- **Job 2**: With retry (will succeed after retry)
+- **Job 3**: Realistic Python venv setup simulation
+
+## Limitations
+
+- **Not true job-level retry**: Only retries individual steps, not entire jobs
+- **Manual re-runs still available**: You can still manually re-run failed workflows from GitHub UI
+- **Same timeout limits apply**: The job timeout (6000 minutes) still applies to total job duration
+
+## Configuration Options
+
+Adjust retry behavior by modifying these parameters:
+
+```yaml
+timeout_minutes: 30      # Max time per attempt
+max_attempts: 2          # Total attempts (1 original + 1 retry)
+retry_on: error          # Retry on non-zero exit code
+```
+
+For more aggressive retry:
+```yaml
+max_attempts: 3          # Try up to 3 times
+timeout_minutes: 60      # Give more time per attempt
+```
+
+## When to Use Retry
+
+✅ **Good use cases:**
+- Dependency installation (pip, apt, npm)
+- Network operations (downloads, API calls)
+- Flaky tests with occasional transient failures
+- Cloud service interactions
+
+❌ **Don't use retry for:**
+- Steps that deterministically fail (code errors)
+- Very long-running operations (already have timeout)
+- Steps that modify state (git commits, deployments)
+
+## Reference
+
+- GitHub Action: https://github.com/nick-fields/retry
+- Failed run that motivated this change: https://github.com/nod-ai/AMD-SHARK-TestSuite/actions/runs/22133201851/job/63978168038

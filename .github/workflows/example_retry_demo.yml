@@ -1,0 +1,142 @@
+# Example workflow demonstrating step-level retry for transient failures
+# This simulates the kind of flaky failures that can occur during dependency installation
+
+name: Retry Demo - Simulating Transient Failures
+
+on:
+  workflow_dispatch:  # Manual trigger for testing
+  pull_request:       # Runs on pull requests
+    branches:
+      - main
+      - 'update_*'
+    paths:
+      - '.github/workflows/**'
+      - '**.md'
+
+jobs:
+  demo-without-retry:
+    name: "Demo: No Retry (will fail)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Flaky step without retry
+        run: |
+          echo "Simulating a flaky dependency installation..."
+          # 50% chance of failure (simulates network issues, package server problems, etc.)
+          if [ $((RANDOM % 2)) -eq 0 ]; then
+            echo "ERROR: Failed to install dependencies (simulated transient failure)"
+            exit 1
+          else
+            echo "SUCCESS: Dependencies installed"
+          fi
+
+  demo-with-retry:
+    name: "Demo: With Retry (will succeed)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Flaky step with automatic retry
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          command: |
+            echo "Simulating a flaky dependency installation..."
+            echo "Attempt number: ${{ github.run_attempt }}"
+
+            # 50% chance of failure on first try
+            if [ ! -f /tmp/retry_marker ]; then
+              # First attempt - simulate failure
+              echo "First attempt - simulating transient failure"
+              touch /tmp/retry_marker
+              exit 1
+            else
+              # Second attempt - succeed
+              echo "Second attempt - SUCCESS!"
+              echo "Dependencies installed successfully"
+            fi
+
+  realistic-example:
+    name: "Realistic: Python venv setup with retry"
+    runs-on: ubuntu-latest
+    env:
+      VENV_DIR: ${{ github.workspace }}/test_venv
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Setup Python venv with retry (simulates your actual use case)
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          command: |
+            echo "Setting up Python virtual environment..."
+            rm -rf ${VENV_DIR}
+            python -m venv ${VENV_DIR}
+            source ${VENV_DIR}/bin/activate
+
+            # Simulate occasional pip install failures
+            if [ ! -f /tmp/pip_retry_marker ]; then
+              echo "Simulating pip install failure (network timeout, package server issue, etc.)"
+              touch /tmp/pip_retry_marker
+              exit 1
+            fi
+
+            pip install --upgrade pip
+            echo "Successfully installed dependencies"
+
+      - name: Verify setup succeeded
+        run: |
+          source ${VENV_DIR}/bin/activate
+          python --version
+          pip --version
+          echo "✓ Virtual environment is ready!"
+
+  comparison-summary:
+    name: "Summary: Benefits of Retry"
+    runs-on: ubuntu-latest
+    needs: [demo-with-retry, realistic-example]
+    steps:
+      - name: Display summary
+        run: |
+          cat << 'EOF'
+          ================================================================================
+          RETRY MECHANISM SUMMARY
+          ================================================================================
+
+          ✓ BENEFITS:
+            • Handles transient failures automatically (network issues, server timeouts)
+            • Reduces manual re-runs of failed workflows
+            • Improves overall CI reliability
+            • No code changes needed in your actual tests
+
+          ✓ CONFIGURATION:
+            • max_attempts: 2        → Try up to 2 times
+            • timeout_minutes: 30    → Each attempt gets 30 minutes
+            • retry_on: error        → Retry on any exit code != 0
+
+          ✓ USE CASES:
+            • Dependency installation (apt, pip, npm)
+            • Network-dependent operations
+            • Cloud service API calls
+            • Flaky integration tests
+
+          ✓ APPLIED TO YOUR WORKFLOW:
+            • "Setup alt e2eamdshark python venv" step
+            • "Run HF top-1000 model" step
+          ================================================================================
+          EOF

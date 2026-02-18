@@ -476,12 +476,19 @@ jobs:
             runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             regression-blob: rocm
+            device: hip
+            target-chip: gfx942
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: merge_cpu_reports
             runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: llvm-cpu
             regression-blob: cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
     env:
       AZ_PUBLIC_KEY: ${{ secrets.AMD_SHARKPUBLIC_AZ_KEY }}
+      CACHE_DIR: ${{ matrix.cache-dir }}
     steps:
       - name: Checkout Test Suite
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

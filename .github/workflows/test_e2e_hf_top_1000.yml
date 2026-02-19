@@ -199,40 +199,54 @@ jobs:
           path: test-suite
 
       - name: "Setup alt e2eamdshark python venv"
-        run: |
-          rm -rf ${ALT_E2E_VENV_DIR}
-          sudo apt update
-          sudo apt install wget
-          python -m venv ${ALT_E2E_VENV_DIR}
-          source ${ALT_E2E_VENV_DIR}/bin/activate
-          pip install --upgrade pip
-          pip install -r ./alt_e2eamdshark/base_requirements.txt
-          pip install -r ./alt_e2eamdshark/hf_requirements.txt
-          pip install -r ./alt_e2eamdshark/iree_requirements.txt
-          pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
-          pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
-        working-directory: ./test-suite
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          on_retry_command: echo "::warning::Setup venv failed, retrying..."
+          command: |
+            cd ./test-suite
+            rm -rf ${ALT_E2E_VENV_DIR}
+            sudo apt update
+            sudo apt install wget
+            python -m venv ${ALT_E2E_VENV_DIR}
+            source ${ALT_E2E_VENV_DIR}/bin/activate
+            pip install --upgrade pip
+            pip install -r ./alt_e2eamdshark/base_requirements.txt
+            pip install -r ./alt_e2eamdshark/hf_requirements.txt
+            pip install -r ./alt_e2eamdshark/iree_requirements.txt
+            pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
+            pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
 
       - name: Run HF top-1000 model
-        run: |
-          source ${ALT_E2E_VENV_DIR}/bin/activate
-          pip freeze
-          cd alt_e2eamdshark
-          free -mh
-          python3.11 ./run.py \
-            -r ./test-onnx \
-            --report \
-            --testsfile onnx_tests/models/external_lists/hf-model-shards/${{ matrix.test-file }}.txt \
-            -b ${{ matrix.backend }} \
-            -d ${{ matrix.device }} \
-            -c ${{ matrix.target-chip }} \
-            --report-file reports/${{ matrix.test-file }}.md \
-            --mode=cl-onnx-iree \
-            --cleanup=3 \
-            --get-metadata \
-            -v
-          python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
-        working-directory: ./test-suite
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 120
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          on_retry_command: echo "::warning::HF model run failed, retrying..."
+          command: |
+            cd ./test-suite
+            source ${ALT_E2E_VENV_DIR}/bin/activate
+            pip freeze
+            cd alt_e2eamdshark
+            free -mh
+            python3.11 ./run.py \
+              -r ./test-onnx \
+              --report \
+              --testsfile onnx_tests/models/external_lists/hf-model-shards/${{ matrix.test-file }}.txt \
+              -b ${{ matrix.backend }} \
+              -d ${{ matrix.device }} \
+              -c ${{ matrix.target-chip }} \
+              --report-file reports/${{ matrix.test-file }}.md \
+              --mode=cl-onnx-iree \
+              --cleanup=3 \
+              --get-metadata \
+              -v
+            python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -287,17 +301,24 @@ jobs:
         with:
           python-version: "3.11"
       - name: "Setup alt test suite venv"
-        run: |
-          sudo apt update
-          sudo apt install wget
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-          python -m venv report_venv_alt
-          source report_venv_alt/bin/activate
-          pip install --upgrade pip
-          pip install -r ./test-suite/alt_e2eamdshark/base_requirements.txt
-          pip install -r ./test-suite/alt_e2eamdshark/iree_requirements.txt
-          pip install --no-deps -r ./test-suite/alt_e2eamdshark/torch_mlir_requirements.txt
-          pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          on_retry_command: echo "::warning::Setup alt test suite venv failed, retrying..."
+          command: |
+            sudo apt update
+            sudo apt install wget
+            curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            python -m venv report_venv_alt
+            source report_venv_alt/bin/activate
+            pip install --upgrade pip
+            pip install -r ./test-suite/alt_e2eamdshark/base_requirements.txt
+            pip install -r ./test-suite/alt_e2eamdshark/iree_requirements.txt
+            pip install --no-deps -r ./test-suite/alt_e2eamdshark/torch_mlir_requirements.txt
+            pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
 
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
@@ -439,33 +460,40 @@ jobs:
         working-directory: ./e2eamdshark-reports
 
       - name: Regression Reports
-        run: |
-          source report_venv_alt/bin/activate
-          cd test-suite
-          mkdir latest
-          mkdir baseline
-          wget https://amdsharkpublic.blob.core.windows.net/ciartifacts/latest-test-suite/combined_reports_hf_top_1k_${{ matrix.backend }}.json -O latest/combined_reports_hf_top_1k_${{ matrix.backend }}.json
-          wget https://amdsharkpublic.blob.core.windows.net/ciartifacts/baseline-test-suite/combined_reports_hf_top_1k_${{ matrix.regression-blob }}.json -O baseline/combined_reports_hf_top_1k_${{ matrix.backend }}.json
-          cd ..
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          on_retry_command: echo "::warning::Regression reports failed, retrying..."
+          command: |
+            source report_venv_alt/bin/activate
+            cd test-suite
+            mkdir latest
+            mkdir baseline
+            wget https://amdsharkpublic.blob.core.windows.net/ciartifacts/latest-test-suite/combined_reports_hf_top_1k_${{ matrix.backend }}.json -O latest/combined_reports_hf_top_1k_${{ matrix.backend }}.json
+            wget https://amdsharkpublic.blob.core.windows.net/ciartifacts/baseline-test-suite/combined_reports_hf_top_1k_${{ matrix.regression-blob }}.json -O baseline/combined_reports_hf_top_1k_${{ matrix.backend }}.json
+            cd ..
 
-          python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
-            --new ./e2eamdshark-reports/combined_reports_unique.json \
-            --old ./test-suite/latest/combined_reports_hf_top_1k_${{ matrix.backend }}.json \
-            --report-file ./e2eamdshark-reports/yesterday_comparison.md \
-            --perf_tol_regression=0.05 \
-            --perf_tol_progression=0.05
+            python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
+              --new ./e2eamdshark-reports/combined_reports_unique.json \
+              --old ./test-suite/latest/combined_reports_hf_top_1k_${{ matrix.backend }}.json \
+              --report-file ./e2eamdshark-reports/yesterday_comparison.md \
+              --perf_tol_regression=0.05 \
+              --perf_tol_progression=0.05
 
-          python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
-            --new ./e2eamdshark-reports/combined_reports_unique.json \
-            --old ./test-suite/baseline/combined_reports_hf_top_1k_${{ matrix.backend }}.json \
-            --report-file ./e2eamdshark-reports/baseline_comparison.md \
-            --perf_tol_regression=0.1 \
-            --perf_tol_progression=0.1
+            python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
+              --new ./e2eamdshark-reports/combined_reports_unique.json \
+              --old ./test-suite/baseline/combined_reports_hf_top_1k_${{ matrix.backend }}.json \
+              --report-file ./e2eamdshark-reports/baseline_comparison.md \
+              --perf_tol_regression=0.1 \
+              --perf_tol_progression=0.1
 
-          az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
-            --name latest-test-suite/combined_reports_hf_top_1k_${{ matrix.backend }}.json \
-            --file ./e2eamdshark-reports/combined_reports_unique.json \
-            --account-key ${AZ_PUBLIC_KEY} --overwrite
+            az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
+              --name latest-test-suite/combined_reports_hf_top_1k_${{ matrix.backend }}.json \
+              --file ./e2eamdshark-reports/combined_reports_unique.json \
+              --account-key ${AZ_PUBLIC_KEY} --overwrite
 
       - name: Push regression artifacts
         run: |

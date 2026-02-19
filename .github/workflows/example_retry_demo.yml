@@ -17,6 +17,7 @@ jobs:
   demo-without-retry:
     name: "Demo: No Retry (will fail)"
     runs-on: ubuntu-latest
+    continue-on-error: true  # Allow workflow to continue even if this job fails
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,21 +47,45 @@ jobs:
           max_attempts: 2
           retry_on: error
           shell: bash
+          on_retry_command: echo "::warning::First attempt failed, retrying... (This warning shows a retry occurred)"
           command: |
             echo "Simulating a flaky dependency installation..."
-            echo "Attempt number: ${{ github.run_attempt }}"
 
             # 50% chance of failure on first try
             if [ ! -f /tmp/retry_marker ]; then
               # First attempt - simulate failure
               echo "First attempt - simulating transient failure"
+              echo "ERROR: Connection timeout (simulated)"
               touch /tmp/retry_marker
               exit 1
             else
               # Second attempt - succeed
               echo "Second attempt - SUCCESS!"
               echo "Dependencies installed successfully"
+              echo "::notice::This step succeeded on retry - check logs for ::warning:: to see retry occurred"
             fi
+
+  demo-all-retries-fail:
+    name: "Demo: All Retries Fail (job will fail)"
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Allow workflow to continue to show the failure behavior
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Step that fails on all attempts
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 2
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          on_retry_command: echo "::warning::Attempt failed, retrying... (will fail again)"
+          command: |
+            echo "Simulating a persistent failure (not transient)..."
+            echo "This will fail on BOTH attempts"
+            echo "ERROR: Permanent failure - database not configured"
+            exit 1
 
   realistic-example:
     name: "Realistic: Python venv setup with retry"
@@ -83,6 +108,7 @@ jobs:
           max_attempts: 2
           retry_on: error
           shell: bash
+          on_retry_command: echo "::warning::Python venv setup failed, retrying..."
           command: |
             echo "Setting up Python virtual environment..."
             rm -rf ${VENV_DIR}
@@ -109,6 +135,7 @@ jobs:
   comparison-summary:
     name: "Summary: Benefits of Retry"
     runs-on: ubuntu-latest
+    if: always()  # Run even if previous jobs failed
     needs: [demo-with-retry, realistic-example]
     steps:
       - name: Display summary
@@ -128,6 +155,19 @@ jobs:
             • max_attempts: 2        → Try up to 2 times
             • timeout_minutes: 30    → Each attempt gets 30 minutes
             • retry_on: error        → Retry on any exit code != 0
+            • on_retry_command       → Logs ::warning:: when retry occurs
+
+          ✓ FAILURE BEHAVIOR:
+            • If ANY attempt succeeds → Job passes ✅
+            • If ALL attempts fail → Job fails ❌ (as expected)
+            • No silent failures - permanent errors still fail the job
+            • Check the "demo-all-retries-fail" job to see this behavior
+
+          ⚠ VISIBILITY NOTE:
+            • When a step succeeds after retry, GitHub shows it as passed (✓)
+            • The initial failure is hidden in the final status
+            • Look for "::warning::" messages in step logs to see if retries happened
+            • This is a limitation of the nick-fields/retry action
 
           ✓ USE CASES:
             • Dependency installation (apt, pip, npm)

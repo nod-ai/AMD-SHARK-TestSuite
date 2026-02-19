@@ -205,6 +205,7 @@ jobs:
           max_attempts: 2
           retry_on: error
           shell: bash
+          on_retry_command: echo "::warning::Setup venv failed, retrying..."
           command: |
             cd ./test-suite
             rm -rf ${ALT_E2E_VENV_DIR}
@@ -226,6 +227,7 @@ jobs:
           max_attempts: 2
           retry_on: error
           shell: bash
+          on_retry_command: echo "::warning::HF model run failed, retrying..."
           command: |
             cd ./test-suite
             source ${ALT_E2E_VENV_DIR}/bin/activate

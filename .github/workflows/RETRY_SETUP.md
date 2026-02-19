@@ -39,7 +39,15 @@ Two critical steps now have automatic retry:
 - **First Attempt**: Runs normally
 - **On Failure**: Automatically retries once more
 - **On Success**: Proceeds to next step (no retry needed)
-- **After 2 Failures**: Marks the step as failed (same as before, but after retry)
+- **After 2 Failures**: **Marks the step AND job as FAILED** ❌
+
+### Important: Jobs Still Fail When All Retries Fail
+
+The retry mechanism does NOT hide permanent failures:
+- ✅ **Transient failure** (attempt 1 fails, attempt 2 succeeds) → Job passes
+- ❌ **Persistent failure** (both attempts fail) → **Job fails** (as it should)
+
+This ensures that real issues are still caught and the job fails appropriately.
 
 ## Example Run Behavior
 
@@ -87,6 +95,11 @@ The demo includes:
 - **Not true job-level retry**: Only retries individual steps, not entire jobs
 - **Manual re-runs still available**: You can still manually re-run failed workflows from GitHub UI
 - **Same timeout limits apply**: The job timeout (6000 minutes) still applies to total job duration
+- **Retry visibility**: The retry action shows only the final outcome in the workflow UI
+  - If a step succeeds after retry, it appears as a simple success
+  - Failed attempts are logged but not shown as separate failures in the UI
+  - Look for "::warning::" messages in step logs to see if retries occurred
+  - The `on_retry_command` parameter logs warnings when retries happen
 
 ## Configuration Options
 

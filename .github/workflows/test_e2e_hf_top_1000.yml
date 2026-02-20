@@ -7,7 +7,6 @@
 name: HF Top-1000 models Test Suite
 on:
   workflow_dispatch:
-  pull_request:
   schedule:
   # Runs at 2:30 AM PST
   - cron: '0 1 * * 1-6'
@@ -254,7 +253,6 @@ jobs:
   push_artifacts:
     needs: [e2eamdshark]
     runs-on: ${{ matrix.runs-on }}
-    if: always()
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -521,27 +519,27 @@ jobs:
 
           echo "================ done recheck for regression models ================"
 
-          # python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
-          #   --new ./e2eamdshark-reports/combined_reports_unique.json \
-          #   --old ./test-suite/baseline/combined_reports_hf_top_1k_${{ matrix.backend }}.json \
-          #   --report-file ./e2eamdshark-reports/baseline_comparison.md \
-          #   --perf_tol_regression=0.1 \
-          #   --perf_tol_progression=0.1
+          python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
+            --new ./e2eamdshark-reports/combined_reports_unique.json \
+            --old ./test-suite/baseline/combined_reports_hf_top_1k_${{ matrix.backend }}.json \
+            --report-file ./e2eamdshark-reports/baseline_comparison.md \
+            --perf_tol_regression=0.1 \
+            --perf_tol_progression=0.1
 
-          # az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
-          #   --name latest-test-suite/combined_reports_hf_top_1k_${{ matrix.backend }}.json \
-          #   --file ./e2eamdshark-reports/combined_reports_unique.json \
-          #   --account-key ${AZ_PUBLIC_KEY} --overwrite
+          az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
+            --name latest-test-suite/combined_reports_hf_top_1k_${{ matrix.backend }}.json \
+            --file ./e2eamdshark-reports/combined_reports_unique.json \
+            --account-key ${AZ_PUBLIC_KEY} --overwrite
 
-      # - name: Push regression artifacts
-      #   run: |
-      #     git config user.name "GitHub Actions Bot"
-      #     git config user.email "<>"
-      #     git pull
-      #     date=$(date '+%Y-%m-%d')
-      #     cp yesterday_comparison.md ${date}/hf-model-top1k/${{ matrix.backend }}/combined-reports_unique/yesterday_comparison.md
-      #     cp baseline_comparison.md ${date}/hf-model-top1k/${{ matrix.backend }}/combined-reports_unique/baseline_comparison.md
-      #     git add $date
-      #     git commit -m "add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
-      #     git push origin main
-      #   working-directory: ./e2eamdshark-reports
+      - name: Push regression artifacts
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git pull
+          date=$(date '+%Y-%m-%d')
+          cp yesterday_comparison.md ${date}/hf-model-top1k/${{ matrix.backend }}/combined-reports_unique/yesterday_comparison.md
+          cp baseline_comparison.md ${date}/hf-model-top1k/${{ matrix.backend }}/combined-reports_unique/baseline_comparison.md
+          git add $date
+          git commit -m "add CI regression reports for e2eamdshark for ${{ matrix.backend }}"
+          git push origin main
+        working-directory: ./e2eamdshark-reports

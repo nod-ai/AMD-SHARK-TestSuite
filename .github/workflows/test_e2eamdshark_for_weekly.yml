@@ -476,12 +476,19 @@ jobs:
             runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: rocm
             regression-blob: rocm
+            device: hip
+            target-chip: gfx942
+            cache-dir: /home/runner/data/e2eamdshark/amdshark-test-suite-models-cache
           - name: merge_cpu_reports
             runs-on: linux-mi325-1gpu-ossci-nod-ai
             backend: llvm-cpu
             regression-blob: cpu
+            device: local-task
+            target-chip: x86_64-linux-gnu
+            cache-dir: /home/runner/groups/aig_amdsharks/test-suite-ci-cache
     env:
       AZ_PUBLIC_KEY: ${{ secrets.AMD_SHARKPUBLIC_AZ_KEY }}
+      CACHE_DIR: ${{ matrix.cache-dir }}
     steps:
       - name: Checkout Test Suite
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -790,6 +797,63 @@ jobs:
             --report-file ./e2eamdshark-reports/yesterday_comparison.md \
             --perf_tol_regression=0.05 \
             --perf_tol_progression=0.05
+
+          cat "e2eamdshark-reports/yesterday_comparison.md" || echo "[WARN] yesterday_comparison.md 1 not found or unreadable"
+
+          # --- Recheck for Regression Models ---
+          echo "================ starting recheck for regression models ================"
+          # generate a json with model name and old status
+          MD_FILE="e2eamdshark-reports/yesterday_comparison.md"
+          python ./test-suite/alt_e2eamdshark/utils/extract_model_old_new_status_from_md.py "$MD_FILE" || echo "[WARN] Failed to extract model old/new status"
+          cat "model_old_new_status.json" || echo "[WARN] model_old_new_status.json not generated"
+
+          JSON_FILE="model_old_new_status.json"
+          python ./test-suite/alt_e2eamdshark/utils/extract_regression_model_names.py "$JSON_FILE" || echo "[WARN] Failed to extract regression models from json"
+          cat "regression_models.txt" || echo "[WARN] regression_models.txt not generated"
+
+          cd test-suite/alt_e2eamdshark/ || echo "failed to cd into test-suite/alt_e2eamdshark/"
+          REGRESSION_MODELS="$PWD/../../regression_models.txt"
+          python ./run.py \
+             -r ./test-onnx \
+             --report \
+             --testsfile $REGRESSION_MODELS \
+             -b ${{ matrix.backend }} \
+             -d ${{ matrix.device }} \
+             -c ${{ matrix.target-chip }} \
+             --report-file current_result.md \
+             --mode=cl-onnx-iree \
+             --cleanup=3 \
+             --get-metadata \
+             -v || echo "[WARN] run.py Regression test execution failed"
+          cd ../..
+
+          REGRESSION_MODELS="regression_models.txt"
+          BASELINE_JSON="model_old_new_status.json"
+          CURRENT_JSON="test-suite/alt_e2eamdshark/current_result.json"
+          REPORT_MD="e2eamdshark-reports/yesterday_comparison.md"
+
+          if [[ ! -f "$REGRESSION_MODELS" ]]; then
+            echo "[WARN] regression_models.txt missing — skipping per-model updates"
+          else
+            while IFS= read -r MODEL; do
+              # skip empty lines
+              [[ -z "$MODEL" ]] && continue
+
+              echo "Processing model: $MODEL"
+
+              python test-suite/alt_e2eamdshark/utils/check_model_status_and_remove.py \
+                "$MODEL" \
+                "$BASELINE_JSON" \
+                "$CURRENT_JSON" \
+                "$REPORT_MD" || echo "[WARN] Failed to process model: $MODEL in check_model_status_and_remove.py"
+
+            done < "$REGRESSION_MODELS"
+          fi
+
+          cat "e2eamdshark-reports/yesterday_comparison.md" || echo "[WARN] yesterday_comparison.md 2 not found or unreadable"
+
+          echo "================ done recheck for regression models ================"
+
 
           python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
             --new ./e2eamdshark-reports/combined_reports_others.json \

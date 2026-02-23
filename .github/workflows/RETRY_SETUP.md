@@ -6,9 +6,9 @@ Added automatic retry logic to handle transient failures in the HF Top-1000 mode
 
 ## What Was Changed
 
-### Modified Workflow: `test_e2e_hf_top_1000.yml`
+### Modified Workflows
 
-Two critical steps now have automatic retry:
+Retry logic has been added to all network-dependent steps across all workflows. Key examples:
 
 #### 1. Setup Python Virtual Environment (Lines 201-220)
 ```yaml
@@ -69,26 +69,13 @@ This ensures that real issues are still caught and the job fails appropriately.
 
 ## Testing the Retry Mechanism
 
-The demo workflow will run automatically on:
-- **Pull requests** to `main` or `update_*` branches (when workflow files or markdown are changed)
-- **Manual trigger** via workflow_dispatch
+To verify retry functionality is working:
 
-### Manual trigger:
-```bash
-# Trigger the example workflow
-gh workflow run example_retry_demo.yml --repo nod-ai/AMD-SHARK-TestSuite
+1. **Monitor workflow runs** for warning annotations in step logs
+2. **Check step duration** - steps that take ~2x normal time likely retried
+3. **Review logs** for retry messages like "::warning::Setup venv failed, retrying..."
 
-# Watch the results
-gh run watch
-```
-
-### Via Pull Request:
-The demo will automatically run when you create a PR that modifies workflow files or markdown files.
-
-The demo includes:
-- **Job 1**: No retry (50% chance of failure)
-- **Job 2**: With retry (will succeed after retry)
-- **Job 3**: Realistic Python venv setup simulation
+See [RETRY_BEHAVIOR_TEST.md](./RETRY_BEHAVIOR_TEST.md) for detailed testing scenarios.
 
 ## Limitations
 

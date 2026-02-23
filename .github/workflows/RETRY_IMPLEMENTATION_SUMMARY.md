@@ -207,18 +207,6 @@ Added comprehensive retry logic to all network-dependent steps across all GitHub
    - GitHub shows warnings as yellow annotations
    - Click on step to see full logs with retry messages
 
-### Demo Workflow
-
-Run the example retry demo to see retry in action:
-```bash
-gh workflow run example_retry_demo.yml
-```
-
-The demo includes:
-- Job that fails without retry
-- Job that succeeds with retry after initial failure
-- Job that fails all retry attempts (to show failure behavior)
-
 ## Migration Notes
 
 ### Before (without retry):
@@ -292,7 +280,6 @@ The demo includes:
 - [RETRY_SETUP.md](./RETRY_SETUP.md) - Initial retry setup guide
 - [RETRY_VISIBILITY.md](./RETRY_VISIBILITY.md) - Understanding retry visibility
 - [RETRY_BEHAVIOR_TEST.md](./RETRY_BEHAVIOR_TEST.md) - Testing retry behavior
-- [example_retry_demo.yml](./example_retry_demo.yml) - Demo workflow
 
 ## Commit History
 

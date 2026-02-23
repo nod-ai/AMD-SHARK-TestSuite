@@ -176,23 +176,13 @@ This means:
 - If steps take unusually long → Check if retries are happening
 - If failures persist after retry → Need to fix underlying issue
 
-## Testing Retry Visibility
+## Verifying Retry Behavior
 
-Run the demo workflow to see this in action:
+To see retry behavior in action:
 
-```bash
-# Trigger demo workflow
-gh workflow run example_retry_demo.yml --repo nod-ai/AMD-SHARK-TestSuite
-
-# Watch the run
-gh run watch
-```
-
-The demo will:
-1. Fail a step intentionally on first attempt
-2. Show `::warning::` annotation when retry occurs
-3. Succeed on second attempt
-4. Display as ✅ in UI (but with warning visible in logs)
+1. **Monitor actual workflow runs** for retry warnings
+2. **Check step logs** when jobs succeed after taking longer than usual
+3. **Look for warning annotations** in the GitHub Actions UI
 
 ## Key Takeaways
 

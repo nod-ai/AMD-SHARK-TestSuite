@@ -353,18 +353,25 @@ jobs:
           path: test-suite
 
       - name: "Setup alt e2eamdshark python venv"
-        run: |
-          rm -rf ${ALT_E2E_VENV_DIR}
-          sudo apt update
-          sudo apt install wget
-          python -m venv ${ALT_E2E_VENV_DIR}
-          source ${ALT_E2E_VENV_DIR}/bin/activate
-          pip install --upgrade pip
-          pip install -r ./alt_e2eamdshark/base_requirements.txt
-          pip install -r ./alt_e2eamdshark/iree_requirements.txt
-          pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
-          pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
-        working-directory: ./test-suite
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          on_retry_command: echo "::warning::Setup venv failed, retrying..."
+          command: |
+            cd ./test-suite
+            rm -rf ${ALT_E2E_VENV_DIR}
+            sudo apt update
+            sudo apt install wget
+            python -m venv ${ALT_E2E_VENV_DIR}
+            source ${ALT_E2E_VENV_DIR}/bin/activate
+            pip install --upgrade pip
+            pip install -r ./alt_e2eamdshark/base_requirements.txt
+            pip install -r ./alt_e2eamdshark/iree_requirements.txt
+            pip install --no-deps -r ./alt_e2eamdshark/torch_mlir_requirements.txt
+            pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
 
       #- name: "Setup IREE EP python venv"
       #  run: |
@@ -381,73 +388,94 @@ jobs:
 
       - name: Run Onnx Bench Mode
         if: contains(matrix.test-file, 'migraphx')
-        run: |
-          source ${ALT_E2E_VENV_DIR}/bin/activate
-          pip freeze
-          cd alt_e2eamdshark
-          free -mh
-          python ./run.py \
-            -r ./test-onnx \
-            --report \
-            --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
-            -b ${{ matrix.backend }} \
-            -d ${{ matrix.device }} \
-            -c ${{ matrix.target-chip }} \
-            --report-file reports/${{ matrix.test-file }}.md \
-            --mode=cl-onnx-iree \
-            --cleanup=3 \
-            --benchmark \
-            --get-metadata \
-            -v
-          python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
-        working-directory: ./test-suite
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 120
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          on_retry_command: echo "::warning::Onnx bench mode failed, retrying..."
+          command: |
+            cd ./test-suite
+            source ${ALT_E2E_VENV_DIR}/bin/activate
+            pip freeze
+            cd alt_e2eamdshark
+            free -mh
+            python ./run.py \
+              -r ./test-onnx \
+              --report \
+              --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
+              -b ${{ matrix.backend }} \
+              -d ${{ matrix.device }} \
+              -c ${{ matrix.target-chip }} \
+              --report-file reports/${{ matrix.test-file }}.md \
+              --mode=cl-onnx-iree \
+              --cleanup=3 \
+              --benchmark \
+              --get-metadata \
+              -v
+            python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
 
       - name: Run Onnx Default Mode
         if: ${{ ! contains(matrix.test-file, 'migraphx') && ! contains(matrix.test-file, 'onnxrt-iree-ep') }}
-        run: |
-          source ${ALT_E2E_VENV_DIR}/bin/activate
-          pip freeze
-          cd alt_e2eamdshark
-          free -mh
-          python ./run.py \
-            -r ./test-onnx \
-            --report \
-            --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
-            -b ${{ matrix.backend }} \
-            -d ${{ matrix.device }} \
-            -c ${{ matrix.target-chip }} \
-            --report-file reports/${{ matrix.test-file }}.md \
-            --mode=cl-onnx-iree \
-            --cleanup=3 \
-            --get-metadata \
-            -v
-          python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
-        working-directory: ./test-suite
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 120
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          on_retry_command: echo "::warning::Onnx default mode failed, retrying..."
+          command: |
+            cd ./test-suite
+            source ${ALT_E2E_VENV_DIR}/bin/activate
+            pip freeze
+            cd alt_e2eamdshark
+            free -mh
+            python ./run.py \
+              -r ./test-onnx \
+              --report \
+              --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
+              -b ${{ matrix.backend }} \
+              -d ${{ matrix.device }} \
+              -c ${{ matrix.target-chip }} \
+              --report-file reports/${{ matrix.test-file }}.md \
+              --mode=cl-onnx-iree \
+              --cleanup=3 \
+              --get-metadata \
+              -v
+            python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
 
       - name: Run OnnxRT IREE EP
         if: contains(matrix.test-file, 'onnxrt-iree-ep')
-        run: |
-          source ${EP_VENV_DIR}/bin/activate
-          export COMPILER_PATH=$(python -c "import iree.compiler as _; print(_.__path__[0])")
-          export LD_LIBRARY_PATH="$COMPILER_PATH/_mlir_libs/"
-          echo "COMPILER_PATH=$COMPILER_PATH" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
-          pip freeze
-          cd alt_e2eamdshark
-          free -mh
-          python ./run.py -m ort-ep \
-            -r ./test-onnx \
-            --report \
-            --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
-            -b ${{ matrix.backend }} \
-            -d ${{ matrix.device }} \
-            -c ${{ matrix.target-chip }} \
-            --report-file reports/${{ matrix.test-file }}.md \
-            --cleanup=3 \
-            --get-metadata \
-            -v
-          python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
-        working-directory: ./test-suite
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 120
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          on_retry_command: echo "::warning::OnnxRT IREE EP failed, retrying..."
+          command: |
+            cd ./test-suite
+            source ${EP_VENV_DIR}/bin/activate
+            export COMPILER_PATH=$(python -c "import iree.compiler as _; print(_.__path__[0])")
+            export LD_LIBRARY_PATH="$COMPILER_PATH/_mlir_libs/"
+            echo "COMPILER_PATH=$COMPILER_PATH" >> $GITHUB_ENV
+            echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
+            pip freeze
+            cd alt_e2eamdshark
+            free -mh
+            python ./run.py -m ort-ep \
+              -r ./test-onnx \
+              --report \
+              --testsfile onnx_tests/models/external_lists/${{ matrix.test-file }}.txt \
+              -b ${{ matrix.backend }} \
+              -d ${{ matrix.device }} \
+              -c ${{ matrix.target-chip }} \
+              --report-file reports/${{ matrix.test-file }}.md \
+              --cleanup=3 \
+              --get-metadata \
+              -v
+            python utils/find_duplicate_models.py -s -r ./test-onnx -o reports/duplicates.json
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -508,16 +536,23 @@ jobs:
         with:
           python-version: "3.11"
       - name: "Setup alt test suite venv"
-        run: |
-          sudo apt update
-          sudo apt install wget
-          python -m venv report_venv_alt
-          source report_venv_alt/bin/activate
-          pip install --upgrade pip
-          pip install -r ./test-suite/alt_e2eamdshark/base_requirements.txt
-          pip install -r ./test-suite/alt_e2eamdshark/iree_requirements.txt
-          pip install --no-deps -r ./test-suite/alt_e2eamdshark/torch_mlir_requirements.txt
-          pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          on_retry_command: echo "::warning::Setup alt test suite venv failed, retrying..."
+          command: |
+            sudo apt update
+            sudo apt install wget
+            python -m venv report_venv_alt
+            source report_venv_alt/bin/activate
+            pip install --upgrade pip
+            pip install -r ./test-suite/alt_e2eamdshark/base_requirements.txt
+            pip install -r ./test-suite/alt_e2eamdshark/iree_requirements.txt
+            pip install --no-deps -r ./test-suite/alt_e2eamdshark/torch_mlir_requirements.txt
+            pip install --pre --upgrade iree-base-compiler iree-base-runtime -f https://iree.dev/pip-release-links.html
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ci_reports_${{ matrix.backend }}_amdshark-test-suite_others_onnx_md
@@ -781,91 +816,98 @@ jobs:
         working-directory: ./e2eamdshark-reports
 
       - name: Regression Reports
-        run: |
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-          source report_venv_alt/bin/activate
-          cd test-suite
-          mkdir latest
-          mkdir baseline
-          wget https://amdsharkpublic.blob.core.windows.net/ciartifacts/latest-test-suite/combined_reports_others_${{ matrix.backend }}.json -O latest/combined_reports_others_${{ matrix.backend }}.json
-          wget https://amdsharkpublic.blob.core.windows.net/ciartifacts/baseline-test-suite/combined_reports_others_${{ matrix.regression-blob }}.json -O baseline/combined_reports_others_${{ matrix.backend }}.json
-          cd ..
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 2
+          retry_on: error
+          shell: bash
+          on_retry_command: echo "::warning::Regression reports failed, retrying..."
+          command: |
+            curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            source report_venv_alt/bin/activate
+            cd test-suite
+            mkdir latest
+            mkdir baseline
+            wget https://amdsharkpublic.blob.core.windows.net/ciartifacts/latest-test-suite/combined_reports_others_${{ matrix.backend }}.json -O latest/combined_reports_others_${{ matrix.backend }}.json
+            wget https://amdsharkpublic.blob.core.windows.net/ciartifacts/baseline-test-suite/combined_reports_others_${{ matrix.regression-blob }}.json -O baseline/combined_reports_others_${{ matrix.backend }}.json
+            cd ..
 
-          python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
-            --new ./e2eamdshark-reports/combined_reports_others.json \
-            --old ./test-suite/latest/combined_reports_others_${{ matrix.backend }}.json \
-            --report-file ./e2eamdshark-reports/yesterday_comparison.md \
-            --perf_tol_regression=0.05 \
-            --perf_tol_progression=0.05
+            python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
+              --new ./e2eamdshark-reports/combined_reports_others.json \
+              --old ./test-suite/latest/combined_reports_others_${{ matrix.backend }}.json \
+              --report-file ./e2eamdshark-reports/yesterday_comparison.md \
+              --perf_tol_regression=0.05 \
+              --perf_tol_progression=0.05
 
-          cat "e2eamdshark-reports/yesterday_comparison.md" || echo "[WARN] yesterday_comparison.md 1 not found or unreadable"
+            cat "e2eamdshark-reports/yesterday_comparison.md" || echo "[WARN] yesterday_comparison.md 1 not found or unreadable"
 
-          # --- Recheck for Regression Models ---
-          echo "================ starting recheck for regression models ================"
-          # generate a json with model name and old status
-          MD_FILE="e2eamdshark-reports/yesterday_comparison.md"
-          python ./test-suite/alt_e2eamdshark/utils/extract_model_old_new_status_from_md.py "$MD_FILE" || echo "[WARN] Failed to extract model old/new status"
-          cat "model_old_new_status.json" || echo "[WARN] model_old_new_status.json not generated"
+            # --- Recheck for Regression Models ---
+            echo "================ starting recheck for regression models ================"
+            # generate a json with model name and old status
+            MD_FILE="e2eamdshark-reports/yesterday_comparison.md"
+            python ./test-suite/alt_e2eamdshark/utils/extract_model_old_new_status_from_md.py "$MD_FILE" || echo "[WARN] Failed to extract model old/new status"
+            cat "model_old_new_status.json" || echo "[WARN] model_old_new_status.json not generated"
 
-          JSON_FILE="model_old_new_status.json"
-          python ./test-suite/alt_e2eamdshark/utils/extract_regression_model_names.py "$JSON_FILE" || echo "[WARN] Failed to extract regression models from json"
-          cat "regression_models.txt" || echo "[WARN] regression_models.txt not generated"
+            JSON_FILE="model_old_new_status.json"
+            python ./test-suite/alt_e2eamdshark/utils/extract_regression_model_names.py "$JSON_FILE" || echo "[WARN] Failed to extract regression models from json"
+            cat "regression_models.txt" || echo "[WARN] regression_models.txt not generated"
 
-          cd test-suite/alt_e2eamdshark/ || echo "failed to cd into test-suite/alt_e2eamdshark/"
-          REGRESSION_MODELS="$PWD/../../regression_models.txt"
-          python ./run.py \
-             -r ./test-onnx \
-             --report \
-             --testsfile $REGRESSION_MODELS \
-             -b ${{ matrix.backend }} \
-             -d ${{ matrix.device }} \
-             -c ${{ matrix.target-chip }} \
-             --report-file current_result.md \
-             --mode=cl-onnx-iree \
-             --cleanup=3 \
-             --get-metadata \
-             -v || echo "[WARN] run.py Regression test execution failed"
-          cd ../..
+            cd test-suite/alt_e2eamdshark/ || echo "failed to cd into test-suite/alt_e2eamdshark/"
+            REGRESSION_MODELS="$PWD/../../regression_models.txt"
+            python ./run.py \
+               -r ./test-onnx \
+               --report \
+               --testsfile $REGRESSION_MODELS \
+               -b ${{ matrix.backend }} \
+               -d ${{ matrix.device }} \
+               -c ${{ matrix.target-chip }} \
+               --report-file current_result.md \
+               --mode=cl-onnx-iree \
+               --cleanup=3 \
+               --get-metadata \
+               -v || echo "[WARN] run.py Regression test execution failed"
+            cd ../..
 
-          REGRESSION_MODELS="regression_models.txt"
-          BASELINE_JSON="model_old_new_status.json"
-          CURRENT_JSON="test-suite/alt_e2eamdshark/current_result.json"
-          REPORT_MD="e2eamdshark-reports/yesterday_comparison.md"
+            REGRESSION_MODELS="regression_models.txt"
+            BASELINE_JSON="model_old_new_status.json"
+            CURRENT_JSON="test-suite/alt_e2eamdshark/current_result.json"
+            REPORT_MD="e2eamdshark-reports/yesterday_comparison.md"
 
-          if [[ ! -f "$REGRESSION_MODELS" ]]; then
-            echo "[WARN] regression_models.txt missing — skipping per-model updates"
-          else
-            while IFS= read -r MODEL; do
-              # skip empty lines
-              [[ -z "$MODEL" ]] && continue
+            if [[ ! -f "$REGRESSION_MODELS" ]]; then
+              echo "[WARN] regression_models.txt missing — skipping per-model updates"
+            else
+              while IFS= read -r MODEL; do
+                # skip empty lines
+                [[ -z "$MODEL" ]] && continue
 
-              echo "Processing model: $MODEL"
+                echo "Processing model: $MODEL"
 
-              python test-suite/alt_e2eamdshark/utils/check_model_status_and_remove.py \
-                "$MODEL" \
-                "$BASELINE_JSON" \
-                "$CURRENT_JSON" \
-                "$REPORT_MD" || echo "[WARN] Failed to process model: $MODEL in check_model_status_and_remove.py"
+                python test-suite/alt_e2eamdshark/utils/check_model_status_and_remove.py \
+                  "$MODEL" \
+                  "$BASELINE_JSON" \
+                  "$CURRENT_JSON" \
+                  "$REPORT_MD" || echo "[WARN] Failed to process model: $MODEL in check_model_status_and_remove.py"
 
-            done < "$REGRESSION_MODELS"
-          fi
+              done < "$REGRESSION_MODELS"
+            fi
 
-          cat "e2eamdshark-reports/yesterday_comparison.md" || echo "[WARN] yesterday_comparison.md 2 not found or unreadable"
+            cat "e2eamdshark-reports/yesterday_comparison.md" || echo "[WARN] yesterday_comparison.md 2 not found or unreadable"
 
-          echo "================ done recheck for regression models ================"
+            echo "================ done recheck for regression models ================"
 
 
-          python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
-            --new ./e2eamdshark-reports/combined_reports_others.json \
-            --old ./test-suite/baseline/combined_reports_others_${{ matrix.backend }}.json \
-            --report-file ./e2eamdshark-reports/baseline_comparison.md \
-            --perf_tol_regression=0.1 \
-            --perf_tol_progression=0.1
+            python ./test-suite/alt_e2eamdshark/utils/check_regressions.py \
+              --new ./e2eamdshark-reports/combined_reports_others.json \
+              --old ./test-suite/baseline/combined_reports_others_${{ matrix.backend }}.json \
+              --report-file ./e2eamdshark-reports/baseline_comparison.md \
+              --perf_tol_regression=0.1 \
+              --perf_tol_progression=0.1
 
-          az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
-            --name latest-test-suite/combined_reports_others_${{ matrix.backend }}.json \
-            --file ./e2eamdshark-reports/combined_reports_others.json \
-            --account-key ${AZ_PUBLIC_KEY} --overwrite
+            az storage blob upload --account-name amdsharkpublic --container-name ciartifacts \
+              --name latest-test-suite/combined_reports_others_${{ matrix.backend }}.json \
+              --file ./e2eamdshark-reports/combined_reports_others.json \
+              --account-key ${AZ_PUBLIC_KEY} --overwrite
 
       - name: Push regression artifacts
         run: |

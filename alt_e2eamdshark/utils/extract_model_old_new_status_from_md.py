@@ -18,11 +18,11 @@ if re.search(r"##\s+No\s+Regression[s]?\s+Found", text, re.IGNORECASE):
     sys.exit(0)
 
 match = re.search(
-    r"##\s+.+?\s+Regression[s]?\s+Found:\s*\n+"
+    r"##\s+.+?\s+Regression[s]?\s+Found:?\s*\n+"
     r"(.*?)"
-    r"\n##\s+(?:No|.+?)\s+Progression[s]?\s+Found:",
+    r"\n##\s+(?:No|.+?)\s+Progression[s]?\s+Found:?",
     text,
-    re.DOTALL | re.IGNORECASE,
+    re.DOTALL,
 )
 
 if not match:

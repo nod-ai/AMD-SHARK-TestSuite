@@ -16,8 +16,15 @@ jobs:
         fetch-depth: 0
     - uses: actions/setup-python@v5
     - name: Install pre-commit
-      run: |
-        pip install pre-commit
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 10
+        max_attempts: 3
+        retry_on: error
+        shell: bash
+        on_retry_command: echo "::warning::Pre-commit installation failed, retrying..."
+        command: |
+          pip install pre-commit
     - name: Run pre-commit on changed files
       # Use the base and head SHAs from the pull request event context
       run: |

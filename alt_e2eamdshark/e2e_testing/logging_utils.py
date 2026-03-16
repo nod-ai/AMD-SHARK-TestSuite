@@ -9,6 +9,7 @@ from pathlib import Path
 import traceback
 import shutil
 import subprocess
+import time
 from e2e_testing.framework import result_comparison
 
 from typing import List, Dict
@@ -25,15 +26,52 @@ def run_command_and_log(command: List[str], save_to: str, stage_name: str) -> No
     # log the command
     commands_log = commands_dir / f"{stage_name}.commands.log"
     commands_log.write_text(script)
+
+    # Log start time and command for verbose output
+    start_time = time.time()
+    timeout_seconds = 600  # Increased from 100 to 600 seconds (10 minutes)
+    print(f"[{stage_name}] Starting command (timeout={timeout_seconds}s)...")
+
     # run the command
-    ret = subprocess.run(script, shell=True, capture_output=True, timeout=100)
-    # if an error occured, log stderr and raise exception
-    if ret.returncode != 0:
+    try:
+        ret = subprocess.run(script, shell=True, capture_output=True, timeout=timeout_seconds)
+        elapsed_time = time.time() - start_time
+        print(f"[{stage_name}] Completed in {elapsed_time:.2f}s")
+
+        # Log timing information
+        timing_log = commands_dir / f"{stage_name}.timing.log"
+        timing_log.write_text(f"Execution time: {elapsed_time:.2f}s\nTimeout limit: {timeout_seconds}s\n")
+
+    except subprocess.TimeoutExpired as e:
+        elapsed_time = time.time() - start_time
+        print(f"[{stage_name}] TIMEOUT after {elapsed_time:.2f}s (limit: {timeout_seconds}s)")
+        # Log timeout details
         detail_dir = Path(save_to) / "detail"
         detail_dir.mkdir(exist_ok=True)
         detail_log = detail_dir / f"{stage_name}.detail.log"
-        detail_log.write_text(ret.stderr.decode())
-        error_msg = f"failure executing command:\n{script}"
+        timeout_msg = f"subprocess.TimeoutExpired: Command exceeded {timeout_seconds}s timeout\n"
+        timeout_msg += f"Actual execution time: {elapsed_time:.2f}s\n"
+        timeout_msg += f"Command: {script}\n"
+        if e.stdout:
+            timeout_msg += f"\n--- STDOUT ---\n{e.stdout.decode()}\n"
+        if e.stderr:
+            timeout_msg += f"\n--- STDERR ---\n{e.stderr.decode()}\n"
+        detail_log.write_text(timeout_msg)
+        raise RuntimeError(f"Timeout after {elapsed_time:.2f}s (limit: {timeout_seconds}s): {script}")
+
+    # if an error occured, log stderr and raise exception
+    if ret.returncode != 0:
+        elapsed_time = time.time() - start_time
+        print(f"[{stage_name}] FAILED with exit code {ret.returncode} after {elapsed_time:.2f}s")
+        detail_dir = Path(save_to) / "detail"
+        detail_dir.mkdir(exist_ok=True)
+        detail_log = detail_dir / f"{stage_name}.detail.log"
+        error_content = f"Exit code: {ret.returncode}\nExecution time: {elapsed_time:.2f}s\n\n--- STDERR ---\n{ret.stderr.decode()}"
+        if ret.stdout:
+            error_content += f"\n\n--- STDOUT ---\n{ret.stdout.decode()}"
+        detail_log.write_text(error_content)
+        error_msg = f"failure executing command:\n{script}\n"
+        error_msg += f"Exit code: {ret.returncode}\n"
         error_msg += f"Error detail in '{detail_log}'"
         raise RuntimeError(error_msg)
 

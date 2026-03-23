@@ -226,11 +226,10 @@ class HfDownloadableModel(OnnxModelInfo):
                         found_models.append(os.path.abspath(os.path.join(root, name)))
             return found_models
 
-        print(f"Checking cache directory: {self.cache_dir}")
+        print(f"Checking for model in local directory: {model_dir}")
         found_models = find_models(model_dir)
 
         if len(found_models) == 0:
-            print(f"Model not found in cache, proceeding to export for {self.name}")
             try:
                 self.export_model()
             except:
@@ -238,7 +237,7 @@ class HfDownloadableModel(OnnxModelInfo):
 
             found_models = find_models(model_dir)
         else:
-            print(f"Found model in cache: {found_models[0]}")
+            print(f"Found model locally: {found_models[0]}")
         if len(found_models) == 1:
             self.model = found_models[0]
             return

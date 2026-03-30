@@ -4,7 +4,7 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-import os, sys, argparse, shutil, zipfile
+import os, sys, argparse, shutil, zipfile, time
 from azure.storage.blob import ContainerClient
 from azure.core.exceptions import ResourceNotFoundError
 from pathlib import Path
@@ -35,10 +35,14 @@ def pre_test_onnx_model_azure_download(name, cache_dir, model_path):
     # skip unzipping such model files, only extract existing models
     if os.path.exists(dest_file):
         # Unzip the model in the model test dir
+        start_time = time.time()
         with ZipFile(dest_file, "r") as zf:
             # onnx/model/testname already present in the zip file structure
             zf.extractall(model_dir)
-            print(f"Unzipping succeded. Look for extracted contents in {model_dir}")
+        unzip_time = time.time() - start_time
+        print(
+            f"Unzipping succeeded in {unzip_time:.2f} seconds. Look for extracted contents in {model_dir}"
+        )
     else:
         print(f"Failed: path {dest_file} does not exist!")
 
@@ -61,16 +65,23 @@ def download_and_setup_onnxmodel(cache_dir, name):
 
     blob_name = os.path.join(blob_dir, "model.onnx.zip")
     dest_file = os.path.join(cache_dir, "model.onnx.zip")
+    print(f"Checking cache directory: {cache_dir}")
     if os.path.exists(dest_file):
         # model already in cache dir, skip download.
         # TODO: skip model downloading based on some comparison / update flag
+        print(f"Found model in cache: {dest_file}")
         return
     # TODO: better organisation of models in tank and cache
-    print(f"Begin download for {blob_name} to {dest_file}")
+    print(
+        f"Model not found in cache, proceeding to download from {blob_name} to {dest_file}"
+    )
 
     try_private = False
+    start_time = time.time()
     try:
         download_azure_blob(account_url, container_name, blob_name, dest_file)
+        download_time = time.time() - start_time
+        print(f"Download completed in {download_time:.2f} seconds")
     except Exception as e:
         try_private = True
         print(
@@ -79,10 +90,13 @@ def download_and_setup_onnxmodel(cache_dir, name):
 
     if try_private:
         print("Trying download from private storage")
+        start_time = time.time()
         try:
             download_azure_blob(
                 priv_account_url, priv_container_name, blob_name, dest_file
             )
+            download_time = time.time() - start_time
+            print(f"Download completed in {download_time:.2f} seconds")
         except Exception as e:
             print(f"Unable to download model for {name}.\nError - {type(e).__name__}")
 

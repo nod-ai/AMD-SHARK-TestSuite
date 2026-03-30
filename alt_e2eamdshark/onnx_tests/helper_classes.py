@@ -9,6 +9,7 @@ import tarfile
 import shutil
 import yaml
 import os
+import time
 
 from typing import List, Optional
 
@@ -87,7 +88,9 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
                 ][dim_param]
 
     def download_model_artifacts(self):
+        print(f"Checking cache directory: {self.cache_dir}")
         try:
+            start_time = time.time()
             self.yml_path = hf_hub_download(
                 repo_id=self.hf_model_repository,
                 filename="turnkey_stats.yaml",
@@ -98,6 +101,11 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
                 filename=f"{self.model_name}.onnx",
                 cache_dir=self.cache_dir,
             )
+            download_time = time.time() - start_time
+            if os.path.exists(self.model_path):
+                print(
+                    f"Model artifacts loaded/downloaded in {download_time:.2f} seconds"
+                )
         except Exception as e:
             logger.error(f"{e}")
             raise
@@ -117,14 +125,21 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
                         found_models.append(os.path.abspath(os.path.join(root, name)))
             return found_models
 
+        print(f"Checking for model in directory: {model_dir}")
         found_models = find_models(model_dir)
 
         if len(found_models) == 0:
+            print(f"Model not found locally, copying from cache for {self.name}")
             try:
+                start_time = time.time()
                 self.get_model_files_from_cache()
+                copy_time = time.time() - start_time
+                print(f"Model files copied from cache in {copy_time:.2f} seconds")
             except Exception:
                 raise
             found_models = find_models(model_dir)
+        else:
+            print(f"Found model locally: {found_models[0]}")
 
         if len(found_models) == 1:
             self.model = found_models[0]
@@ -181,6 +196,8 @@ class HfDownloadableModel(OnnxModelInfo):
                 "Please install through `pip install optimum[exporters]`."
             )
 
+        print(f"Exporting model from HuggingFace: {self.model_repo_path}")
+        start_time = time.time()
         main_export(
             self.model_repo_path,
             output=model_dir,
@@ -191,6 +208,8 @@ class HfDownloadableModel(OnnxModelInfo):
             framework="pt",
             optimize=optim_level,
         )
+        export_time = time.time() - start_time
+        print(f"Model export completed in {export_time:.2f} seconds")
 
     def __repr__(self):
         cls = self.__class__.__name__
@@ -209,6 +228,7 @@ class HfDownloadableModel(OnnxModelInfo):
                         found_models.append(os.path.abspath(os.path.join(root, name)))
             return found_models
 
+        print(f"Checking for model in local directory: {model_dir}")
         found_models = find_models(model_dir)
 
         if len(found_models) == 0:
@@ -218,6 +238,8 @@ class HfDownloadableModel(OnnxModelInfo):
                 raise RuntimeError("Failed to Export class: ", self)
 
             found_models = find_models(model_dir)
+        else:
+            print(f"Found model locally: {found_models[0]}")
         if len(found_models) == 1:
             self.model = found_models[0]
             return
@@ -348,15 +370,21 @@ class OnnxModelZooDownloadableModel(OnnxModelInfo):
         )
 
         # no model and cache doesn't exist: download files to cache
+        print(f"Checking cache directory: {self.cache_dir}")
         if not os.path.exists(cache_file):
-            print(f"Begin download for {self.name}")
+            print(f"Model not found in cache, proceeding to download for {self.name}")
+            start_time = time.time()
             content = requests.get(self.model_url, stream=True).content
+            download_time = time.time() - start_time
             if content is None or len(content) == 0:
                 raise ValueError(
                     f"Contents downloaded from {self.model_url} are invalid. This is likely an invalid URL."
                 )
             with open(cache_file, "wb") as model_out_file:
                 model_out_file.write(content)
+            print(f"Download completed in {download_time:.2f} seconds")
+        else:
+            print(f"Found model in cache: {cache_file}")
 
         if self.is_validated:
             self.unzip_model_archive(cache_file)
@@ -411,13 +439,19 @@ class AzureDownloadableModel(OnnxModelInfo):
                         found_models.append(os.path.abspath(os.path.join(root, name)))
             return found_models
 
+        print(f"Checking for model in directory: {model_dir}")
         found_models = find_models(model_dir)
 
         if len(found_models) == 0:
+            print(
+                f"Model not found locally, checking cache and downloading if needed for {self.name}"
+            )
             azutils.pre_test_onnx_model_azure_download(
                 self.name, self.cache_dir, self.model
             )
             found_models = find_models(model_dir)
+        else:
+            print(f"Found model locally: {found_models[0]}")
         if len(found_models) == 1:
             self.model = found_models[0]
             return

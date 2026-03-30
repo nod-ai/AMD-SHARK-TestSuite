@@ -244,7 +244,10 @@ def run_tests(
                     save_dict(metadata, metadata_file)
                 stage_timings[curr_stage] = time.time() - stage_start
                 if verbose:
-                    print(f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s" + " " * 20)
+                    print(
+                        f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s"
+                        + " " * 20
+                    )
 
             artifact_save_to = None if no_artifacts else log_dir
             # generate mlir from the instance using the config
@@ -259,7 +262,10 @@ def run_tests(
                 )
                 stage_timings[curr_stage] = time.time() - stage_start
                 if verbose:
-                    print(f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s" + " " * 20)
+                    print(
+                        f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s"
+                        + " " * 20
+                    )
 
             # apply config-specific preprocessing to the ModelArtifact
             curr_stage = "preprocessing"
@@ -271,7 +277,10 @@ def run_tests(
                 )
                 stage_timings[curr_stage] = time.time() - stage_start
                 if verbose:
-                    print(f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s" + " " * 20)
+                    print(
+                        f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s"
+                        + " " * 20
+                    )
 
             # compile mlir_module using config (calls backend compile)
             curr_stage = "compilation"
@@ -285,7 +294,10 @@ def run_tests(
                 )
                 stage_timings[curr_stage] = time.time() - stage_start
                 if verbose:
-                    print(f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s" + " " * 20)
+                    print(
+                        f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s"
+                        + " " * 20
+                    )
 
             # get inputs from inst
             curr_stage = "construct_inputs"
@@ -299,7 +311,10 @@ def run_tests(
                     inputs.save_to(log_dir, save_as_npy=dump_npys)
                 stage_timings[curr_stage] = time.time() - stage_start
                 if verbose:
-                    print(f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s" + " " * 20)
+                    print(
+                        f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s"
+                        + " " * 20
+                    )
 
             # run native inference
             curr_stage = "native_inference"
@@ -319,7 +334,10 @@ def run_tests(
                 )
                 stage_timings[curr_stage] = time.time() - stage_start
                 if verbose:
-                    print(f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s" + " " * 20)
+                    print(
+                        f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s"
+                        + " " * 20
+                    )
 
             # run inference with the compiled module
             curr_stage = "compiled_inference"
@@ -335,7 +353,10 @@ def run_tests(
                 outputs_raw.save_to(log_dir, base_stem="output", save_as_npy=dump_npys)
                 stage_timings[curr_stage] = time.time() - stage_start
                 if verbose:
-                    print(f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s" + " " * 20)
+                    print(
+                        f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s"
+                        + " " * 20
+                    )
 
             # apply model-specific post-processing:
             curr_stage = "postprocessing"
@@ -348,7 +369,10 @@ def run_tests(
                 inst.save_processed_output(outputs, log_dir, "output")
                 stage_timings[curr_stage] = time.time() - stage_start
                 if verbose:
-                    print(f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s" + " " * 20)
+                    print(
+                        f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s"
+                        + " " * 20
+                    )
 
         except Exception as e:
             status_dict[t.unique_name] = {
@@ -377,7 +401,10 @@ def run_tests(
                 )
                 stage_timings[curr_stage] = time.time() - stage_start
                 if verbose:
-                    print(f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s (mean inference: {mean_time_ms:.2f}ms)" + " " * 20)
+                    print(
+                        f"\tStage '{curr_stage}' completed in {stage_timings[curr_stage]:.2f}s (mean inference: {mean_time_ms:.2f}ms)"
+                        + " " * 20
+                    )
             except Exception as e:
                 # don't exit test because of a benchmarking failure
                 mean_time_ms = "ERROR"

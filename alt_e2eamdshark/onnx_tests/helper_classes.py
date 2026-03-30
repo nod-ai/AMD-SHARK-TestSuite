@@ -103,7 +103,9 @@ class HfOnnxModelZooNonLegacyModel(OnnxModelInfo):
             )
             download_time = time.time() - start_time
             if os.path.exists(self.model_path):
-                print(f"Model artifacts loaded/downloaded in {download_time:.2f} seconds")
+                print(
+                    f"Model artifacts loaded/downloaded in {download_time:.2f} seconds"
+                )
         except Exception as e:
             logger.error(f"{e}")
             raise
@@ -441,7 +443,9 @@ class AzureDownloadableModel(OnnxModelInfo):
         found_models = find_models(model_dir)
 
         if len(found_models) == 0:
-            print(f"Model not found locally, checking cache and downloading if needed for {self.name}")
+            print(
+                f"Model not found locally, checking cache and downloading if needed for {self.name}"
+            )
             azutils.pre_test_onnx_model_azure_download(
                 self.name, self.cache_dir, self.model
             )

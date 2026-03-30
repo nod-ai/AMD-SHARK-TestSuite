@@ -40,7 +40,9 @@ def pre_test_onnx_model_azure_download(name, cache_dir, model_path):
             # onnx/model/testname already present in the zip file structure
             zf.extractall(model_dir)
         unzip_time = time.time() - start_time
-        print(f"Unzipping succeeded in {unzip_time:.2f} seconds. Look for extracted contents in {model_dir}")
+        print(
+            f"Unzipping succeeded in {unzip_time:.2f} seconds. Look for extracted contents in {model_dir}"
+        )
     else:
         print(f"Failed: path {dest_file} does not exist!")
 
@@ -70,7 +72,9 @@ def download_and_setup_onnxmodel(cache_dir, name):
         print(f"Found model in cache: {dest_file}")
         return
     # TODO: better organisation of models in tank and cache
-    print(f"Model not found in cache, proceeding to download from {blob_name} to {dest_file}")
+    print(
+        f"Model not found in cache, proceeding to download from {blob_name} to {dest_file}"
+    )
 
     try_private = False
     start_time = time.time()

@@ -7,9 +7,9 @@
 name: E2EAMDSHARK Test Suite Duplicate models
 on:
   workflow_dispatch:
-  schedule:
-  # Runs at 6:30 AM PST on every Sunday
-   - cron: '30 13 * * 0'
+  # schedule:
+  # # Runs at 6:30 AM PST on every Sunday
+  #  - cron: '30 13 * * 0'
 
 jobs:
   e2eamdshark:
